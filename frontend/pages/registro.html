@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - SpeakLexi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        secondary: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7c3aed',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'bounce-in': 'bounceIn 0.6s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideIn: {
+                            '0%': { opacity: '0', transform: 'translateX(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        bounceIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.3)' },
+                            '50%': { opacity: '1', transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-secondary-600 to-primary-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-comments text-white text-sm"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-secondary-600 to-primary-600 bg-clip-text text-transparent">
+                            SpeakLexi
+                        </h1>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Botón Dark/Light -->
+                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
+                    </button>
+                    
+                    <div class="hidden md:flex space-x-4">
+                        <a href="index.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
+                            Inicio
+                        </a>
+                        <a href="login.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
+                            Iniciar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+        <div class="max-w-2xl w-full animate-fade-in">
+            <!-- Logo Header -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-r from-secondary-600 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-user-plus text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    Únete a SpeakLexi
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Crea tu cuenta y comienza tu aventura de aprendizaje
+                </p>
+            </div>
+
+            <!-- Register Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+                <!-- Progress Steps -->
+                <div class="flex items-center justify-center mb-8">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-gradient-to-r from-secondary-600 to-primary-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                            1
+                        </div>
+                        <div class="w-16 h-1 bg-gradient-to-r from-secondary-600 to-primary-600 mx-2"></div>
+                        <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm font-bold">
+                            2
+                        </div>
+                        <div class="w-16 h-1 bg-gray-300 dark:bg-gray-600 mx-2"></div>
+                        <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm font-bold">
+                            3
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alerta de error -->
+                <div id="error-alert" class="hidden mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg animate-slide-in">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mt-0.5"></i>
+                        <p id="error-message" class="text-sm text-red-800 dark:text-red-200"></p>
+                    </div>
+                </div>
+
+                <!-- Formulario -->
+                <form id="register-form" class="space-y-6">
+                    <!-- Grid para nombre y apellidos -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nombre <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                </div>
+                                <input
+                                    type="text"
+                                    id="nombre"
+                                    name="nombre"
+                                    required
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                    placeholder="Juan"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="primerApellido" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Primer Apellido <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                </div>
+                                <input
+                                    type="text"
+                                    id="primerApellido"
+                                    name="primerApellido"
+                                    required
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                    placeholder="Pérez"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="segundoApellido" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Segundo Apellido <span class="text-gray-400 text-sm">(opcional)</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input
+                                type="text"
+                                id="segundoApellido"
+                                name="segundoApellido"
+                                class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                placeholder="Martínez"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="correo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Correo Electrónico <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            <input
+                                type="email"
+                                id="correo"
+                                name="correo"
+                                required
+                                class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                placeholder="tu@email.com"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Contraseña <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-gray-400"></i>
+                                </div>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    required
+                                    minlength="8"
+                                    class="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                    placeholder="Mínimo 8 caracteres"
+                                />
+                                <button
+                                    type="button"
+                                    id="toggle-password"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                                >
+                                    <i id="eye-icon-1" class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                Mínimo 8 caracteres
+                            </p>
+                        </div>
+
+                        <div>
+                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Confirmar Contraseña <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-gray-400"></i>
+                                </div>
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    required
+                                    class="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                    placeholder="Repite tu contraseña"
+                                />
+                                <button
+                                    type="button"
+                                    id="toggle-confirm-password"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                                >
+                                    <i id="eye-icon-2" class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="idioma" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Idioma de aprendizaje <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-globe text-gray-400"></i>
+                            </div>
+                            <select
+                                id="idioma"
+                                name="idioma"
+                                required
+                                class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none transition-colors"
+                            >
+                                <option value="">Selecciona un idioma</option>
+                                <option value="inglés">🇬🇧 Inglés</option>
+                                <option value="francés">🇫🇷 Francés</option>
+                                <option value="alemán">🇩🇪 Alemán</option>
+                                <option value="italiano">🇮🇹 Italiano</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5"></i>
+                            <div>
+                                <p class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                                    Próximo paso: Evaluación de nivel
+                                </p>
+                                <p class="text-xs text-blue-700 dark:text-blue-300">
+                                    Después del registro podrás realizar una evaluación para determinar tu nivel o seleccionarlo manualmente.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        id="submit-btn"
+                        class="w-full px-4 py-4 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-xl font-semibold hover:from-secondary-700 hover:to-primary-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                        <span class="flex items-center justify-center">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Crear Cuenta
+                        </span>
+                    </button>
+                </form>
+
+                <div class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+                    ¿Ya tienes cuenta?
+                    <a href="login.html" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors">
+                        Inicia sesión aquí
+                    </a>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="mt-8 text-center">
+                <div class="grid grid-cols-3 gap-4 text-xs text-gray-500 dark:text-gray-400">
+                    <div class="flex items-center justify-center gap-1">
+                        <i class="fas fa-shield-alt text-green-500"></i>
+                        <span>Seguro</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-1">
+                        <i class="fas fa-bolt text-yellow-500"></i>
+                        <span>Rápido</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-1">
+                        <i class="fas fa-users text-blue-500"></i>
+                        <span>Confiable</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm w-full"></div>
+
+    <script type="module">
+        // Elementos DOM
+        const registerForm = document.getElementById('register-form');
+        const nombreInput = document.getElementById('nombre');
+        const primerApellidoInput = document.getElementById('primerApellido');
+        const segundoApellidoInput = document.getElementById('segundoApellido');
+        const correoInput = document.getElementById('correo');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const idiomaSelect = document.getElementById('idioma');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorAlert = document.getElementById('error-alert');
+        const errorMessage = document.getElementById('error-message');
+        const togglePassword = document.getElementById('toggle-password');
+        const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
+        const eyeIcon1 = document.getElementById('eye-icon-1');
+        const eyeIcon2 = document.getElementById('eye-icon-2');
+
+        // Función para mostrar toast
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500';
+            const icon = type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+            
+            toast.className = `${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce-in transform transition-all duration-300`;
+            toast.innerHTML = `
+                <i class="fas ${icon} text-lg"></i>
+                <span class="flex-1">${message}</span>
+                <button class="text-white/80 hover:text-white transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Agregar funcionalidad de cerrar
+            const closeBtn = toast.querySelector('button');
+            closeBtn.addEventListener('click', () => {
+                toast.style.transform = 'translateX(100%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            });
+            
+            document.getElementById('toast-container').appendChild(toast);
+            
+            // Auto-remover después de 4 segundos
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.transform = 'translateX(100%)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 4000);
+        }
+
+        // Mostrar error
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorAlert.classList.remove('hidden');
+        }
+
+        // Ocultar error
+        function hideError() {
+            errorAlert.classList.add('hidden');
+        }
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            eyeIcon1.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        });
+
+        toggleConfirmPassword.addEventListener('click', () => {
+            const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+            confirmPasswordInput.type = type;
+            eyeIcon2.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        });
+
+        // Validar contraseñas coinciden
+        function validatePasswords() {
+            if (passwordInput.value && confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordInput.setCustomValidity('Las contraseñas no coinciden');
+                confirmPasswordInput.classList.add('border-red-500');
+            } else {
+                confirmPasswordInput.setCustomValidity('');
+                confirmPasswordInput.classList.remove('border-red-500');
+            }
+        }
+
+        passwordInput.addEventListener('input', validatePasswords);
+        confirmPasswordInput.addEventListener('input', validatePasswords);
+
+        // Submit form
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            // Validar contraseñas
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                showError('Las contraseñas no coinciden');
+                return;
+            }
+
+            if (passwordInput.value.length < 8) {
+                showError('La contraseña debe tener al menos 8 caracteres');
+                return;
+            }
+
+            if (!idiomaSelect.value) {
+                showError('Por favor selecciona un idioma de aprendizaje');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creando cuenta...';
+
+            try {
+                const res = await fetch('http://localhost:5000/api/auth/registro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nombre: nombreInput.value,
+                        primer_apellido: primerApellidoInput.value,
+                        segundo_apellido: segundoApellidoInput.value || '',
+                        correo: correoInput.value,
+                        password: passwordInput.value,
+                        idioma: idiomaSelect.value,
+                        nivel_actual: 'A1' // Por defecto, se asignará después
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || `Error ${res.status}`);
+                }
+
+                // Guardar correo e idioma en localStorage para siguiente paso
+                localStorage.setItem('correo', correoInput.value);
+                localStorage.setItem('idioma', idiomaSelect.value);
+
+                showToast('✅ Cuenta creada exitosamente. Redirigiendo...', 'success');
+
+                // Redirigir a verificación de email
+                setTimeout(() => {
+                    window.location.href = 'verificar-email.html';
+                }, 1500);
+
+            } catch (error) {
+                let errorMsg = error.message || 'Error desconocido';
+                if (error.message === 'Failed to fetch') {
+                    errorMsg = 'No se pudo conectar al servidor. Intenta más tarde.';
+                }
+                showError(errorMsg);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Crear Cuenta';
+            }
+        });
+    </script>
+
+    <!-- Script para el tema oscuro/claro -->
+    <script>
+        // Toggle tema oscuro/claro
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // Verificar preferencia guardada o del sistema
+        if (localStorage.getItem('color-theme') === 'dark' || 
+            (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+        
+        themeToggle.addEventListener('click', function() {
+            // Toggle icon
+            themeIcon.classList.toggle('fa-moon');
+            themeIcon.classList.toggle('fa-sun');
+            
+            // Toggle dark class
+            document.documentElement.classList.toggle('dark');
+            
+            // Save preference
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('color-theme', 'dark');
+            } else {
+                localStorage.setItem('color-theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>
