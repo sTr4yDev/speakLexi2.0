@@ -8,7 +8,7 @@
     'use strict';
 
     // ============================================
-    // 1. VERIFICACIÓN DE DEPENDENCIAS (CRÍTICO)
+    // 1. ESPERA ACTIVA DE DEPENDENCIAS
     // ============================================
     const requiredDependencies = [
         'APP_CONFIG',
@@ -18,25 +18,60 @@
         'themeManager'
     ];
 
-    for (const dep of requiredDependencies) {
-        if (!window[dep]) {
-            console.error(`❌ ${dep} no está cargado`);
-            return;
+    /**
+     * Espera a que todas las dependencias estén cargadas
+     */
+    async function waitForDependencies(maxWaitMs = 5000) {
+        const startTime = Date.now();
+        
+        while (Date.now() - startTime < maxWaitMs) {
+            const allLoaded = requiredDependencies.every(dep => window[dep]);
+            
+            if (allLoaded) {
+                console.log('✅ Todas las dependencias cargadas');
+                return true;
+            }
+            
+            // Esperar 100ms antes de revisar de nuevo
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
+        
+        // Timeout: mostrar qué falta
+        const missing = requiredDependencies.filter(dep => !window[dep]);
+        console.error(`❌ Timeout esperando dependencias. Faltan: ${missing.join(', ')}`);
+        return false;
     }
 
-    console.log('✅ Módulo Login inicializado');
+    /**
+     * Verificación de dependencias con reporte detallado
+     */
+    function checkDependencies() {
+        const results = {};
+        let allOk = true;
+        
+        for (const dep of requiredDependencies) {
+            const loaded = !!window[dep];
+            results[dep] = loaded;
+            
+            if (!loaded) {
+                console.error(`❌ ${dep} no está cargado`);
+                allOk = false;
+            }
+        }
+        
+        return { allOk, results };
+    }
 
     // ============================================
     // 2. CONFIGURACIÓN DESDE APP_CONFIG
     // ============================================
     const config = {
-        API: window.APP_CONFIG.API,
-        ENDPOINTS: window.APP_CONFIG.API.ENDPOINTS,
-        STORAGE: window.APP_CONFIG.STORAGE.KEYS,
-        VALIDATION: window.APP_CONFIG.VALIDATION,
-        UI: window.APP_CONFIG.UI,
-        ROLES: window.APP_CONFIG.ROLES
+        get API() { return window.APP_CONFIG?.API || {}; },
+        get ENDPOINTS() { return window.APP_CONFIG?.API?.ENDPOINTS || {}; },
+        get STORAGE() { return window.APP_CONFIG?.STORAGE?.KEYS || {}; },
+        get VALIDATION() { return window.APP_CONFIG?.VALIDATION || {}; },
+        get UI() { return window.APP_CONFIG?.UI || {}; },
+        get ROLES() { return window.APP_CONFIG?.ROLES || {}; }
     };
 
     // ============================================
@@ -114,11 +149,30 @@
     /**
      * Inicializa el módulo
      */
-    function init() {
+    async function init() {
+        console.log('🚀 Iniciando módulo Login...');
+        
+        // Esperar a que se carguen las dependencias
+        const dependenciesLoaded = await waitForDependencies();
+        
+        if (!dependenciesLoaded) {
+            const { results } = checkDependencies();
+            console.error('💥 No se pudieron cargar todas las dependencias:', results);
+            
+            // Mostrar error en la UI
+            if (elementos.errorAlert && elementos.errorMessage) {
+                elementos.errorMessage.textContent = 'Error al cargar módulos del sistema. Recarga la página.';
+                elementos.errorAlert.classList.remove('hidden');
+            }
+            return;
+        }
+
+        console.log('✅ Módulo Login inicializado correctamente');
+        
         setupEventListeners();
         cargarUsuariosPrueba();
         
-        if (window.APP_CONFIG.ENV.DEBUG) {
+        if (window.APP_CONFIG?.ENV?.DEBUG) {
             console.log('🔧 Módulo Login listo:', { config, elementos });
         }
     }
@@ -178,15 +232,15 @@
         // Validar email
         if (!datos.correo) {
             errores.email = 'El correo electrónico es requerido';
-        } else if (!window.formValidator.validateEmail(datos.correo)) {
+        } else if (window.formValidator && !window.formValidator.validateEmail(datos.correo)) {
             errores.email = 'Por favor ingresa un email válido';
         }
         
         // Validar contraseña
         if (!datos.password) {
             errores.password = 'La contraseña es requerida';
-        } else if (datos.password.length < 8) {
-            errores.password = 'La contraseña debe tener al menos 8 caracteres';
+        } else if (datos.password.length < 6) {
+            errores.password = 'La contraseña debe tener al menos 6 caracteres';
         }
         
         return {
@@ -204,9 +258,13 @@
             mostrarLoading(true);
             limpiarErrores();
 
+            console.log('🔐 Intentando login...');
+
             // ✅ USAR apiClient CON ENDPOINTS DE APP_CONFIG
             const endpoint = config.ENDPOINTS.AUTH.LOGIN;
             const response = await window.apiClient.post(endpoint, datos);
+
+            console.log('📥 Respuesta del servidor:', response);
 
             if (response.success) {
                 await manejarLoginExitoso(response.data);
@@ -226,15 +284,20 @@
      * Maneja login exitoso
      */
     async function manejarLoginExitoso(data) {
+        console.log('✅ Login exitoso. Data recibida:', data);
+        
         const usuario = data.usuario;
         const token = data.token;
 
         if (!usuario || !token) {
+            console.error('❌ Respuesta inválida:', { usuario, token });
             throw new Error('Respuesta inválida del servidor');
         }
 
         // ✅ GUARDAR EN STORAGE USANDO APP_CONFIG
         const { USUARIO, TOKEN } = config.STORAGE;
+        console.log('💾 Guardando en localStorage:', { USUARIO, TOKEN });
+        
         localStorage.setItem(TOKEN, token);
         localStorage.setItem(USUARIO, JSON.stringify(usuario));
 
@@ -242,7 +305,25 @@
 
         // ✅ REDIRIGIR SEGÚN ROL USANDO APP_CONFIG
         const rol = usuario.rol?.toLowerCase();
-        const dashboardUrl = config.ROLES.RUTAS_DASHBOARD[rol] || config.UI.RUTAS.DASHBOARD_ESTUDIANTE;
+        console.log('🎭 Rol del usuario:', rol);
+        
+        let dashboardUrl = config.ROLES.RUTAS_DASHBOARD[rol];
+        console.log('🔗 URL de dashboard (config):', dashboardUrl);
+        
+        // 🔧 AJUSTE: Si la ruta es absoluta, ajustarla según ubicación actual
+        if (dashboardUrl && dashboardUrl.startsWith('/pages/')) {
+            // Estamos en /pages/auth/login.html
+            // Necesitamos ir a /pages/estudiante/...
+            dashboardUrl = dashboardUrl.replace('/pages/', '../');
+            console.log('🔧 URL ajustada:', dashboardUrl);
+        }
+        
+        if (!dashboardUrl) {
+            console.warn('⚠️ No se encontró ruta para rol:', rol);
+            dashboardUrl = '../estudiante/estudiante-dashboard.html';
+        }
+
+        console.log('➡️ Redirigiendo a:', dashboardUrl);
 
         setTimeout(() => {
             window.location.href = dashboardUrl;
@@ -253,6 +334,8 @@
      * Maneja errores de login
      */
     function manejarErrorLogin(response) {
+        console.log('❌ Error en login:', response);
+        
         if (response.codigo === 'CUENTA_DESACTIVADA') {
             estado.userId = response.usuario_id?.toString() || null;
             estado.diasRestantes = response.dias_restantes || 0;
@@ -285,7 +368,7 @@
     function manejarError(mensaje, error) {
         console.error('💥 Error:', error);
         
-        if (window.APP_CONFIG.ENV.DEBUG) {
+        if (window.APP_CONFIG?.ENV?.DEBUG) {
             console.trace();
         }
         
@@ -324,7 +407,6 @@
             const input = document.getElementById(campo);
             if (input) {
                 input.classList.add('border-red-500');
-                // Podrías agregar elementos de error específicos por campo
             }
         });
         
@@ -336,8 +418,8 @@
     }
 
     function limpiarErrores() {
-        elementos.errorAlert.classList.add('hidden');
-        elementos.deactivatedAlert.classList.add('hidden');
+        elementos.errorAlert?.classList.add('hidden');
+        elementos.deactivatedAlert?.classList.add('hidden');
         
         // Limpiar estilos de error en inputs
         elementos.emailInput?.classList.remove('border-red-500');
@@ -427,12 +509,12 @@
     // 9. INICIALIZACIÓN
     // ============================================
     
-    // Esperar a que el DOM esté listo
+    // Esperar a que el DOM esté listo Y las dependencias cargadas
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
-        // DOM ya está listo
-        setTimeout(init, 100);
+        // DOM ya está listo, iniciar con delay para dar tiempo a scripts async
+        setTimeout(init, 200);
     }
 
 })();

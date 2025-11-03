@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico - SpeakLexi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <i class="fas fa-stethoscope text-blue-600"></i>
+                Diagnóstico del Sistema de Login
+            </h1>
+            <p class="text-gray-600 mb-6">Herramienta para verificar que todos los módulos estén cargando correctamente</p>
+            
+            <button onclick="runDiagnostics()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg">
+                <i class="fas fa-play-circle mr-2"></i>
+                Ejecutar Diagnóstico Completo
+            </button>
+        </div>
+
+        <div id="results" class="space-y-4"></div>
+    </div>
+
+    <!-- Cargar APP_CONFIG -->
+    <script src="/config/app-config.js"></script>
+    <script src="/assets/js/core/utils.js"></script>
+    <script src="/assets/js/core/api-client.js"></script>
+    <script src="/assets/js/core/form-validator.js"></script>
+    <script src="/assets/js/core/theme-manager.js"></script>
+    <script src="/assets/js/core/toast-manager.js"></script>
+
+    <script>
+        const resultsContainer = document.getElementById('results');
+
+        function addResult(title, status, details, isExpanded = false) {
+            const statusColors = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800'
+            };
+
+            const statusIcons = {
+                success: 'fa-check-circle text-green-600',
+                error: 'fa-times-circle text-red-600',
+                warning: 'fa-exclamation-triangle text-yellow-600',
+                info: 'fa-info-circle text-blue-600'
+            };
+
+            const card = document.createElement('div');
+            card.className = `border-2 rounded-xl p-6 ${statusColors[status]} transition-all`;
+            card.innerHTML = `
+                <div class="flex items-start gap-4">
+                    <i class="fas ${statusIcons[status]} text-2xl mt-1"></i>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold mb-2">${title}</h3>
+                        <div class="text-sm space-y-1 font-mono">
+                            ${Array.isArray(details) ? details.map(d => `<div>${d}</div>`).join('') : details}
+                        </div>
+                    </div>
+                </div>
+            `;
+            resultsContainer.appendChild(card);
+        }
+
+        async function runDiagnostics() {
+            resultsContainer.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i><p class="mt-4 text-gray-600">Ejecutando diagnóstico...</p></div>';
+            
+            await new Promise(resolve => setTimeout(resolve, 500));
+            resultsContainer.innerHTML = '';
+
+            // 1. Verificar APP_CONFIG
+            if (window.APP_CONFIG) {
+                addResult(
+                    '✅ APP_CONFIG Cargado',
+                    'success',
+                    [
+                        `Versión: ${window.APP_CONFIG.ENV.VERSION}`,
+                        `Modo: ${window.APP_CONFIG.ENV.MODE}`,
+                        `API URL: ${window.APP_CONFIG.API.API_URL}`,
+                        `Base URL: ${window.APP_CONFIG.API.BASE_URL}`
+                    ]
+                );
+
+                // Verificar rutas
+                const rutasCorrectas = Object.values(window.APP_CONFIG.ROLES.RUTAS_DASHBOARD)
+                    .every(ruta => ruta.startsWith('../') || ruta.startsWith('/'));
+                
+                if (rutasCorrectas) {
+                    addResult(
+                        '✅ Rutas de Dashboard Configuradas',
+                        'success',
+                        Object.entries(window.APP_CONFIG.ROLES.RUTAS_DASHBOARD).map(
+                            ([rol, ruta]) => `${rol}: ${ruta}`
+                        )
+                    );
+                } else {
+                    addResult(
+                        '⚠️ Problema con Rutas de Dashboard',
+                        'warning',
+                        Object.entries(window.APP_CONFIG.ROLES.RUTAS_DASHBOARD).map(
+                            ([rol, ruta]) => `${rol}: ${ruta} ${!ruta.startsWith('../') && !ruta.startsWith('/') ? '⚠️ Posible error' : '✅'}`
+                        )
+                    );
+                }
+            } else {
+                addResult(
+                    '❌ APP_CONFIG NO Cargado',
+                    'error',
+                    'El archivo /config/app-config.js no se cargó correctamente'
+                );
+            }
+
+            // 2. Verificar módulos core
+            const coreModules = [
+                'Utils',
+                'apiClient',
+                'formValidator',
+                'themeManager',
+                'toastManager'
+            ];
+
+            coreModules.forEach(moduleName => {
+                if (window[moduleName]) {
+                    addResult(
+                        `✅ ${moduleName} Cargado`,
+                        'success',
+                        `Módulo disponible en window.${moduleName}`
+                    );
+                } else {
+                    addResult(
+                        `❌ ${moduleName} NO Cargado`,
+                        'error',
+                        `Verifica que existe /assets/js/core/${moduleName.toLowerCase()}.js`
+                    );
+                }
+            });
+
+            // 3. Verificar localStorage
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                addResult(
+                    '✅ localStorage Disponible',
+                    'success',
+                    'El navegador soporta localStorage correctamente'
+                );
+
+                // Ver qué hay guardado
+                const usuario = localStorage.getItem('usuario');
+                const token = localStorage.getItem('token');
+                
+                if (usuario && token) {
+                    const usuarioObj = JSON.parse(usuario);
+                    addResult(
+                        '📊 Sesión Activa Detectada',
+                        'info',
+                        [
+                            `Usuario: ${usuarioObj.nombre}`,
+                            `Rol: ${usuarioObj.rol}`,
+                            `Token: ${token.substring(0, 20)}...`
+                        ]
+                    );
+                } else {
+                    addResult(
+                        'ℹ️ No hay Sesión Activa',
+                        'info',
+                        'No se detectó usuario ni token en localStorage'
+                    );
+                }
+            } catch (error) {
+                addResult(
+                    '❌ Error con localStorage',
+                    'error',
+                    `Error: ${error.message}`
+                );
+            }
+
+            // 4. Test de conexión con backend
+            try {
+                addResult(
+                    '🔄 Probando Conexión con Backend...',
+                    'info',
+                    'Enviando petición al servidor...'
+                );
+
+                const response = await fetch('http://localhost:5000/api/health', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(
+                        '✅ Backend Conectado',
+                        'success',
+                        [
+                            `Status: ${response.status}`,
+                            `Respuesta: ${JSON.stringify(data)}`
+                        ]
+                    );
+                } else {
+                    addResult(
+                        '⚠️ Backend Responde con Error',
+                        'warning',
+                        `Status: ${response.status} - ${response.statusText}`
+                    );
+                }
+            } catch (error) {
+                addResult(
+                    '❌ No se Puede Conectar al Backend',
+                    'error',
+                    [
+                        `Error: ${error.message}`,
+                        'Verifica que el backend esté ejecutándose en http://localhost:5000'
+                    ]
+                );
+            }
+
+            // 5. Verificar estructura de respuesta de login (simulada)
+            addResult(
+                '📋 Estructura Esperada del Backend',
+                'info',
+                [
+                    'POST /api/auth/login debe responder:',
+                    JSON.stringify({
+                        success: true,
+                        data: {
+                            usuario: {
+                                id: 1,
+                                nombre: "Usuario",
+                                correo: "usuario@test.com",
+                                rol: "alumno"
+                            },
+                            token: "eyJhbGc..."
+                        }
+                    }, null, 2)
+                ]
+            );
+
+            // 6. Resumen final
+            const allModulesLoaded = coreModules.every(m => window[m]);
+            addResult(
+                allModulesLoaded ? '🎉 Diagnóstico Completo' : '⚠️ Hay Problemas Detectados',
+                allModulesLoaded ? 'success' : 'warning',
+                allModulesLoaded 
+                    ? 'Todos los módulos están cargados correctamente. Si el login no funciona, el problema está en el backend o en la lógica de redirección.'
+                    : 'Algunos módulos no están cargados. Revisa los errores marcados arriba.'
+            );
+        }
+
+        // Auto-ejecutar al cargar
+        setTimeout(runDiagnostics, 500);
+    </script>
+</body>
+</html>

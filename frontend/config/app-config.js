@@ -478,12 +478,12 @@ const ROLES_CONFIG = {
         MANTENIMIENTO: 'mantenimiento'
     },
     
-    // Rutas de dashboard por rol
+    // ✅ CORRECCIÓN APLICADA: Rutas relativas desde /pages/auth/
     RUTAS_DASHBOARD: {
-        alumno: '/pages/estudiante/estudiante-dashboard.html',
-        profesor: '/pages/profesor/profesor-dashboard.html',
-        admin: '/pages/admin/admin-dashboard.html',
-        mantenimiento: '/pages/mantenimiento/mantenimiento-dashboard.html'
+        alumno: '../estudiante/estudiante-dashboard.html',
+        profesor: '../profesor/profesor-dashboard.html',
+        admin: '../admin/admin-dashboard.html',
+        mantenimiento: '../mantenimiento/mantenimiento-dashboard.html'
     },
     
     // Estados de cuenta (según BD)
@@ -651,6 +651,22 @@ const TEST_USERS = APP_ENV.MODE === 'development' ? [
 ] : [];
 
 /**
+ * Función auxiliar para navegar al dashboard según el rol
+ * @param {string} rol - Rol del usuario
+ */
+function navegarAlDashboard(rol) {
+    const rutas = ROLES_CONFIG.RUTAS_DASHBOARD;
+    
+    if (rutas[rol]) {
+        window.location.href = rutas[rol];
+    } else {
+        console.error('Rol no válido o dashboard no configurado:', rol);
+        // Redirigir a página por defecto o mostrar error
+        window.location.href = '../estudiante/estudiante-dashboard.html';
+    }
+}
+
+/**
  * Configuración de la aplicación completa
  */
 const APP_CONFIG = {
@@ -663,7 +679,9 @@ const APP_CONFIG = {
     ROLES: ROLES_CONFIG,
     ERROR: ERROR_CONFIG,
     FORMAT: FORMAT_CONFIG,
-    TEST_USERS: TEST_USERS
+    TEST_USERS: TEST_USERS,
+    // Exportar función helper
+    navegarAlDashboard: navegarAlDashboard
 };
 
 /**
@@ -684,7 +702,8 @@ if (typeof window !== 'undefined') {
         ROLES: ROLES_CONFIG,
         ERROR: ERROR_CONFIG,
         FORMAT: FORMAT_CONFIG,
-        TEST_USERS: TEST_USERS
+        TEST_USERS: TEST_USERS,
+        navegarAlDashboard: navegarAlDashboard
     };
 }
 
@@ -703,4 +722,5 @@ if (typeof exports !== 'undefined') {
 if (APP_ENV.DEBUG && typeof console !== 'undefined') {
     console.log(`🚀 ${APP_ENV.APP_NAME} v${APP_ENV.VERSION} - Configuración cargada en modo: ${APP_ENV.MODE}`);
     console.log('📁 Módulos configurados: Usuarios, Lecciones, Aprendizaje, Desempeño, Mantenimiento');
+    console.log('✅ Rutas de dashboard corregidas para navegación relativa');
 }
