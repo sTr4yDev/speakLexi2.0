@@ -1,6 +1,6 @@
 /* ============================================
    SPEAKLEXI - VALIDADOR DE FORMULARIOS
-   Archivo: assets/js/form-validator.js
+   Archivo: assets/js/core/form-validator.js
    Usa: window.APP_CONFIG desde app-config.js
    ============================================ */
 
@@ -78,6 +78,42 @@ class FormValidator {
     }
 
     /**
+     * Obtiene la fortaleza de una contraseña
+     */
+    getPasswordStrength(password) {
+        if (!password) {
+            return { score: -1, text: '', color: '' };
+        }
+
+        let score = 0;
+        
+        // Criterios de fortaleza
+        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[^a-zA-Z0-9]/.test(password)) score++;
+
+        // Mapear score a categorías
+        const strength = {
+            0: { text: 'Muy débil', color: 'bg-red-500' },
+            1: { text: 'Débil', color: 'bg-orange-500' },
+            2: { text: 'Media', color: 'bg-yellow-500' },
+            3: { text: 'Buena', color: 'bg-blue-500' },
+            4: { text: 'Fuerte', color: 'bg-green-500' },
+            5: { text: 'Muy fuerte', color: 'bg-green-600' }
+        };
+
+        const normalizedScore = Math.min(score, 5);
+        
+        return {
+            score: normalizedScore,
+            text: strength[normalizedScore].text,
+            color: strength[normalizedScore].color
+        };
+    }
+
+    /**
      * Valida que las contraseñas coincidan
      */
     validatePasswordMatch(password, confirmPassword) {
@@ -95,9 +131,9 @@ class FormValidator {
     /**
      * Valida un nombre
      */
-    validateNombre(nombre) {
+    validateNombre(nombre, fieldLabel = 'nombre') {
         if (!nombre || nombre.trim() === '') {
-            return { valid: false, error: 'El nombre es requerido' };
+            return { valid: false, error: `El ${fieldLabel} es requerido` };
         }
 
         const trimmed = nombre.trim();
@@ -115,6 +151,16 @@ class FormValidator {
     }
 
     /**
+     * Valida un campo select
+     */
+    validateSelect(value, fieldLabel = 'campo') {
+        if (!value || value === '' || value === 'null' || value === 'undefined') {
+            return { valid: false, error: `Por favor selecciona un ${fieldLabel}` };
+        }
+        return { valid: true };
+    }
+
+    /**
      * Valida un campo requerido
      */
     validateRequired(value, fieldName = 'campo') {
@@ -125,26 +171,50 @@ class FormValidator {
     }
 
     /**
+     * Muestra error en un campo (alias para compatibilidad)
+     */
+    showFieldError(fieldId, message) {
+        return this.showError(fieldId, message);
+    }
+
+    /**
      * Muestra error en un campo
      */
     showError(fieldId, message) {
         const field = document.getElementById(fieldId);
-        if (!field) return;
+        if (!field) {
+            console.warn(`Campo ${fieldId} no encontrado`);
+            return;
+        }
 
         // Agregar borde rojo
-        field.classList.add('border-red-500');
-        field.classList.remove('border-green-500');
+        field.classList.add('border-red-500', 'dark:border-red-500');
+        field.classList.remove('border-green-500', 'dark:border-green-500');
 
         // Crear mensaje de error
         let errorElement = document.getElementById(`${fieldId}-error`);
         if (!errorElement) {
             errorElement = document.createElement('p');
             errorElement.id = `${fieldId}-error`;
-            errorElement.className = 'text-red-500 text-sm mt-1';
-            field.parentNode.appendChild(errorElement);
+            errorElement.className = 'text-red-500 dark:text-red-400 text-sm mt-1 animate-slide-in';
+            
+            // Insertar después del campo o su contenedor
+            const parent = field.closest('.relative') || field.parentNode;
+            if (parent.nextSibling) {
+                parent.parentNode.insertBefore(errorElement, parent.nextSibling);
+            } else {
+                parent.parentNode.appendChild(errorElement);
+            }
         }
 
         errorElement.textContent = message;
+    }
+
+    /**
+     * Limpia error de un campo (alias para compatibilidad)
+     */
+    clearFieldError(fieldId) {
+        return this.clearError(fieldId);
     }
 
     /**
@@ -153,13 +223,34 @@ class FormValidator {
     clearError(fieldId) {
         const field = document.getElementById(fieldId);
         if (field) {
-            field.classList.remove('border-red-500');
+            field.classList.remove('border-red-500', 'dark:border-red-500');
         }
 
         const errorElement = document.getElementById(`${fieldId}-error`);
         if (errorElement) {
             errorElement.remove();
         }
+    }
+
+    /**
+     * Limpia todos los errores de un formulario
+     */
+    clearAllErrors(formId) {
+        const form = document.getElementById(formId);
+        if (!form) {
+            console.warn(`Formulario ${formId} no encontrado`);
+            return;
+        }
+
+        // Limpiar todos los campos con borde rojo
+        form.querySelectorAll('.border-red-500').forEach(field => {
+            field.classList.remove('border-red-500', 'dark:border-red-500');
+        });
+
+        // Eliminar todos los mensajes de error
+        form.querySelectorAll('[id$="-error"]').forEach(error => {
+            error.remove();
+        });
     }
 
     /**
@@ -185,7 +276,11 @@ class FormValidator {
             }
 
             if (result.valid && rule.type === 'nombre') {
-                result = this.validateNombre(value);
+                result = this.validateNombre(value, rule.label);
+            }
+
+            if (result.valid && rule.type === 'select') {
+                result = this.validateSelect(value, rule.label);
             }
 
             if (!result.valid) {
@@ -197,6 +292,23 @@ class FormValidator {
             valid: Object.keys(errors).length === 0,
             errors: errors
         };
+    }
+
+    /**
+     * Valida múltiples campos y muestra errores
+     */
+    validateFields(fields) {
+        let isValid = true;
+
+        for (const [fieldId, validator] of Object.entries(fields)) {
+            const result = validator();
+            if (!result.valid) {
+                this.showFieldError(fieldId, result.error);
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
 }
 

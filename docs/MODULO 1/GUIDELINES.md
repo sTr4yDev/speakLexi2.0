@@ -1,31 +1,28 @@
-# Análisis de Errores y Soluciones - Proyecto SpeakLexi 2.0
+# 🚀 Guía Completa de Desarrollo - SpeakLexi 2.0
 
-## ERRORES IDENTIFICADOS Y RESOLUCIONES
+## 📋 Resumen de Errores y Soluciones - Flujo de Onboarding
 
-### 1. ERROR: Unknown column 'fecha_creacion' in 'field list'
+## 🔴 Errores Críticos Resueltos
 
-**Contexto:**
-El usuario intentaba registrar un nuevo usuario pero el backend devolvía un error 500.
+### **Error #1: Inconsistencia en Esquema de Base de Datos**
 
-**Causa Raíz:**
-Inconsistencia entre los nombres de columnas utilizados en el código del backend y el esquema real de la base de datos.
-
-**Detalles Técnicos:**
-- Archivo afectado: `backend/controllers/authController.js` (línea 73)
-- Código problemático:
+**Problema:**
 ```javascript
+// ❌ authController.js - Columnas incorrectas
 await connection.query(
     `INSERT INTO perfil_usuarios (usuario_id, nombre_completo, fecha_creacion) 
      VALUES (?, ?, NOW())`,
     [usuario_id, nombre_completo]
 );
 ```
-- El esquema de base de datos define la columna como `creado_en`, no `fecha_creacion`
-- La columna `creado_en` tiene un valor DEFAULT CURRENT_TIMESTAMP
+
+**Impacto:**
+- Error 500 en registro: `Unknown column 'fecha_creacion' in 'field list'`
+- Inconsistencias en múltiples archivos: `email_verificado` vs `correo_verificado`
 
 **Solución:**
-Remover la referencia a la columna inexistente, permitiendo que use el valor por defecto:
 ```javascript
+// ✅ Usar nombres correctos del esquema
 await connection.query(
     `INSERT INTO perfil_usuarios (usuario_id, nombre_completo) 
      VALUES (?, ?)`,
@@ -33,326 +30,857 @@ await connection.query(
 );
 ```
 
-**Errores Adicionales del Mismo Tipo:**
-También se encontró `email_verificado` cuando debería ser `correo_verificado` en múltiples ubicaciones:
-- authController.js líneas 245, 308, 564
-- authMiddleware.js líneas 50, 180
-
-**Lección Aprendida:**
-Siempre verificar que los nombres de columnas en el código coincidan exactamente con el esquema de base de datos. Revisar tanto controllers como middlewares para inconsistencias similares.
-
 ---
 
-### 2. ERROR: Route.get() requires a callback function but got a [object Undefined]
+### **Error #2: Funciones de Controlador No Exportadas**
 
-**Contexto:**
-Después de corregir el primer error, el servidor no iniciaba y mostraba un error de Express.
+**Problema:**
+```javascript
+// ❌ auth-routes.js - Funciones no existentes
+router.get('/perfil', authMiddleware.verificarToken, authController.obtenerPerfil);
+router.post('/logout', authMiddleware.verificarToken, authController.cerrarSesion);
+```
 
-**Causa Raíz:**
-El archivo de rutas (`auth-routes.js`) estaba intentando usar funciones del controlador que no existían o no estaban exportadas correctamente.
-
-**Detalles Técnicos:**
-- Error en línea 365 de `auth-routes.js`
-- Las rutas esperaban funciones `obtenerPerfil` y `cerrarSesion` que no existían en el controlador
-- El archivo actualizado incluía rutas protegidas adicionales que requerían estas funciones
+**Impacto:**
+- Servidor no inicia: `Route.get() requires a callback function but got [object Undefined]`
 
 **Solución:**
-Agregar las funciones faltantes al controlador:
-
-1. `exports.obtenerPerfil`:
-   - Recupera datos completos del usuario autenticado
-   - Incluye información del perfil específico según el rol (estudiante/profesor/admin)
-
-2. `exports.cerrarSesion`:
-   - Maneja el cierre de sesión
-   - Registra el evento en logs
-   - Nota: En JWT stateless, el logout es principalmente del lado del cliente
-
-**Lección Aprendida:**
-Al actualizar archivos de rutas, verificar que todas las funciones referenciadas existan en sus respectivos controladores. Mantener sincronización entre rutas y controladores.
+```javascript
+// ✅ Exportar funciones en authController.js
+exports.obtenerPerfil = async (req, res) => { /* ... */ };
+exports.cerrarSesion = async (req, res) => { /* ... */ };
+```
 
 ---
 
-### 3. ERROR: Acceso no autorizado, Token requerido
+### **Error #3: Autenticación Prematura en Onboarding**
 
-**Contexto:**
-Durante el flujo de onboarding, después de verificar el email, el usuario no podía asignar su nivel.
-
-**Causa Raíz:**
-El endpoint `/api/auth/actualizar-nivel` estaba protegido con middleware de autenticación, pero durante el onboarding el usuario aún no tiene un token JWT (no ha iniciado sesión).
-
-**Detalles Técnicos:**
-- Archivo: `backend/routes/auth-routes.js` línea 377-383
-- El endpoint tenía:
+**Problema:**
 ```javascript
+// ❌ Endpoint protegido durante onboarding
 router.patch(
   '/actualizar-nivel', 
-  authMiddleware.verificarToken,  // REQUIERE TOKEN
-  authMiddleware.verificarEmail,
-  validacionesActualizarNivel, 
+  authMiddleware.verificarToken,  // ← Usuario no tiene token aún
   authController.actualizarNivel
 );
 ```
-- El flujo de onboarding es: Registro → Verificar Email → Asignar Nivel → Login
-- En "Asignar Nivel" el usuario NO tiene token aún
+
+**Impacto:**
+- Error 401 en asignación de nivel: `Acceso no autorizado, Token requerido`
+- Flujo de onboarding interrumpido
 
 **Solución:**
-Remover los middlewares de autenticación del endpoint, dejándolo público:
 ```javascript
+// ✅ Endpoint público para onboarding
 router.patch('/actualizar-nivel', validacionesActualizarNivel, authController.actualizarNivel);
 ```
 
-El controlador ya validaba el usuario usando el correo del body del request.
-
-**Lección Aprendida:**
-Diferenciar entre endpoints que requieren autenticación y aquellos que son parte del proceso de onboarding. Documentar claramente el flujo de autenticación y en qué punto se obtiene el token.
-
 ---
 
-### 4. ERROR: No se encontró el correo del usuario
+### **Error #4: Pérdida de Datos en localStorage**
 
-**Contexto:**
-En la página de asignar nivel, después de verificar el email, se mostraba un error de que no se encontró el correo.
-
-**Causa Raíz:**
-El localStorage se estaba limpiando prematuramente en `verificar-email.html`, antes de que el usuario llegara a `asignar-nivel.html`.
-
-**Detalles Técnicos:**
-- En `verificar-email.html` líneas 280-284:
+**Problema:**
 ```javascript
-localStorage.removeItem('correo');
-localStorage.removeItem('idioma');
-// Luego redirige a asignar-nivel.html
-```
-- En `asignar-nivel.html` línea 492:
-```javascript
-const correo = localStorage.getItem('correo'); // null
-```
-
-**Flujo del Problema:**
-1. Registro → guarda correo e idioma en localStorage
-2. Verificar email → BORRA localStorage → redirige a asignar nivel
-3. Asignar nivel → intenta leer localStorage vacío → error
-
-**Solución:**
-No borrar el localStorage en `verificar-email.html`. Dejarlo para que se borre después de asignar el nivel exitosamente (lo cual ya estaba implementado en `asignar-nivel.html` líneas 515-516).
-
-**Lección Aprendida:**
-Mapear completamente el flujo de datos entre páginas. El localStorage debe mantenerse hasta que todo el proceso de onboarding esté completo.
-
----
-
-### 5. ERROR: Respuesta inválida del servidor (login)
-
-**Contexto:**
-Al intentar hacer login, el frontend mostraba "Respuesta inválida del servidor" aunque el backend respondía correctamente.
-
-**Causa Raíz:**
-Inconsistencia en el nombre de la propiedad del token entre backend y frontend.
-
-**Detalles Técnicos:**
-- Backend (`authController.js` respuesta de login):
-```javascript
-res.json({
-    mensaje: 'Login exitoso',
-    token: token,  // Propiedad llamada "token"
-    usuario: { ... }
-});
-```
-
-- Frontend (`login.html` línea 460):
-```javascript
-const access_token = data.access_token;  // Buscando "access_token"
-if (!usuario || !access_token) {
-    throw new Error('Respuesta inválida del servidor');
+// ❌ verificar-email.js - Limpieza prematura
+async function manejarVerificacionExitosa(data) {
+    localStorage.removeItem('correo');
+    localStorage.removeItem('idioma'); // ← Se necesitan después!
+    window.location.href = '/asignar-nivel.html';
 }
 ```
 
+**Impacto:**
+- `asignar-nivel.html` no encuentra datos: `No se encontró el correo del usuario`
+- Flujo de onboarding incompleto
+
 **Solución:**
-Cambiar el frontend para usar el nombre correcto:
 ```javascript
-const token = data.token;
-if (!usuario || !token) {
-    throw new Error('Respuesta inválida del servidor');
+// ✅ Limpiar solo al final del flujo (en asignar-nivel.js)
+async function actualizarNivel(nivel) {
+    const response = await window.apiClient.patch(endpoint, datos);
+    
+    if (response.success) {
+        // ✅ Limpiar DESPUÉS del éxito
+        localStorage.removeItem('correo');
+        localStorage.removeItem('idioma');
+        window.location.href = '/login.html';
+    }
 }
+```
+
+---
+
+### **Error #5: Inconsistencia en Propiedades de Respuesta**
+
+**Problema:**
+```javascript
+// ❌ Backend vs Frontend - Nombres diferentes
+// Backend responde:
+res.json({ token: 'abc123', usuario: { ... } });
+
+// Frontend espera:
+const access_token = data.access_token; // ← undefined
+```
+
+**Impacto:**
+- Login falla: `Respuesta inválida del servidor`
+- Usuario no puede acceder al sistema
+
+**Solución:**
+```javascript
+// ✅ Mantener consistencia
+// Backend:
+res.json({ token: 'abc123', usuario: { ... } });
+
+// Frontend:
+const token = data.token; // ← Nombre correcto
 localStorage.setItem('token', token);
 ```
 
-**Lección Aprendida:**
-Mantener consistencia en los nombres de propiedades entre frontend y backend. Documentar la estructura de respuestas de la API.
-
 ---
 
-### 6. ERROR: Cannot GET /estudiante/estudiante-dashboard.html
+### **Error #6: Rutas de Archivo Incorrectas**
 
-**Contexto:**
-Después de un login exitoso, la redirección fallaba con 404.
-
-**Causa Raíz:**
-Las rutas de redirección en el frontend no coincidían con la estructura real de carpetas del proyecto.
-
-**Detalles Técnicos:**
-- Código de redirección usaba:
+**Problema:**
 ```javascript
+// ❌ Ruta no coincide con estructura real
 let redirectPath = '/estudiante/estudiante-dashboard.html';
+// Estructura real: /pages/estudiante/dashboard-estudiante.html
 ```
 
-- Estructura real de carpetas:
-```
-frontend/pages/estudiante/dashboard-estudiante.html
-```
+**Impacto:**
+- Error 404 después de login: `Cannot GET /estudiante/estudiante-dashboard.html`
+- Usuario no puede acceder al dashboard
 
 **Solución:**
-Corregir las rutas de redirección para que coincidan con la estructura de carpetas:
 ```javascript
+// ✅ Usar rutas correctas
 let redirectPath = '/pages/estudiante/dashboard-estudiante.html';
 ```
 
-**Lección Aprendida:**
-Verificar la estructura de carpetas del proyecto antes de codificar rutas. Considerar usar constantes o un archivo de configuración para las rutas.
+---
+
+## ✅ Flujo Correcto Implementado
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    FLUJO DE ONBOARDING COMPLETO                │
+└─────────────────────────────────────────────────────────────────┘
+
+1️⃣ REGISTRO (registro.html)
+   ├─ Usuario llena: {correo, nombre, password, idioma_aprendizaje}
+   ├─ Backend: INSERT en usuarios + perfil_usuarios
+   ├─ ✅ Guardar en localStorage: correo, idioma
+   └─ Redirigir a: verificar-email.html
+        ↓
+
+2️⃣ VERIFICAR EMAIL (verificar-email.html)
+   ├─ Leer correo desde localStorage
+   ├─ Usuario ingresa código de 6 dígitos
+   ├─ Backend: Actualizar correo_verificado = 1
+   ├─ ✅ NO LIMPIAR localStorage (se necesita después)
+   └─ Redirigir a: asignar-nivel.html
+        ↓
+
+3️⃣ ASIGNAR NIVEL (asignar-nivel.html)
+   ├─ ✅ Leer datos: localStorage.getItem('correo', 'idioma')
+   ├─ Usuario elige: Evaluación o Selección Manual
+   ├─ Backend: PATCH /actualizar-nivel (ENDPOINT PÚBLICO)
+   ├─ ✅ DESPUÉS de éxito: limpiar localStorage
+   └─ Redirigir a: login.html
+        ↓
+
+4️⃣ LOGIN (login.html)
+   ├─ Usuario ingresa: correo + password
+   ├─ Backend: Validar credenciales → generar JWT
+   ├─ Frontend: localStorage.setItem('token', data.token)
+   ├─ Determinar rol y redirigir
+   └─ Dashboard correspondiente
+```
 
 ---
 
-## GUIDELINES PARA DESARROLLO CON IA
+## 🛠️ Guidelines para Desarrollo con IA
 
-### A. Verificación de Esquema de Base de Datos
+### **A. VERIFICACIÓN DE ESQUEMA DE BASE DE DATOS**
 
-1. **SIEMPRE** pedir o revisar el esquema de base de datos antes de escribir queries
-2. Verificar nombres exactos de:
-   - Tablas
-   - Columnas
-   - Tipos de datos
-   - Valores por defecto
-3. Buscar inconsistencias comunes:
-   - `email` vs `correo`
-   - `fecha_creacion` vs `creado_en` vs `created_at`
-   - `verificado` vs `email_verificado` vs `correo_verificado`
-
-### B. Sincronización Frontend-Backend
-
-1. Documentar estructura de respuestas de API:
+#### ✅ DO's:
 ```javascript
-// Ejemplo de documentación
-// POST /api/auth/login
-// Response: { token: string, usuario: Object, redirectUrl: string }
-```
-
-2. Mantener nombres de propiedades consistentes entre ambos lados
-3. Usar TypeScript o JSDoc para tipado cuando sea posible
-
-### C. Gestión de Estado y Flujo de Datos
-
-1. Mapear el flujo completo de datos ANTES de implementar:
-```
-Registro → localStorage: {correo, idioma}
-Verificar Email → NO borrar localStorage
-Asignar Nivel → usar localStorage → borrar después
-Login → guardar token
-```
-
-2. Documentar el ciclo de vida de datos temporales (localStorage, sessionStorage)
-3. Identificar puntos de limpieza de datos
-
-### D. Middlewares de Autenticación
-
-1. Clasificar endpoints por tipo:
-   - Públicos (registro, login, verificar email)
-   - Onboarding (asignar nivel - sin token pero con validación)
-   - Protegidos (dashboard, perfil - requieren token)
-
-2. Documentar claramente en qué punto del flujo se obtiene el token JWT
-
-3. Para endpoints de transición (onboarding), considerar validación alternativa (email en body en lugar de token)
-
-### E. Verificación de Rutas y Archivos
-
-1. SIEMPRE verificar estructura de carpetas antes de codificar rutas
-2. Usar rutas absolutas desde la raíz cuando sea posible
-3. Considerar crear un archivo de configuración:
-```javascript
-const ROUTES = {
-  ESTUDIANTE_DASHBOARD: '/pages/estudiante/dashboard-estudiante.html',
-  ADMIN_DASHBOARD: '/pages/admin/dashboard-admin.html',
-  // ...
+// 1. SIEMPRE pedir el esquema antes de escribir queries
+const ESQUEMA = {
+    usuarios: {
+        usuario_id: 'INT PRIMARY KEY AUTO_INCREMENT',
+        correo: 'VARCHAR(255) UNIQUE NOT NULL',
+        contrasena_hash: 'VARCHAR(255) NOT NULL',
+        rol: "ENUM('estudiante','profesor','admin')",
+        correo_verificado: 'TINYINT DEFAULT 0',
+        activo: 'TINYINT DEFAULT 1',
+        creado_en: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+    },
+    perfil_usuarios: {
+        perfil_id: 'INT PRIMARY KEY AUTO_INCREMENT',
+        usuario_id: 'INT FOREIGN KEY',
+        nombre_completo: 'VARCHAR(255)',
+        creado_en: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+    }
 };
-```
 
-### F. Manejo de Errores en Transacciones
+// 2. Verificar nombres exactos de columnas
+function validarEsquema(query, tablaEsperada) {
+    const columnasRequeridas = ESQUEMA[tablaEsperada];
+    Object.keys(columnasRequeridas).forEach(columna => {
+        if (!query.includes(columna)) {
+            console.warn(`⚠️ Columna faltante en query: ${columna}`);
+        }
+    });
+}
 
-1. En operaciones con transacciones de base de datos:
-```javascript
-let connection;
-try {
-    connection = await database.getConnection();
-    await connection.beginTransaction();
-    // operaciones
-    await connection.commit();
-} catch (error) {
-    if (connection) await connection.rollback();
-    // manejo de error
-} finally {
-    if (connection) connection.release();
+// 3. Usar consultas parametrizadas
+async function querySegura(connection, sql, parametros) {
+    return await connection.query(sql, parametros);
 }
 ```
 
-2. Logs descriptivos en cada paso de la transacción
-3. Rollback automático en caso de cualquier error
-
-### G. Exportaciones de Funciones
-
-1. Al crear nuevas rutas, verificar INMEDIATAMENTE que las funciones existan
-2. Verificar que las funciones estén exportadas correctamente:
+#### ❌ DON'Ts:
 ```javascript
-exports.nombreFuncion = async (req, res) => { ... }
+// ❌ NO asumir nombres de columnas
+`INSERT INTO tabla (fecha_creacion, email_verificado)` // Pueden no existir
+
+// ❌ NO usar concatenación de strings
+`SELECT * FROM usuarios WHERE correo = '${email}'`     // SQL Injection
+
+// ❌ NO olvidar transacciones en operaciones múltiples
+await query1();
+await query2(); // Si query2 falla, query1 queda aplicada
 ```
-
-3. No confiar en que la función existe solo porque está en un archivo anterior; verificar físicamente
-
-### H. Testing de Flujos Completos
-
-1. Probar el flujo completo de usuario ANTES de considerar terminado:
-   - Registro
-   - Verificación de email
-   - Asignación de nivel
-   - Login
-   - Navegación al dashboard
-
-2. Verificar que los datos persistan correctamente en cada paso
-3. Probar con y sin datos en localStorage/sessionStorage
-
-### I. Consistencia en Nombres
-
-Mantener un glosario de términos del proyecto:
-```
-usuario vs user
-correo vs email
-contrasena vs password
-nivel vs level
-idioma vs language
-fecha_creacion vs created_at vs creado_en
-```
-
-Elegir UNA convención y mantenerla en todo el proyecto.
-
-### J. Archivos de Configuración y Middleware
-
-Al actualizar archivos que otros archivos importan:
-1. Listar todos los archivos que lo usan
-2. Verificar que las exportaciones no se rompan
-3. Verificar que las importaciones usen los nombres correctos
-4. Probar que el servidor inicie correctamente después de cambios
 
 ---
 
-## CHECKLIST ANTES DE ENTREGAR CÓDIGO
+### **B. SINCRONIZACIÓN FRONTEND-BACKEND**
 
-- [ ] Verificar nombres de columnas contra esquema de BD
-- [ ] Verificar nombres de propiedades entre frontend/backend
-- [ ] Verificar que todas las funciones referenciadas existan
-- [ ] Verificar rutas de archivos contra estructura de carpetas
-- [ ] Mapear flujo completo de datos y su ciclo de vida
-- [ ] Clasificar endpoints por nivel de autenticación requerido
-- [ ] Verificar manejo de transacciones con try-catch-finally
-- [ ] Probar flujo completo de usuario
-- [ ] Documentar estructura de respuestas de API
-- [ ] Verificar que el servidor inicie sin errores
+#### ✅ DO's:
+```javascript
+// 1. Documentar estructura de respuestas API
+/**
+ * @typedef {Object} LoginResponse
+ * @property {string} token - JWT token de autenticación
+ * @property {Object} usuario - Datos del usuario
+ * @property {string} redirectUrl - URL para redirección
+ * @property {string} mensaje - Mensaje descriptivo
+ */
+
+// 2. Mantener consistencia en nombres
+const API_RESPONSE_FORMATS = {
+    AUTH: {
+        LOGIN: { token: '', usuario: {}, redirectUrl: '' },
+        REGISTER: { mensaje: '', usuario_id: '' },
+        VERIFY_EMAIL: { mensaje: '', verificado: true }
+    }
+};
+
+// 3. Validar respuestas en frontend
+function validarRespuestaAPI(data, esquemaEsperado) {
+    const propiedadesRequeridas = Object.keys(esquemaEsperado);
+    const faltantes = propiedadesRequeridas.filter(prop => !data[prop]);
+    
+    if (faltantes.length > 0) {
+        throw new Error(`Propiedades faltantes: ${faltantes.join(', ')}`);
+    }
+    
+    return true;
+}
+
+// 4. Usar cliente API consistente
+class ApiClient {
+    async post(endpoint, data) {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        // Validar estructura
+        validarRespuestaAPI(result, API_RESPONSE_FORMATS[endpoint]);
+        
+        return result;
+    }
+}
+```
+
+#### ❌ DON'Ts:
+```javascript
+// ❌ NO mezclar convenciones de nombres
+// Backend: { token, usuario }
+// Frontend: data.access_token // ← Inconsistente
+
+// ❌ NO asumir que la respuesta siempre tiene la misma estructura
+const token = data.token; // ❌ Puede ser undefined
+
+// ❌ NO olvidar manejar errores de red
+fetch('/api/login').then(data => data.json()) // ❌ Sin catch
+```
+
+---
+
+### **C. GESTIÓN DE ESTADO Y FLUJO DE DATOS**
+
+#### ✅ DO's:
+```javascript
+// 1. Mapear flujo completo ANTES de implementar
+const FLUJO_ONBOARDING = {
+    PASO_1: {
+        nombre: 'Registro',
+        datosRecibidos: [],
+        datosGuardados: ['correo', 'idioma_aprendizaje'],
+        siguientePaso: 'verificar-email.html',
+        limpiarDatos: false
+    },
+    PASO_2: {
+        nombre: 'Verificar Email', 
+        datosRecibidos: ['correo'],
+        datosGuardados: [],
+        siguientePaso: 'asignar-nivel.html',
+        limpiarDatos: false // ← IMPORTANTE: No limpiar aquí
+    },
+    PASO_3: {
+        nombre: 'Asignar Nivel',
+        datosRecibidos: ['correo', 'idioma'],
+        datosGuardados: [],
+        siguientePaso: 'login.html',
+        limpiarDatos: true // ← Limpiar solo al final
+    }
+};
+
+// 2. Gestión robusta de localStorage
+class FlowStateManager {
+    static guardarDatosOnboarding(datos) {
+        const KEYS = window.APP_CONFIG.STORAGE.KEYS;
+        
+        Object.entries(datos).forEach(([key, value]) => {
+            if (value) {
+                localStorage.setItem(KEYS[key.toUpperCase()], value);
+            }
+        });
+        
+        // Debug en desarrollo
+        if (window.APP_CONFIG.ENV.DEBUG) {
+            console.log('💾 Datos guardados para flujo:', datos);
+        }
+    }
+    
+    static recuperarDatosOnboarding() {
+        const KEYS = window.APP_CONFIG.STORAGE.KEYS;
+        
+        const datos = {
+            correo: localStorage.getItem(KEYS.CORREO),
+            idioma: localStorage.getItem(KEYS.IDIOMA)
+        };
+        
+        // Validar datos críticos
+        if (!datos.correo) {
+            throw new Error('Datos de flujo incompletos. Redirigiendo a registro.');
+        }
+        
+        return datos;
+    }
+    
+    static limpiarDatosOnboarding() {
+        const KEYS = window.APP_CONFIG.STORAGE.KEYS;
+        
+        Object.values(KEYS).forEach(key => {
+            localStorage.removeItem(key);
+        });
+        
+        console.log('🧹 Datos de onboarding limpiados');
+    }
+}
+
+// 3. Navegación con validación de estado
+function navegarASiguientePaso(pasoDestino) {
+    try {
+        const datosActuales = FlowStateManager.recuperarDatosOnboarding();
+        
+        // Validar que tenemos los datos necesarios para el siguiente paso
+        const paso = FLUJO_ONBOARDING[pasoDestino];
+        const datosRequeridos = paso.datosRecibidos || [];
+        
+        const datosFaltantes = datosRequeridos.filter(key => !datosActuales[key]);
+        
+        if (datosFaltantes.length > 0) {
+            throw new Error(`Datos faltantes para ${paso.nombre}: ${datosFaltantes.join(', ')}`);
+        }
+        
+        // Navegar
+        window.location.href = paso.siguientePaso;
+        
+    } catch (error) {
+        console.error('❌ Error en navegación:', error);
+        window.location.href = '/registro.html'; // Volver al inicio
+    }
+}
+```
+
+#### ❌ DON'Ts:
+```javascript
+// ❌ NO limpiar localStorage en pasos intermedios
+function verificarEmailExitoso() {
+    localStorage.clear(); // ❌ Rompe el flujo
+    window.location.href = '/asignar-nivel.html';
+}
+
+// ❌ NO asumir que los datos siempre existen
+const correo = localStorage.getItem('correo');
+enviarAlBackend(correo); // ❌ Puede enviar null
+
+// ❌ NO mezclar lógica de diferentes flujos
+localStorage.setItem('token', data.token); // Auth
+localStorage.setItem('correo', data.correo); // Onboarding ← Mezclado
+```
+
+---
+
+### **D. MIDDLEWARES DE AUTENTICACIÓN**
+
+#### ✅ DO's:
+```javascript
+// 1. Clasificar endpoints por tipo de autenticación
+const ENDPOINT_CATEGORIES = {
+    PUBLICOS: [
+        '/api/auth/registro',
+        '/api/auth/verificar-email',
+        '/api/auth/login',
+        '/api/auth/actualizar-nivel' // ← Onboarding sin token
+    ],
+    ONBOARDING: [
+        '/api/auth/actualizar-nivel' // Validación por email, no token
+    ],
+    PROTEGIDOS: [
+        '/api/auth/perfil',
+        '/api/auth/logout',
+        '/api/estudiante/*',
+        '/api/profesor/*'
+    ]
+};
+
+// 2. Middleware para endpoints de onboarding
+const validarOnboarding = (req, res, next) => {
+    // Para onboarding, validar por email en body en lugar de token
+    const { correo } = req.body;
+    
+    if (!correo) {
+        return res.status(400).json({
+            success: false,
+            mensaje: 'Correo requerido para operación de onboarding'
+        });
+    }
+    
+    // Verificar que el email existe y está verificado
+    // ... lógica de validación
+    
+    req.usuarioOnboarding = { correo };
+    next();
+};
+
+// 3. Aplicar middlewares según categoría
+app.patch('/api/auth/actualizar-nivel', 
+    validarOnboarding,        // ← Sin token
+    validacionesActualizarNivel, 
+    authController.actualizarNivel
+);
+
+app.get('/api/auth/perfil',
+    authMiddleware.verificarToken,  // ← Requiere token
+    authController.obtenerPerfil
+);
+```
+
+#### ❌ DON'Ts:
+```javascript
+// ❌ NO proteger endpoints de onboarding con token
+router.patch('/actualizar-nivel',
+    authMiddleware.verificarToken, // ❌ Usuario no tiene token aún
+    authController.actualizarNivel
+);
+
+// ❌ NO mezclar lógica de autenticación
+function middlewareMixto(req, res, next) {
+    if (req.path === '/actualizar-nivel') {
+        // Lógica onboarding
+    } else {
+        // Lógica con token
+    } // ❌ Difícil de mantener
+}
+```
+
+---
+
+### **E. MANEJO DE ERRORES Y TRANSACCIONES**
+
+#### ✅ DO's:
+```javascript
+// 1. Transacciones robustas para operaciones múltiples
+async function operacionConTransaccion(operaciones) {
+    let connection;
+    
+    try {
+        connection = await database.getConnection();
+        await connection.beginTransaction();
+        
+        console.log('🔄 Iniciando transacción...');
+        
+        // Ejecutar todas las operaciones
+        for (const operacion of operaciones) {
+            const { sql, parametros } = operacion;
+            await connection.query(sql, parametros);
+        }
+        
+        // Si todo sale bien, commit
+        await connection.commit();
+        console.log('✅ Transacción completada');
+        
+        return { success: true };
+        
+    } catch (error) {
+        // Si algo falla, rollback
+        if (connection) {
+            await connection.rollback();
+            console.log('🔙 Rollback ejecutado');
+        }
+        
+        console.error('💥 Error en transacción:', error);
+        
+        return { 
+            success: false, 
+            error: error.message,
+            codigo: error.code
+        };
+        
+    } finally {
+        // Siempre liberar conexión
+        if (connection) {
+            connection.release();
+        }
+    }
+}
+
+// 2. Ejemplo de uso en registro
+async function registrarUsuario(datosUsuario) {
+    const operaciones = [
+        {
+            sql: `INSERT INTO usuarios (correo, contrasena_hash, rol) VALUES (?, ?, ?)`,
+            parametros: [datosUsuario.correo, datosUsuario.contrasenaHash, 'estudiante']
+        },
+        {
+            sql: `INSERT INTO perfil_usuarios (usuario_id, nombre_completo) VALUES (?, ?)`,
+            parametros: [/* obtener ID del primer INSERT */, datosUsuario.nombre]
+        }
+    ];
+    
+    return await operacionConTransaccion(operaciones);
+}
+
+// 3. Manejo de erroes en frontend
+class ErrorHandler {
+    static manejarErrorAPI(error, contexto) {
+        console.error(`💥 Error en ${contexto}:`, error);
+        
+        // Mostrar error al usuario
+        if (error.message.includes('NetworkError')) {
+            window.toastManager.error('Error de conexión. Verifica tu internet.');
+        } else if (error.message.includes('401')) {
+            window.toastManager.error('Sesión expirada. Por favor inicia sesión again.');
+            setTimeout(() => window.location.href = '/login.html', 2000);
+        } else {
+            window.toastManager.error(error.message || 'Error inesperado');
+        }
+        
+        // Log para desarrollo
+        if (window.APP_CONFIG.ENV.DEBUG) {
+            console.error('📋 Detalles del error:', {
+                contexto,
+                error: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString()
+            });
+        }
+    }
+}
+```
+
+---
+
+### **F. ESTRUCTURA DE MÓDULOS FRONTEND**
+
+#### ✅ DO's:
+```javascript
+// 1. Plantilla para módulos multi-página
+class OnboardingModule {
+    constructor() {
+        this.config = window.APP_CONFIG;
+        this.estado = {
+            pasoActual: this.obtenerPasoActual(),
+            datos: this.cargarDatosTemporales()
+        };
+    }
+    
+    async inicializar() {
+        try {
+            await this.validarDependencias();
+            await this.cargarDatos();
+            this.inicializarEventos();
+            this.mostrarInterfaz();
+            
+            console.log(`✅ Módulo ${this.estado.pasoActual} listo`);
+            
+        } catch (error) {
+            this.manejarErrorInicializacion(error);
+        }
+    }
+    
+    async validarDependencias() {
+        const dependenciasRequeridas = [
+            'APP_CONFIG', 'apiClient', 'Utils', 'toastManager'
+        ];
+        
+        const faltantes = dependenciasRequeridas.filter(dep => !window[dep]);
+        
+        if (faltantes.length > 0) {
+            throw new Error(`Dependencias faltantes: ${faltantes.join(', ')}`);
+        }
+    }
+    
+    cargarDatosTemporales() {
+        const datos = {
+            correo: window.Utils.getFromStorage(this.config.STORAGE.CORREO),
+            idioma: window.Utils.getFromStorage(this.config.STORAGE.IDIOMA)
+        };
+        
+        // Validar datos críticos para este paso
+        if (this.requiereCorreo() && !datos.correo) {
+            throw new Error('Datos de flujo incompletos. Redirigiendo al registro.');
+        }
+        
+        return datos;
+    }
+    
+    async procesarPaso(datosPaso) {
+        try {
+            // Validar datos antes de enviar
+            this.validarDatosPaso(datosPaso);
+            
+            // Enviar al backend
+            const respuesta = await window.apiClient.post(
+                this.obtenerEndpoint(), 
+                datosPaso
+            );
+            
+            // Manejar respuesta exitosa
+            await this.manejarExito(respuesta);
+            
+        } catch (error) {
+            ErrorHandler.manejarErrorAPI(error, this.estado.pasoActual);
+        }
+    }
+    
+    async manejarExito(respuesta) {
+        // Mostrar feedback al usuario
+        window.toastManager.success(respuesta.mensaje || 'Operación exitosa');
+        
+        // Guardar datos temporalmente si es necesario
+        if (respuesta.datosTemporales) {
+            this.guardarDatosTemporales(respuesta.datosTemporales);
+        }
+        
+        // Navegar al siguiente paso
+        setTimeout(() => {
+            window.location.href = this.obtenerSiguientePaso();
+        }, 1500);
+    }
+    
+    // Métodos abstractos para implementar en cada página
+    requiereCorreo() { return true; }
+    obtenerEndpoint() { throw new Error('Método abstracto'); }
+    obtenerSiguientePaso() { throw new Error('Método abstracto'); }
+}
+
+// 2. Implementación específica por página
+class VerificarEmailModule extends OnboardingModule {
+    obtenerEndpoint() { return '/api/auth/verificar-email'; }
+    obtenerSiguientePaso() { return '/asignar-nivel.html'; }
+    
+    inicializarEventos() {
+        document.getElementById('form-verificacion')
+            .addEventListener('submit', (e) => this.manejarVerificacion(e));
+    }
+    
+    async manejarVerificacion(event) {
+        event.preventDefault();
+        
+        const codigo = document.getElementById('codigo-verificacion').value;
+        
+        await this.procesarPaso({
+            correo: this.estado.datos.correo,
+            codigo_verificacion: codigo
+        });
+    }
+    
+    // NO limpiar localStorage aquí - se hace en el último paso
+}
+```
+
+---
+
+## 🎯 CHECKLIST PRE-IMPLEMENTACIÓN
+
+### **ANTES de escribir código:**
+
+#### ✅ Base de Datos
+- [ ] **Tengo el esquema actualizado** de todas las tablas involucradas
+- [ ] **Verifico nombres exactos** de tablas y columnas
+- [ **Confirmo tipos de datos** y valores por defecto
+- [ ] **Reviso constraints** (UNIQUE, FOREIGN KEY, etc.)
+
+#### ✅ Backend
+- [ ] **Documento estructura de request/response** para cada endpoint
+- [ ] **Defino nivel de autenticación** (público, onboarding, protegido)
+- [ ] **Planifico transacciones** para operaciones múltiples
+- [ ] **Preparo manejo de erroes** específicos por endpoint
+
+#### ✅ Frontend
+- [ ] **Mapeo el flujo completo** de datos entre páginas
+- [ ] **Defino ciclo de vida** de localStorage/sessionStorage
+- [ ] **Documento dependencias** entre módulos
+- [ ] **Planifico manejo de erroes** y estados de carga
+
+#### ✅ Integración
+- [ ] **Verifico consistencia** de nombres entre frontend/backend
+- [ ] **Confirmo rutas de archivos** contra estructura real
+- [ ] **Documento flujo de autenticación** (cuándo se obtiene token)
+- [ ] **Preparo casos de error** (red, datos faltantes, timeouts)
+
+### **DURANTE desarrollo:**
+
+#### ✅ Por cada endpoint:
+- [ ] **Validación de datos** de entrada
+- [ ] **Manejo de erroes** con try-catch
+- [ ] **Transacciones** para operaciones múltiples
+- [ ] **Respuestas consistentes** en formato
+- [ ] **Logs descriptivos** para debugging
+
+#### ✅ Por cada página frontend:
+- [ ] **Validación de datos** antes de enviar
+- [ ] **Manejo de estados** de carga/error/éxito
+- [ ] **Recuperación graceful** de datos faltantes
+- [ ] **Feedback al usuario** apropiado
+- [ ] **Limpieza adecuada** de recursos
+
+### **DESPUÉS de desarrollar:**
+
+#### ✅ Pruebas de flujo completo:
+- [ ] **Registro → Verificación → Asignación Nivel → Login → Dashboard**
+- [ ] **Recarga de página** en cada paso (debe recuperar estado)
+- [ ] **Navegación hacia atrás** (no debe romper flujo)
+- [ ] **Datos corruptos/missing** en localStorage (debe recuperarse)
+- [ ] **Errores de red** en cada operación (debe manejarse gracefully)
+
+#### ✅ Verificaciones finales:
+- [ ] **Servidor inicia** sin errores
+- [ ] **Todas las rutas** responden correctamente
+- [ ] **Console limpia** de errores no manejados
+- [ ] **Responsive** y accesibilidad básica
+- [ ] **Performance** aceptable
+
+---
+
+## 🔧 HERRAMIENTAS DE DEBUG Y MONITOREO
+
+```javascript
+// Agregar a utils.js o módulo separado
+class DevelopmentTools {
+    static enableDebugMode() {
+        if (!window.APP_CONFIG.ENV.DEBUG) return;
+        
+        // Monitor de localStorage
+        const originalSetItem = localStorage.setItem;
+        localStorage.setItem = function(key, value) {
+            console.log(`💾 localStorage SET: ${key} =`, value);
+            originalSetItem.call(this, key, value);
+        };
+        
+        const originalRemoveItem = localStorage.removeItem;
+        localStorage.removeItem = function(key) {
+            console.log(`🗑️ localStorage REMOVE: ${key}`);
+            originalRemoveItem.call(this, key);
+        };
+        
+        // Monitor de API calls
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            console.log('🌐 API Call:', args[0], args[1]);
+            return originalFetch.apply(this, args).then(response => {
+                console.log('📥 API Response:', response.url, response.status);
+                return response;
+            });
+        };
+        
+        console.log('🔧 Debug mode enabled');
+    }
+    
+    static showAppState() {
+        console.log('📊 Estado de la aplicación:', {
+            localStorage: { ...localStorage },
+            currentPage: window.location.pathname,
+            config: window.APP_CONFIG,
+            screen: { width: window.innerWidth, height: window.innerHeight }
+        });
+    }
+    
+    static validateDataFlow(requiredData) {
+        const missing = requiredData.filter(key => !localStorage.getItem(key));
+        
+        if (missing.length > 0) {
+            console.error('❌ Datos faltantes en flujo:', missing);
+            return false;
+        }
+        
+        console.log('✅ Flujo de datos válido');
+        return true;
+    }
+}
+
+// Inicializar en desarrollo
+if (window.APP_CONFIG?.ENV?.DEBUG) {
+    DevelopmentTools.enableDebugMode();
+}
+```
+
+---
+
+## 📝 RESUMEN EJECUTIVO
+
+### **Lecciones Clave Aprendidas:**
+
+1. **📋 Esquema Primero**: Nunca asumir estructura de BD - siempre verificar
+2. **🔄 Sincronización**: Mantener consistencia absoluta entre frontend/backend
+3. **🗂️ Flujo de Datos**: Mapear completamente el ciclo de vida de los datos
+4. **🔐 Autenticación Gradual**: Diferenciar entre endpoints públicos, onboarding y protegidos
+5. **🐛 Debugging Proactivo**: Logs detallados y herramientas de monitoreo
+6. **🛡️ Manejo de Erroes**: Recuperación graceful en cada capa
+
+### **Patrones Establecidos:**
+
+- **Onboarding**: localStorage persiste hasta final del flujo
+- **Autenticación**: Token JWT solo después de login exitoso
+- **API**: Estructuras de respuesta consistentes y validadas
+- **Desarrollo**: Checklists pre, durante y post implementación
+
+### **Resultado:**
+✅ **Flujo de onboarding completamente funcional**
+✅ **Arquitectura escalable y mantenible**
+✅ **Base sólida para features futuros**
+
+---
+
+*Esta guía debe ser consultada antes de implementar cualquier nuevo feature o modificar el flujo existente.*

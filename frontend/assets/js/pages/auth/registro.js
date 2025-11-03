@@ -284,11 +284,24 @@
                 console.log('✅ Registro exitoso');
                 window.toastManager.success('¡Cuenta creada! Revisa tu correo para verificarla.');
 
-                // Guardar email para verificación
+                // ✅ CORREGIDO: Guardar EMAIL E IDIOMA para los siguientes pasos del onboarding
                 const storageKeys = window.APP_CONFIG.STORAGE.KEYS;
                 localStorage.setItem(storageKeys.EMAIL, formData.correo);
+                localStorage.setItem(storageKeys.IDIOMA, formData.idioma_aprendizaje);
 
-                // Redirigir
+                // ✅ Debug: Confirmar que se guardó correctamente
+                if (window.APP_CONFIG.ENV.DEBUG) {
+                    console.log('💾 Datos guardados en localStorage:', {
+                        correo: formData.correo,
+                        idioma: formData.idioma_aprendizaje,
+                        keys_usadas: {
+                            EMAIL: storageKeys.EMAIL,
+                            IDIOMA: storageKeys.IDIOMA
+                        }
+                    });
+                }
+
+                // Redirigir a verificación de email
                 setTimeout(() => {
                     window.location.href = `verificar-email.html?email=${encodeURIComponent(formData.correo)}`;
                 }, 1500);

@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-02 20:36:34
+# RAW LINKS — Actualizado 2025-11-02 22:04:02
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: 26c6469eaa32eda578276a31176c916d3c2e25c8
+# Commit: 9dba88b57f29582e86f54266065bd5d2c076ccb7
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -29,6 +29,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/com
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/css/animations.css
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/css/custom-styles.css
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/form-validator.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/module-loader.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/navbar-loader.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/theme-manager.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/toast-manager.js
@@ -36,9 +37,11 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/auth/login.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/auth/registro.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/auth/verificar-email.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/cambiar-curso.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/dashboard.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/perfil.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/onboarding/asignar-nivel.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/diag.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/index.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/dashboard-admin.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/auth/login.html
@@ -62,12 +65,10 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/
 ========================= DOCS LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 1/GUIDELINES.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 1/README.md
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/README.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/guidelines/como-crear-paginas.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/guidelines/formato-paginas.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/raw_links.txt
-https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/raw_links_20251101_190332.txt
-https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/raw_links_20251101_191126.txt
-https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/raw_links_20251101_194817.txt
 
 ========================= OTROS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/.gitignore

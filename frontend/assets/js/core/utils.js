@@ -219,21 +219,27 @@ class Utils {
     }
 
     /**
-     * Guarda datos en localStorage de forma segura
+     * ✅ CORREGIDO: Guarda datos en localStorage de forma segura
      * @param {string} key - Clave
      * @param {any} value - Valor
      */
     static saveToStorage(key, value) {
         try {
-            const serialized = JSON.stringify(value);
-            localStorage.setItem(key, serialized);
+            // Si es string simple, guardar directamente
+            if (typeof value === 'string' && !this.looksLikeJSON(value)) {
+                localStorage.setItem(key, value);
+            } else {
+                // Para objetos, arrays, números, etc. usar JSON
+                const serialized = JSON.stringify(value);
+                localStorage.setItem(key, serialized);
+            }
         } catch (error) {
             console.error('Error al guardar en localStorage:', error);
         }
     }
 
     /**
-     * Obtiene datos de localStorage de forma segura
+     * ✅ CORREGIDO: Obtiene datos de localStorage de forma segura
      * @param {string} key - Clave
      * @param {any} defaultValue - Valor por defecto
      * @returns {any}
@@ -241,9 +247,51 @@ class Utils {
     static getFromStorage(key, defaultValue = null) {
         try {
             const item = localStorage.getItem(key);
-            return item ? JSON.parse(item) : defaultValue;
+            
+            if (item === null) return defaultValue;
+            
+            // Intentar parsear como JSON
+            try {
+                return JSON.parse(item);
+            } catch (jsonError) {
+                // Si falla el parseo JSON, devolver el string original
+                return item;
+            }
         } catch (error) {
             console.error('Error al leer de localStorage:', error);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * ✅ NUEVO: Verifica si un string parece JSON
+     * @param {string} str - String a verificar
+     * @returns {boolean}
+     */
+    static looksLikeJSON(str) {
+        if (typeof str !== 'string') return false;
+        
+        const trimmed = str.trim();
+        return (
+            (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+            (trimmed.startsWith('[') && trimmed.endsWith(']')) ||
+            (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+            ['true', 'false', 'null'].includes(trimmed) ||
+            !isNaN(trimmed) && trimmed !== ''
+        );
+    }
+
+    /**
+     * ✅ NUEVO: Obtiene string simple de localStorage (sin parsear JSON)
+     * @param {string} key - Clave
+     * @param {string} defaultValue - Valor por defecto
+     * @returns {string}
+     */
+    static getStringFromStorage(key, defaultValue = '') {
+        try {
+            return localStorage.getItem(key) || defaultValue;
+        } catch (error) {
+            console.error('Error al leer string de localStorage:', error);
             return defaultValue;
         }
     }

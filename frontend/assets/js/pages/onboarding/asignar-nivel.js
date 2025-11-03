@@ -123,7 +123,7 @@
                 { question: "Qual é um sinônimo de 'onipresente'?", options: ["raro", "em todo lugar", "bonito", "difícil"], correct: 1 },
                 { question: "Complete a expressão: 'Está chovendo a cântaros e ___'", options: ["cachorros", "gatos", "peixes", "ratos"], correct: 1 },
                 { question: "Qual é a forma passiva: 'Eles construíram a casa em 1990'", options: ["A casa foi construída em 1990", "A casa é construída em 1990", "A casa construiu em 1990", "A casa estava construída em 1990"], correct: 0 },
-                { question: "O que significa 'serendipidade'?", options: ["Um feliz acidente", "Um momento triste", "Uma situação difícil", "Um evento planejado"], correct: 0 }
+                { question: "O que significa 'serendipidade'?", options: ["Um feliz acidente", "Um momento triste", "Uma situación difícil", "Um evento planejado"], correct: 0 }
             ]
         };
 
@@ -433,7 +433,7 @@
         }
 
         /**
-         * Actualiza el nivel del usuario en el servidor
+         * ✅ VERSIÓN CON DEBUG: Actualiza el nivel del usuario en el servidor
          */
         async function actualizarNivel(nivel) {
             if (estado.isLoading) return;
@@ -447,13 +447,65 @@
             }
 
             try {
-                // ✅ USAR apiClient CON ENDPOINTS DE APP_CONFIG
-                const endpoint = config.ENDPOINTS.AUTH.ACTUALIZAR_NIVEL;
-                const response = await window.apiClient.patch(endpoint, {
+                // ✅ DEBUG: Mostrar datos que se enviarán
+                const datosAEnviar = {
                     correo: estado.correo,
                     nivel: nivel,
                     idioma: estado.idioma
+                };
+
+                console.log('📤 Datos a enviar:', datosAEnviar);
+                console.log('📋 Estado completo:', estado);
+                console.log('💾 LocalStorage actual:', {
+                    correo: localStorage.getItem(config.STORAGE.CORREO),
+                    idioma: localStorage.getItem(config.STORAGE.IDIOMA),
+                    idioma_aprendizaje: localStorage.getItem('idioma_aprendizaje')
                 });
+
+                // ✅ VALIDAR DATOS ANTES DE ENVIAR
+                const errores = [];
+                
+                if (!estado.correo) {
+                    errores.push({ campo: 'correo', mensaje: 'Correo está vacío' });
+                }
+                
+                if (!estado.idioma) {
+                    errores.push({ campo: 'idioma', mensaje: 'Idioma está vacío' });
+                } else {
+                    // Verificar formato del idioma
+                    const idiomasPermitidos = ['Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués', 'Japonés', 'Coreano', 'Chino'];
+                    if (!idiomasPermitidos.includes(estado.idioma)) {
+                        errores.push({ 
+                            campo: 'idioma', 
+                            mensaje: `Idioma "${estado.idioma}" no está en la lista permitida: ${idiomasPermitidos.join(', ')}` 
+                        });
+                    }
+                }
+
+                if (!nivel) {
+                    errores.push({ campo: 'nivel', mensaje: 'Nivel está vacío' });
+                } else {
+                    const nivelesPermitidos = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+                    if (!nivelesPermitidos.includes(nivel)) {
+                        errores.push({ 
+                            campo: 'nivel', 
+                            mensaje: `Nivel "${nivel}" no válido. Debe ser: ${nivelesPermitidos.join(', ')}` 
+                        });
+                    }
+                }
+
+                if (errores.length > 0) {
+                    console.log('❌ Errores de validación:', errores);
+                    throw new Error(`Errores de validación: ${JSON.stringify(errores)}`);
+                }
+
+                // ✅ USAR apiClient CON ENDPOINTS DE APP_CONFIG
+                const endpoint = config.ENDPOINTS.AUTH.ACTUALIZAR_NIVEL;
+                console.log('🌐 Enviando a endpoint:', endpoint);
+                
+                const response = await window.apiClient.patch(endpoint, datosAEnviar);
+
+                console.log('📨 Respuesta del servidor:', response);
 
                 if (response.success) {
                     window.toastManager.success(`✅ Nivel ${nivel} asignado correctamente`);

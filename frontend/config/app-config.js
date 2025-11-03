@@ -55,8 +55,8 @@ const API_CONFIG = {
             VALIDAR_TOKEN_RECUPERACION: '/auth/validar-token-recuperacion',
             
             // UC-03: Autenticar usuario (verificación)
-            VERIFICAR_EMAIL: '/auth/verificar-email',
-            REENVIAR_CODIGO: '/auth/reenviar-codigo',
+            VERIFICAR_EMAIL: '/auth/verificar',
+            REENVIAR_CODIGO: '/auth/reenviar-verificacion',
             
             // UC-04: Registrar usuario
             REGISTRO: '/auth/registro',
@@ -290,6 +290,7 @@ const STORAGE_CONFIG = {
         // Preferencias
         THEME: 'color-theme',
         EMAIL: 'correo',
+        CORREO: 'correo', // Alias
         
         // Perfil estudiante (según tabla perfil_estudiantes)
         IDIOMA: 'idioma_aprendizaje',
@@ -363,7 +364,142 @@ const UI_CONFIG = {
         ENABLED: true,
         DURATION: 300,
         EASING: 'ease-in-out'
+    },
+    
+    // ✅ Rutas de la aplicación
+    RUTAS: {
+        HOME: '/index.html',
+        LOGIN: '/pages/auth/login.html',
+        REGISTRO: '/pages/auth/registro.html',
+        VERIFICAR_EMAIL: '/pages/auth/verificar-email.html',
+        ASIGNAR_NIVEL: '/pages/onboarding/asignar-nivel.html',
+        RECUPERAR_PASSWORD: '/pages/auth/recuperar-contrasena.html'
     }
+};
+
+/**
+ * ✅ NUEVA: Configuración de niveles CEFR y evaluación
+ */
+const NIVELES_CONFIG = {
+    // Niveles disponibles (CEFR estándar)
+    DISPONIBLES: [
+        { 
+            id: "A1", 
+            name: "Principiante", 
+            description: "Empezando desde cero",
+            caracteristicas: [
+                "Comprende frases básicas",
+                "Puede presentarse",
+                "Vocabulario: ~500 palabras"
+            ]
+        },
+        { 
+            id: "A2", 
+            name: "Elemental", 
+            description: "Conocimientos básicos",
+            caracteristicas: [
+                "Conversación simple",
+                "Tareas cotidianas",
+                "Vocabulario: ~1000 palabras"
+            ]
+        },
+        { 
+            id: "B1", 
+            name: "Intermedio", 
+            description: "Conversación cotidiana",
+            caracteristicas: [
+                "Temas familiares",
+                "Viajes",
+                "Vocabulario: ~2000 palabras"
+            ]
+        },
+        { 
+            id: "B2", 
+            name: "Intermedio Alto", 
+            description: "Fluidez en la mayoría de situaciones",
+            caracteristicas: [
+                "Temas abstractos",
+                "Argumentación",
+                "Vocabulario: ~4000 palabras"
+            ]
+        },
+        { 
+            id: "C1", 
+            name: "Avanzado", 
+            description: "Dominio del idioma",
+            caracteristicas: [
+                "Textos complejos",
+                "Expresión fluida",
+                "Vocabulario: ~8000 palabras"
+            ]
+        },
+        { 
+            id: "C2", 
+            name: "Maestría", 
+            description: "Nivel nativo",
+            caracteristicas: [
+                "Comprensión total",
+                "Expresión matizada",
+                "Vocabulario: 10000+ palabras"
+            ]
+        }
+    ],
+    
+    // Mapeo de puntajes a niveles
+    SCORE_TO_LEVEL: {
+        90: "C2",
+        75: "C1",
+        60: "B2",
+        45: "B1",
+        30: "A2",
+        0: "A1"
+    },
+    
+    // Configuración de evaluación
+    EVALUACION: {
+        PREGUNTAS_POR_NIVEL: 10,
+        TIEMPO_LIMITE_SEGUNDOS: 600,
+        MIN_PREGUNTAS_CORRECTAS: {
+            A1: 0,
+            A2: 3,
+            B1: 5,
+            B2: 6,
+            C1: 8,
+            C2: 9
+        }
+    }
+};
+
+/**
+ * ✅ NUEVA: Configuración de tiempos y timeouts
+ */
+const TIMEOUTS_CONFIG = {
+    // Timeout para peticiones API (ms)
+    API_REQUEST: 30000,
+    
+    // Timeout para reenvío de código de verificación (segundos)
+    REENVIO_CODIGO: 60,
+    
+    // Timeout para reenvío de recuperación de contraseña (segundos)
+    REENVIO_RECUPERACION: 120,
+    
+    // Tiempo de espera para redirecciones (ms)
+    REDIRECT_DELAY: 1500,
+    
+    // Duración de mensajes toast (ms)
+    TOAST_DURATION: 4000,
+    
+    // Timeout para auto-logout por inactividad (ms)
+    AUTO_LOGOUT: 30 * 60 * 1000, // 30 minutos
+    
+    // Duración de animaciones (ms)
+    ANIMATION_DURATION: 300,
+    
+    // Debounce para búsquedas (ms)
+    SEARCH_DEBOUNCE: 300,
+    
+    // Polling interval para actualizaciones (ms)
+    POLLING_INTERVAL: 30000 // 30 segundos
 };
 
 /**
@@ -674,13 +810,14 @@ const APP_CONFIG = {
     API: API_CONFIG,
     STORAGE: STORAGE_CONFIG,
     UI: UI_CONFIG,
+    TIMEOUTS: TIMEOUTS_CONFIG,
+    NIVELES: NIVELES_CONFIG,  // ← ✅ AGREGADO
     VALIDATION: VALIDATION_CONFIG,
     GAMIFICACION: GAMIFICACION_CONFIG,
     ROLES: ROLES_CONFIG,
     ERROR: ERROR_CONFIG,
     FORMAT: FORMAT_CONFIG,
     TEST_USERS: TEST_USERS,
-    // Exportar función helper
     navegarAlDashboard: navegarAlDashboard
 };
 
@@ -697,6 +834,8 @@ if (typeof window !== 'undefined') {
         API: API_CONFIG,
         STORAGE: STORAGE_CONFIG,
         UI: UI_CONFIG,
+        TIMEOUTS: TIMEOUTS_CONFIG,
+        NIVELES: NIVELES_CONFIG,  // ← ✅ AGREGADO
         VALIDATION: VALIDATION_CONFIG,
         GAMIFICACION: GAMIFICACION_CONFIG,
         ROLES: ROLES_CONFIG,
@@ -722,5 +861,6 @@ if (typeof exports !== 'undefined') {
 if (APP_ENV.DEBUG && typeof console !== 'undefined') {
     console.log(`🚀 ${APP_ENV.APP_NAME} v${APP_ENV.VERSION} - Configuración cargada en modo: ${APP_ENV.MODE}`);
     console.log('📁 Módulos configurados: Usuarios, Lecciones, Aprendizaje, Desempeño, Mantenimiento');
-    console.log('✅ Rutas de dashboard corregidas para navegación relativa');
-}
+    console.log('✅ Configuración NIVELES agregada correctamente');
+    console.log('🎯 Niveles CEFR disponibles: A1, A2, B1, B2, C1, C2');
+}A
