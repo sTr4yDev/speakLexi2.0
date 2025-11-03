@@ -1,139 +1,39 @@
+<!--
+/pages/estudiante/estudiante-dashboard.html
+Panel de control principal para estudiantes después de iniciar sesión.
+-->
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - SpeakLexi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ✅ PRELOAD CRÍTICO -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="/assets/css/custom-styles.css" as="style">
+    
+    <!-- ✅ CSS EXTERNO -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            900: '#0c4a6e',
-                        },
-                        dark: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-in': 'slideIn 0.3s ease-out',
-                        'pulse-soft': 'pulseSoft 2s infinite',
-                    }
-                }
-            }
-        }
-    </script>
+    
+    <!-- ✅ TAILWIND + CONFIG -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
+    
+    <!-- ✅ CSS INTERNO (crítico) -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <!-- ✅ META OPTIMIZACIÓN -->
+    <meta name="description" content="SpeakLexi - Panel de control para estudiantes">
+    <meta name="theme-color" content="#4F46E5">
 </head>
-<body class="bg-gray-50 dark:bg-dark-900 transition-colors duration-300">
-    <!-- Navbar Mejorada -->
-    <nav class="bg-white dark:bg-dark-800 shadow-lg border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-8">
-                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                        SpeakLexi
-                    </h1>
-                    <div class="hidden lg:flex gap-6">
-                        <a href="#" class="text-primary-600 dark:text-primary-400 font-medium border-b-2 border-primary-600 dark:border-primary-400 pb-1 transition-colors">
-                            <i class="fas fa-home mr-2"></i>Inicio
-                        </a>
-                        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                            <i class="fas fa-book mr-2"></i>Lecciones
-                        </a>
-                        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                            <i class="fas fa-trophy mr-2"></i>Logros
-                        </a>
-                        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                            <i class="fas fa-chart-line mr-2"></i>Progreso
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-4">
-                    <!-- Toggle Modo Oscuro/Claro -->
-                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
-                    </button>
-                    
-                    <!-- Notificaciones -->
-                    <div class="relative">
-                        <button class="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                            <i class="fas fa-bell text-xl"></i>
-                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse-soft"></span>
-                        </button>
-                    </div>
-                    
-                    <!-- User Menu Mejorado -->
-                    <div class="relative">
-                        <button id="user-menu-btn" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <img src="https://ui-avatars.com/api/?name=Usuario&background=6366f1&color=fff" class="w-8 h-8 rounded-full" alt="Avatar" id="user-avatar">
-                            <span class="hidden md:block font-medium text-gray-700 dark:text-gray-200" id="user-name">Usuario</span>
-                            <i class="fas fa-chevron-down text-sm text-gray-500 dark:text-gray-400 transition-transform" id="user-menu-arrow"></i>
-                        </button>
-                        <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-dark-800 rounded-xl shadow-xl py-3 z-50 border border-gray-200 dark:border-gray-600 animate-slide-in">
-                            <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-                                <p class="text-sm font-semibold text-gray-900 dark:text-white" id="dropdown-name">Usuario</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400" id="dropdown-email">usuario@example.com</p>
-                            </div>
-                            <a href="perfil.html" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-user mr-3 text-gray-400"></i>
-                                Mi Perfil
-                            </a>
-                            <a href="/pages/estudiante/cambiar-curso.html" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-language mr-3 text-gray-400"></i>
-                                Cambiar Curso
-                            </a>
-                            <a href="#" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-cog mr-3 text-gray-400"></i>
-                                Configuración
-                            </a>
-                            <hr class="my-2 border-gray-200 dark:border-gray-700">
-                            <button id="logout-btn" class="flex items-center w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                                <i class="fas fa-sign-out-alt mr-3"></i>
-                                Cerrar Sesión
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Mobile Menu -->
-    <div class="lg:hidden bg-white dark:bg-dark-800 border-b border-gray-200 dark:border-gray-700">
-        <div class="flex justify-around py-3">
-            <a href="#" class="flex flex-col items-center text-primary-600 dark:text-primary-400">
-                <i class="fas fa-home mb-1"></i>
-                <span class="text-xs">Inicio</span>
-            </a>
-            <a href="#" class="flex flex-col items-center text-gray-600 dark:text-gray-400">
-                <i class="fas fa-book mb-1"></i>
-                <span class="text-xs">Lecciones</span>
-            </a>
-            <a href="#" class="flex flex-col items-center text-gray-600 dark:text-gray-400">
-                <i class="fas fa-trophy mb-1"></i>
-                <span class="text-xs">Logros</span>
-            </a>
-            <a href="#" class="flex flex-col items-center text-gray-600 dark:text-gray-400">
-                <i class="fas fa-chart-line mb-1"></i>
-                <span class="text-xs">Progreso</span>
-            </a>
-        </div>
-    </div>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- ✅ NAVBAR DINÁMICO -->
+    <div id="navbar-container"></div>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <!-- Header Mejorado -->
         <div class="mb-8 animate-fade-in">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2" id="greeting">¡Bienvenido!</h2>
@@ -149,7 +49,7 @@
 
         <!-- Stats Cards Mejoradas -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Racha Actual</p>
@@ -165,7 +65,7 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">XP Total</p>
@@ -184,7 +84,7 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones</p>
@@ -201,7 +101,7 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Nivel</p>
@@ -268,7 +168,7 @@
                 <!-- Two Column Grid for Daily Goal and Progress -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Daily Goal Card Mejorada -->
-                    <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white">Meta Diaria</h3>
                             <span class="text-sm text-gray-600 dark:text-gray-400" id="meta-diaria">30 min</span>
@@ -295,7 +195,7 @@
                     </div>
 
                     <!-- Weekly Progress Card -->
-                    <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Progreso Semanal</h3>
                         
                         <div class="space-y-4">
@@ -340,7 +240,7 @@
                 </div>
 
                 <!-- Recent Lessons Mejorada -->
-                <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white">Lecciones Recientes</h3>
                         <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">Ver todas</button>
@@ -361,7 +261,7 @@
                             </div>
                         </div>
                         
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-dark-700 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all cursor-pointer group">
+                        <div class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all cursor-pointer group">
                             <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <i class="fas fa-play text-purple-600 dark:text-purple-400 text-lg"></i>
                             </div>
@@ -392,7 +292,7 @@
             <!-- Right Column - 1/3 width -->
             <div class="space-y-8">
                 <!-- Leaderboard Mejorado -->
-                <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white">Clasificación Global</h3>
                         <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">Ver ranking completo</button>
@@ -446,7 +346,7 @@
                 </div>
 
                 <!-- Achievements Mejorado -->
-                <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white">Logros Recientes</h3>
                         <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">Ver todos</button>
@@ -490,7 +390,7 @@
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h3>
                     
                     <div class="grid grid-cols-2 gap-3">
@@ -520,205 +420,24 @@
     </div>
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm w-full"></div>
 
-    <script type="module">
-        // ===== GESTIÓN DE TEMA OSCURO/CLARO =====
-        // Verificar tema guardado o preferencia del sistema [citation:3]
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.getElementById('theme-icon').className = 'fas fa-sun text-yellow-400';
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.getElementById('theme-icon').className = 'fas fa-moon text-gray-600';
-        }
-
-        // Toggle de tema
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            if (document.documentElement.classList.contains('dark')) {
-                localStorage.theme = 'dark';
-                document.getElementById('theme-icon').className = 'fas fa-sun text-yellow-400';
-            } else {
-                localStorage.theme = 'light';
-                document.getElementById('theme-icon').className = 'fas fa-moon text-gray-600';
-            }
-        });
-
-        // ===== VERIFICACIÓN DE AUTENTICACIÓN =====
-        const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
-        const token = localStorage.getItem('token');
-
-        if (!usuario || !token) {
-            window.location.href = 'login.html';
-        }
-
-        // Verificar rol
-        if (usuario.rol !== 'alumno' && usuario.rol !== 'estudiante') {
-            window.location.href = 'login.html';
-        }
-
-        // ===== FUNCIONES DE UTILIDAD =====
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            const bgColor = type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500';
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in dark:bg-opacity-90`;
-            toast.innerHTML = `
-                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // ===== CARGA DE DATOS DEL USUARIO =====
-        async function loadUserData() {
-            try {
-                // Simulación de datos - en producción esto vendría de tu API
-                const userData = {
-                    perfil: {
-                        dias_racha: 7,
-                        total_xp: 1850,
-                        lecciones_completadas: 12,
-                        nivel_usuario: 4,
-                        nivel_actual: 'A1',
-                        idioma_aprendizaje: 'Inglés',
-                        meta_diaria: 30
-                    }
-                };
-
-                // Actualizar UI con datos del usuario
-                const nombreCompleto = `${usuario.nombre || 'Usuario'} ${usuario.primer_apellido || ''}`;
-                document.getElementById('user-name').textContent = usuario.nombre || 'Usuario';
-                document.getElementById('dropdown-name').textContent = usuario.nombre || 'Usuario';
-                document.getElementById('dropdown-email').textContent = usuario.correo || 'usuario@example.com';
-                document.getElementById('greeting').textContent = `¡Bienvenido, ${usuario.nombre || 'Usuario'}!`;
-                
-                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&background=6366f1&color=fff`;
-                document.getElementById('user-avatar').src = avatarUrl;
-                document.getElementById('leaderboard-avatar').src = avatarUrl;
-
-                // Datos del perfil
-                if (userData.perfil) {
-                    document.getElementById('dias-racha').textContent = userData.perfil.dias_racha || 0;
-                    document.getElementById('total-xp').textContent = userData.perfil.total_xp || 0;
-                    document.getElementById('lecciones-completadas').textContent = userData.perfil.lecciones_completadas || 0;
-                    document.getElementById('nivel-usuario').textContent = userData.perfil.nivel_usuario || 1;
-                    document.getElementById('nivel-actual').textContent = `${userData.perfil.nivel_actual || 'A1'} - ${userData.perfil.idioma_aprendizaje || 'Inglés'}`;
-                    document.getElementById('idioma-aprendizaje').textContent = userData.perfil.idioma_aprendizaje || 'Inglés';
-                    document.getElementById('meta-diaria').textContent = `${userData.perfil.meta_diaria || 30} min`;
-                    document.getElementById('leaderboard-xp').textContent = `${userData.perfil.total_xp || 0} XP`;
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error al cargar datos del perfil', 'error');
-            }
-        }
-
-        // ===== GESTIÓN DEL MENÚ DE USUARIO =====
-        const userMenuBtn = document.getElementById('user-menu-btn');
-        const userDropdown = document.getElementById('user-dropdown');
-        const userMenuArrow = document.getElementById('user-menu-arrow');
-
-        userMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            userDropdown.classList.toggle('hidden');
-            userMenuArrow.classList.toggle('rotate-180');
-        });
-
-        // Cerrar dropdown al hacer click fuera
-        document.addEventListener('click', (e) => {
-            if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
-                userDropdown.classList.add('hidden');
-                userMenuArrow.classList.remove('rotate-180');
-            }
-        });
-
-        // ===== LOGOUT =====
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.clear();
-            showToast('Sesión cerrada correctamente', 'success');
-            setTimeout(() => window.location.href = '/pages/auth/login.html', 1000);
-        });
-
-        // ===== ANIMACIONES DE CARGA =====
-        // Animar elementos al hacer scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observar elementos para animación
-        document.querySelectorAll('.bg-white, .bg-gradient-to-br').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            observer.observe(el);
-        });
-
-        // ===== INICIALIZACIÓN =====
-        // Cargar datos al iniciar
-        loadUserData();
-
-        // Mostrar animación de bienvenida
-        setTimeout(() => {
-            showToast(`¡Bienvenido de nuevo, ${usuario.nombre || 'Usuario'}!`, 'success');
-        }, 1000);
-    </script>
-
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideIn {
-            from { 
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes pulseSoft {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        /* Scrollbar personalizado */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-        
-        .dark ::-webkit-scrollbar-track {
-            background: #374151;
-        }
-        
-        .dark ::-webkit-scrollbar-thumb {
-            background: #6b7280;
-        }
-    </style>
+    <!-- ============================================
+         ORDEN DE CARGA OPTIMIZADO (CRÍTICO)
+    ============================================ -->
+    
+    <!-- 1️⃣ CONFIGURACIÓN GLOBAL (SIEMPRE PRIMERO) -->
+    <script src="/config/app-config.js"></script>
+    
+    <!-- 2️⃣ CORE MODULES (async para no bloquear) -->
+    <script src="/assets/js/core/utils.js" async></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/form-validator.js" async></script>
+    <script src="/assets/js/core/theme-manager.js" async></script>
+    <script src="/assets/js/core/toast-manager.js" async></script>
+    <script src="/assets/js/core/navbar-loader.js" async></script>
+    
+    <!-- 3️⃣ LÓGICA DE PÁGINA (defer para DOM listo) -->
+    <script src="/assets/js/pages/estudiante/dashboard.js" defer></script>
 </body>
 </html>

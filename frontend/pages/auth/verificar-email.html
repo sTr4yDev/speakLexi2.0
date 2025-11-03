@@ -1,103 +1,36 @@
+<!--
+/pages/auth/verificar-email.html
+Página de verificación de email durante el registro de usuario.
+-->
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es" class="h-full scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificar Email - SpeakLexi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ✅ PRELOAD CRÍTICO -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="/assets/css/custom-styles.css" as="style">
+    
+    <!-- ✅ CSS EXTERNO -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                        },
-                        secondary: {
-                            50: '#faf5ff',
-                            100: '#f3e8ff',
-                            500: '#a855f7',
-                            600: '#9333ea',
-                            700: '#7c3aed',
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-in': 'slideIn 0.3s ease-out',
-                        'bounce-in': 'bounceIn 0.6s ease-out',
-                        'pulse-slow': 'pulse 3s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        slideIn: {
-                            '0%': { opacity: '0', transform: 'translateX(-10px)' },
-                            '100%': { opacity: '1', transform: 'translateX(0)' },
-                        },
-                        bounceIn: {
-                            '0%': { opacity: '0', transform: 'scale(0.3)' },
-                            '50%': { opacity: '1', transform: 'scale(1.05)' },
-                            '70%': { transform: 'scale(0.9)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .glass-effect {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .code-input:focus {
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
-        }
-    </style>
+    
+    <!-- ✅ TAILWIND + CONFIG -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
+    
+    <!-- ✅ CSS INTERNO (crítico) -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <!-- ✅ META OPTIMIZACIÓN -->
+    <meta name="description" content="SpeakLexi - Verifica tu email para completar el registro">
+    <meta name="theme-color" content="#4F46E5">
 </head>
-<body class="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
-    <nav class="fixed w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center space-x-2">
-                    <a href="index.html" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-gradient-to-r from-secondary-600 to-primary-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-comments text-white text-sm"></i>
-                        </div>
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-secondary-600 to-primary-600 bg-clip-text text-transparent">
-                            SpeakLexi
-                        </h1>
-                    </a>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
-                    </button>
-                    
-                    <div class="hidden md:flex space-x-4">
-                        <a href="index.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
-                            Inicio
-                        </a>
-                        <a href="login.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
-                            Iniciar Sesión
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- ✅ NAVBAR DINÁMICO -->
+    <div id="navbar-container"></div>
 
     <div class="min-h-screen flex items-center justify-center p-4 pt-20">
         <div class="max-w-md w-full animate-fade-in">
@@ -217,289 +150,22 @@
 
     <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm w-full"></div>
 
-    <script type="module">
-        // Función para mostrar toast
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            const bgColor = type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500';
-            const icon = type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
-            
-            toast.className = `${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce-in transform transition-all duration-300`;
-            toast.innerHTML = `
-                <i class="fas ${icon} text-lg"></i>
-                <span class="flex-1">${message}</span>
-                <button class="text-white/80 hover:text-white transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            // Agregar funcionalidad de cerrar
-            const closeBtn = toast.querySelector('button');
-            closeBtn.addEventListener('click', () => {
-                toast.style.transform = 'translateX(100%)';
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            });
-            
-            document.getElementById('toast-container').appendChild(toast);
-            
-            // Auto-remover después de 4 segundos
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.style.transform = 'translateX(100%)';
-                    toast.style.opacity = '0';
-                    setTimeout(() => toast.remove(), 300);
-                }
-            }, 4000);
-        }
-
-        // Obtener email de localStorage o URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get('email') || localStorage.getItem('correo');
-
-        if (!email) {
-            showToast('No se encontró el correo del usuario', 'error');
-            setTimeout(() => window.location.href = 'registro.html', 2000);
-        }
-
-        document.getElementById('email-display').textContent = email;
-
-        // Elementos DOM
-        const verifyForm = document.getElementById('verify-form');
-        const submitBtn = document.getElementById('submit-btn');
-        const resendBtn = document.getElementById('resend-btn');
-        const countdownElement = document.getElementById('countdown');
-        const countdownTimeElement = document.getElementById('countdown-time');
-        const errorAlert = document.getElementById('error-alert');
-        const errorMessage = document.getElementById('error-message');
-        const codeInputs = document.querySelectorAll('.code-input');
-
-        // Estado del countdown
-        let countdown = 60;
-        let countdownInterval = null;
-
-        // Iniciar countdown al cargar la página
-        startCountdown();
-
-        function startCountdown() {
-            resendBtn.disabled = true;
-            countdownElement.classList.remove('hidden');
-            
-            countdownInterval = setInterval(() => {
-                countdown--;
-                countdownTimeElement.textContent = countdown;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    resendBtn.disabled = false;
-                    countdownElement.classList.add('hidden');
-                    countdown = 60;
-                }
-            }, 1000);
-        }
-
-        // Mostrar error
-        function showError(msg) {
-            errorMessage.textContent = msg;
-            errorAlert.classList.remove('hidden');
-        }
-
-        function hideError() {
-            errorAlert.classList.add('hidden');
-        }
-
-        // Manejo de inputs de código
-        codeInputs.forEach((input, index) => {
-            input.addEventListener('input', (e) => {
-                const value = e.target.value;
-                
-                // Si pegan los 6 dígitos
-                if (value.length > 1) {
-                    const code = value.slice(0, 6);
-                    code.split('').forEach((digit, i) => {
-                        if (codeInputs[i]) {
-                            codeInputs[i].value = digit;
-                        }
-                    });
-                    codeInputs[5].focus();
-                    return;
-                }
-
-                // Auto-mover al siguiente input
-                if (value && index < 5) {
-                    codeInputs[index + 1].focus();
-                }
-
-                // Auto-verificar si todos los campos están llenos
-                const allFilled = Array.from(codeInputs).every(input => input.value);
-                if (allFilled) {
-                    verifyForm.requestSubmit();
-                }
-            });
-
-            input.addEventListener('keydown', (e) => {
-                // Backspace: volver al anterior
-                if (e.key === 'Backspace' && !input.value && index > 0) {
-                    codeInputs[index - 1].focus();
-                }
-                
-                // Flechas: navegar entre inputs
-                if (e.key === 'ArrowLeft' && index > 0) {
-                    codeInputs[index - 1].focus();
-                    e.preventDefault();
-                }
-                if (e.key === 'ArrowRight' && index < 5) {
-                    codeInputs[index + 1].focus();
-                    e.preventDefault();
-                }
-            });
-
-            // Solo permitir números
-            input.addEventListener('keypress', (e) => {
-                if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault();
-                }
-            });
-
-            // Prevenir pegar texto no numérico
-            input.addEventListener('paste', (e) => {
-                e.preventDefault();
-                const pasteData = e.clipboardData.getData('text');
-                const numbersOnly = pasteData.replace(/\D/g, '');
-                if (numbersOnly) {
-                    const code = numbersOnly.slice(0, 6);
-                    code.split('').forEach((digit, i) => {
-                        if (codeInputs[i]) {
-                            codeInputs[i].value = digit;
-                        }
-                    });
-                    codeInputs[5].focus();
-                }
-            });
-        });
-
-        // Auto-focus en primer input
-        setTimeout(() => codeInputs[0].focus(), 100);
-
-        // Submit form
-        verifyForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideError();
-
-            const code = Array.from(codeInputs).map(input => input.value).join('');
-
-            if (code.length !== 6) {
-                showError('Por favor ingresa el código completo de 6 dígitos');
-                codeInputs[0].focus();
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verificando...';
-
-            try {
-                const res = await fetch('http://localhost:5000/api/auth/verificar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ correo: email, codigo: code })
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(data.error || 'Error al verificar el correo');
-                }
-
-                showToast('✅ Correo verificado correctamente', 'success');
-
-                // ✅ CORRECCIÓN: NO borrar localStorage aquí
-                // Se necesita en asignar-nivel.html
-                // El localStorage se limpiará después de asignar el nivel exitosamente
-
-                // Redirigir a asignar nivel
-                setTimeout(() => {
-                    window.location.href = '/pages/onboarding/asignar-nivel.html';
-                }, 1500);
-
-            } catch (error) {
-                // Resetear inputs en caso de error
-                codeInputs.forEach(input => input.value = '');
-                codeInputs[0].focus();
-                showError(error.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Verificar Email';
-            }
-        });
-
-        // Reenviar código
-        resendBtn.addEventListener('click', async () => {
-            resendBtn.disabled = true;
-            resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Reenviando...';
-
-            try {
-                const res = await fetch('http://localhost:5000/api/auth/reenviar-verificacion', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ correo: email })
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(data.error || 'Error al reenviar código');
-                }
-
-                showToast('✅ Código reenviado. Revisa tu correo electrónico.', 'success');
-                
-                // Reiniciar countdown
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                }
-                countdown = 60;
-                startCountdown();
-
-            } catch (error) {
-                showToast(error.message, 'error');
-            } finally {
-                resendBtn.disabled = false;
-                resendBtn.innerHTML = '<i class="fas fa-redo-alt mr-2"></i>Reenviar código';
-            }
-        });
-    </script>
-
-    <script>
-        // Toggle tema oscuro/claro
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        
-        // Verificar preferencia guardada o del sistema
-        if (localStorage.getItem('color-theme') === 'dark' || 
-            (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-        } else {
-            document.documentElement.classList.remove('dark');
-            themeIcon.classList.remove('fa-sun');
-            themeIcon.classList.add('fa-moon');
-        }
-        
-        themeToggle.addEventListener('click', function() {
-            // Toggle icon
-            themeIcon.classList.toggle('fa-moon');
-            themeIcon.classList.toggle('fa-sun');
-            
-            // Toggle dark class
-            document.documentElement.classList.toggle('dark');
-            
-            // Save preference
-            if (document.documentElement.classList.contains('dark')) {
-                localStorage.setItem('color-theme', 'dark');
-            } else {
-                localStorage.setItem('color-theme', 'light');
-            }
-        });
-    </script>
+    <!-- ============================================
+         ORDEN DE CARGA OPTIMIZADO (CRÍTICO)
+    ============================================ -->
+    
+    <!-- 1️⃣ CONFIGURACIÓN GLOBAL (SIEMPRE PRIMERO) -->
+    <script src="/config/app-config.js"></script>
+    
+    <!-- 2️⃣ CORE MODULES (async para no bloquear) -->
+    <script src="/assets/js/core/utils.js" async></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/form-validator.js" async></script>
+    <script src="/assets/js/core/theme-manager.js" async></script>
+    <script src="/assets/js/core/toast-manager.js" async></script>
+    <script src="/assets/js/core/navbar-loader.js" async></script>
+    
+    <!-- 3️⃣ LÓGICA DE PÁGINA (defer para DOM listo) -->
+    <script src="/assets/js/pages/auth/verificar-email.js" defer></script>
 </body>
 </html>

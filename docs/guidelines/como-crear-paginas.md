@@ -1,33 +1,30 @@
-# 🚀 Guía Completa de Implementación y Optimización - SpeakLexi 2.0
+# 📘 GUÍA COMPLETA DE IMPLEMENTACIÓN Y OPTIMIZACIÓN - SpeakLexi 2.0
 
-## 🎯 Objetivo Combinado
+## 🎯 OBJETIVO COMBINADO
 **Optimizar el frontend** + **Implementar arquitectura centralizada con APP_CONFIG** para todos los módulos futuros.
 
 ---
 
-## 🏗️ Arquitectura Final Optimizada con APP_CONFIG
+## 🏗️ ARQUITECTURA FINAL OPTIMIZADA
 
 ### 📂 ESTRUCTURA DE ARCHIVOS (Definitiva)
 ```
 frontend/
-├── 📁 config/
+├── config/
 │   └── app-config.js           ← ⭐ CORAZÓN DEL SISTEMA
-├── 📁 assets/
-│   ├── 📁 components/          # Componentes HTML reutilizables
-│   │   ├── navbar.html
-│   │   └── footer.html
-│   ├── 📁 css/                 # Estilos modulares
-│   │   ├── animations.css
-│   │   └── custom-styles.css
-│   └── 📁 js/
-│       ├── 📁 core/            ← ✅ SCRIPTS CENTRALIZADOS (usan APP_CONFIG)
-│       │   ├── api-client.js
-│       │   ├── form-validator.js
-│       │   ├── theme-manager.js
-│       │   ├── toast-manager.js
-│       │   ├── navbar-loader.js
-│       │   └── utils.js
-│       └── 📁 pages/           ← ✅ LÓGICA ESPECÍFICA
+├── assets/
+│   ├── css/
+│   │   ├── custom-styles.css
+│   │   └── animations.css
+│   └── js/
+│       ├── core/               ← ✅ SCRIPTS CENTRALIZADOS
+│       │   ├── api-client.js      (usa APP_CONFIG)
+│       │   ├── form-validator.js  (usa APP_CONFIG)
+│       │   ├── theme-manager.js   (usa APP_CONFIG)
+│       │   ├── toast-manager.js   (usa APP_CONFIG)
+│       │   ├── navbar-loader.js   (usa APP_CONFIG)
+│       │   └── utils.js           (usa APP_CONFIG)
+│       └── pages/              ← ✅ LÓGICA ESPECÍFICA
 │           ├── auth/
 │           │   ├── registro.js     (✅ LISTO)
 │           │   ├── login.js
@@ -37,8 +34,8 @@ frontend/
 │           ├── profesor/
 │           ├── admin/
 │           └── mantenimiento/
-└── 📁 pages/                   ← ✅ PÁGINAS OPTIMIZADAS
-    ├── auth/
+└── pages/
+    ├── auth/                   ← ✅ PÁGINAS OPTIMIZADAS
     ├── estudiante/
     ├── profesor/
     ├── admin/
@@ -52,7 +49,7 @@ frontend/
 ### ✅ `template-pagina.html` (Usar como base)
 ```html
 <!DOCTYPE html>
-<html lang="es" class="h-full scroll-smooth">
+<html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,7 +64,7 @@ frontend/
     
     <!-- ✅ TAILWIND + CONFIG -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/assets/js/core/tailwind-config.js"></script>
+    <script src="/assets/js/tailwind-config.js"></script>
     
     <!-- ✅ CSS INTERNO (crítico) -->
     <link rel="stylesheet" href="/assets/css/custom-styles.css">
@@ -109,7 +106,7 @@ frontend/
 
 ---
 
-## 📝 PLANTILLA JS PARA NUEVAS PÁGINAS (Con APP_CONFIG)
+## 📝 PLANTILLA JS PARA NUEVAS PÁGINAS
 
 ### ✅ `template-pagina.js` (Usar como base)
 ```javascript
@@ -200,6 +197,23 @@ frontend/
         
         // Eventos específicos del módulo
         configurarEventosEspecificos();
+    }
+
+    /**
+     * Carga datos iniciales si es necesario
+     */
+    async function cargarDatosIniciales() {
+        try {
+            mostrarLoading(true);
+            
+            // Ejemplo: Cargar listas desplegables
+            // await cargarOpcionesSelect();
+            
+        } catch (error) {
+            manejarError('Error cargando datos iniciales', error);
+        } finally {
+            mostrarLoading(false);
+        }
     }
 
     /**

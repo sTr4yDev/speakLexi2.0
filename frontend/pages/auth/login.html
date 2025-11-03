@@ -1,99 +1,36 @@
+<!--
+/pages/auth/login.html
+Página de inicio de sesión para usuarios existentes.
+-->>
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es" class="h-full scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - SpeakLexi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ✅ PRELOAD CRÍTICO -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="/assets/css/custom-styles.css" as="style">
+    
+    <!-- ✅ CSS EXTERNO -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                        },
-                        secondary: {
-                            50: '#faf5ff',
-                            100: '#f3e8ff',
-                            500: '#a855f7',
-                            600: '#9333ea',
-                            700: '#7c3aed',
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-in': 'slideIn 0.3s ease-out',
-                        'bounce-in': 'bounceIn 0.6s ease-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        slideIn: {
-                            '0%': { opacity: '0', transform: 'translateX(-10px)' },
-                            '100%': { opacity: '1', transform: 'translateX(0)' },
-                        },
-                        bounceIn: {
-                            '0%': { opacity: '0', transform: 'scale(0.3)' },
-                            '50%': { opacity: '1', transform: 'scale(1.05)' },
-                            '70%': { transform: 'scale(0.9)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .glass-effect {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-    </style>
+    
+    <!-- ✅ TAILWIND + CONFIG -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
+    
+    <!-- ✅ CSS INTERNO (crítico) -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <!-- ✅ META OPTIMIZACIÓN -->
+    <meta name="description" content="SpeakLexi - Plataforma de aprendizaje de idiomas">
+    <meta name="theme-color" content="#4F46E5">
 </head>
-<body class="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
-    <nav class="fixed w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center space-x-2">
-                    <a href="index.html" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-gradient-to-r from-secondary-600 to-primary-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-comments text-white text-sm"></i>
-                        </div>
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-secondary-600 to-primary-600 bg-clip-text text-transparent">
-                            SpeakLexi
-                        </h1>
-                    </a>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
-                    </button>
-                    
-                    <div class="hidden md:flex space-x-4">
-                        <a href="index.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
-                            Inicio
-                        </a>
-                        <a href="registro.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
-                            Registrarse
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- ✅ NAVBAR DINÁMICO -->
+    <div id="navbar-container"></div>
 
     <div class="min-h-screen flex items-center justify-center p-4 pt-20">
         <div class="max-w-md w-full animate-fade-in">
@@ -139,7 +76,8 @@
                         <i id="toggle-icon" class="fas fa-chevron-down text-gray-500 transition-transform"></i>
                     </button>
                     <div id="test-users-container" class="hidden p-4 space-y-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                        </div>
+                        <!-- Usuarios de prueba se cargarán dinámicamente -->
+                    </div>
                 </div>
 
                 <form id="login-form" class="space-y-6">
@@ -234,316 +172,22 @@
 
     <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm w-full"></div>
 
-    <script type="module">
-        // Usuarios de prueba
-        const TEST_USERS = [
-            {
-                name: "Estudiante Demo",
-                email: "estudiante@speaklexi.com",
-                password: "estudiante123",
-                role: "estudiante",
-                description: "Acceso completo al módulo de aprendizaje",
-                color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-            },
-            {
-                name: "Profesor Demo",
-                email: "profesor@speaklexi.com",
-                password: "profesor123",
-                role: "profesor",
-                description: "Acceso a estadísticas y retroalimentación",
-                color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-            },
-            {
-                name: "Admin Demo",
-                email: "admin@speaklexi.com",
-                password: "admin123",
-                role: "admin",
-                description: "Gestión de contenido y lecciones",
-                color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-            },
-            {
-                name: "Mantenimiento Demo",
-                email: "mantenimiento@speaklexi.com",
-                password: "mantenimiento123",
-                role: "mantenimiento",
-                description: "Reportes y tareas programadas",
-                color: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-            }
-        ];
-
-        // Estado
-        let userId = null;
-        let diasRestantes = 0;
-        let cuentaDesactivada = false;
-
-        // Elementos DOM
-        const loginForm = document.getElementById('login-form');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const submitBtn = document.getElementById('submit-btn');
-        const togglePassword = document.getElementById('toggle-password');
-        const eyeIcon = document.getElementById('eye-icon');
-        const errorAlert = document.getElementById('error-alert');
-        const errorMessage = document.getElementById('error-message');
-        const deactivatedAlert = document.getElementById('deactivated-alert');
-        const deactivatedMessage = document.getElementById('deactivated-message');
-        const reactivateBtn = document.getElementById('reactivate-btn');
-        const toggleTestUsers = document.getElementById('toggle-test-users');
-        const testUsersContainer = document.getElementById('test-users-container');
-        const toggleIcon = document.getElementById('toggle-icon');
-
-        // Función para mostrar toast
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            const bgColor = type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500';
-            const icon = type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
-            
-            toast.className = `${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce-in transform transition-all duration-300`;
-            toast.innerHTML = `
-                <i class="fas ${icon} text-lg"></i>
-                <span class="flex-1">${message}</span>
-                <button class="text-white/80 hover:text-white transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            // Agregar funcionalidad de cerrar
-            const closeBtn = toast.querySelector('button');
-            closeBtn.addEventListener('click', () => {
-                toast.style.transform = 'translateX(100%)';
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            });
-            
-            document.getElementById('toast-container').appendChild(toast);
-            
-            // Auto-remover después de 4 segundos
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.style.transform = 'translateX(100%)';
-                    toast.style.opacity = '0';
-                    setTimeout(() => toast.remove(), 300);
-                }
-            }, 4000);
-        }
-
-        // Mostrar error
-        function showError(msg) {
-            errorMessage.textContent = msg;
-            errorAlert.classList.remove('hidden');
-            deactivatedAlert.classList.add('hidden');
-        }
-
-        // Ocultar errores
-        function hideErrors() {
-            errorAlert.classList.add('hidden');
-            deactivatedAlert.classList.add('hidden');
-        }
-
-        // Toggle password visibility
-        togglePassword.addEventListener('click', () => {
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-            eyeIcon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
-        });
-
-        // Toggle test users
-        toggleTestUsers.addEventListener('click', () => {
-            testUsersContainer.classList.toggle('hidden');
-            toggleIcon.className = testUsersContainer.classList.contains('hidden') 
-                ? 'fas fa-chevron-down text-gray-500' 
-                : 'fas fa-chevron-up text-gray-500';
-        });
-
-        // Cargar usuarios de prueba
-        function loadTestUsers() {
-            testUsersContainer.innerHTML = TEST_USERS.map(user => `
-                <button type="button" data-email="${user.email}" data-password="${user.password}" class="test-user-btn w-full text-left p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:border-primary-300 dark:hover:border-primary-700 transition-all duration-200 transform hover:-translate-y-1 hover:shadow-md">
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="flex-1 min-w-0">
-                            <p class="font-medium text-sm text-gray-900 dark:text-white">${user.name}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">${user.email}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">${user.description}</p>
-                        </div>
-                        <span class="text-xs font-medium px-3 py-1 rounded-full ${user.color} whitespace-nowrap">
-                            ${user.role}
-                        </span>
-                    </div>
-                </button>
-            `).join('');
-
-            // Agregar event listeners
-            document.querySelectorAll('.test-user-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const button = e.currentTarget;
-                    emailInput.value = button.dataset.email;
-                    passwordInput.value = button.dataset.password;
-                    testUsersContainer.classList.add('hidden');
-                    toggleIcon.className = 'fas fa-chevron-down text-gray-500';
-                    hideErrors();
-                    showToast(`Credenciales cargadas - ${button.querySelector('p').textContent}`, 'success');
-                });
-            });
-        }
-
-        loadTestUsers();
-
-        // Reactivar cuenta
-        reactivateBtn.addEventListener('click', async () => {
-            if (!userId) {
-                showToast('No se pudo identificar el usuario', 'error');
-                return;
-            }
-
-            reactivateBtn.disabled = true;
-            reactivateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Reactivando...';
-
-            try {
-                const res = await fetch(`http://localhost:5000/api/usuario/reactivar/${userId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: passwordInput.value })
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) throw new Error(data.error || 'Error al reactivar la cuenta');
-
-                showToast('¡Cuenta reactivada exitosamente!', 'success');
-                hideErrors();
-                setTimeout(() => loginForm.requestSubmit(), 1000);
-
-            } catch (error) {
-                showToast(error.message, 'error');
-            } finally {
-                reactivateBtn.disabled = false;
-                reactivateBtn.innerHTML = '<i class="fas fa-refresh mr-2"></i>Reactivar mi cuenta';
-            }
-        });
-
-        // Submit form
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideErrors();
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Iniciando sesión...';
-
-            try {
-                const res = await fetch('http://localhost:5000/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        correo: emailInput.value,
-                        password: passwordInput.value
-                    })
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    if (data.codigo === 'CUENTA_DESACTIVADA') {
-                        userId = data.usuario_id?.toString() || null;
-                        diasRestantes = data.dias_restantes || 0;
-                        deactivatedMessage.textContent = diasRestantes > 0 
-                            ? `Tienes ${diasRestantes} días para reactivarla.`
-                            : 'El período de recuperación ha expirado.';
-                        deactivatedAlert.classList.remove('hidden');
-                        if (diasRestantes <= 0) {
-                            reactivateBtn.classList.add('hidden');
-                        }
-                        return;
-                    } else if (data.codigo === 'CUENTA_ELIMINADA') {
-                        showError('Esta cuenta ha sido eliminada permanentemente.');
-                    } else if (data.codigo === 'EMAIL_NOT_VERIFIED') {
-                        showToast('Email no verificado. Revisa tu correo.', 'error');
-                        setTimeout(() => {
-                            window.location.href = `verificar-email.html?email=${encodeURIComponent(emailInput.value)}`;
-                        }, 1500);
-                    } else {
-                        throw new Error(data.error || `Error ${res.status}`);
-                    }
-                    return;
-                }
-
-                // ===================================
-                // INICIO DE LA CORRECCIÓN APLICADA
-                // ===================================
-                const usuario = data.usuario;
-                const token = data.token; // <-- CORREGIDO (antes era access_token)
-
-                if (!usuario || !token) { // <-- CORREGIDO (antes era access_token)
-                    throw new Error('Respuesta inválida del servidor');
-                }
-
-                // Guardar en localStorage
-                localStorage.setItem('usuario', JSON.stringify(usuario));
-                localStorage.setItem('token', token); // <-- CORREGIDO (antes era access_token)
-                // ===================================
-                // FIN DE LA CORRECCIÓN APLICADA
-                // ===================================
-
-                showToast(`✅ ¡Bienvenido ${usuario.nombre}!`, 'success');
-
-                // Redirección según rol
-                const rol = usuario.rol?.toLowerCase() || 'estudiante';
-                let redirectPath = '/pages/estudiante/estudiante-dashboard.html';
-
-                if (rol === 'admin' || rol === 'administrador') {
-                    redirectPath = '/pages/admin/admin-dashboard.html';
-                } else if (rol === 'profesor' || rol === 'teacher') {
-                    redirectPath = 'profesor-dashboard.html';
-                } else if (rol === 'mantenimiento' || rol === 'maintenance') {
-                    redirectPath = 'pages/mantenimiento/mantenimiento-dashboard.html';
-                }
-
-                setTimeout(() => window.location.href = redirectPath, 1000);
-
-            } catch (error) {
-                let errorMsg = error.message || 'Error desconocido';
-                if (error.message === 'Failed to fetch') {
-                    errorMsg = 'No se pudo conectar al servidor. Intenta más tarde.';
-                }
-                showError(errorMsg);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión';
-            }
-        });
-    </script>
-
-    <script>
-        // Toggle tema oscuro/claro
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        
-        // Verificar preferencia guardada o del sistema
-        if (localStorage.getItem('color-theme') === 'dark' || 
-            (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-        } else {
-            document.documentElement.classList.remove('dark');
-            themeIcon.classList.remove('fa-sun');
-            themeIcon.classList.add('fa-moon');
-        }
-        
-        themeToggle.addEventListener('click', function() {
-            // Toggle icon
-            themeIcon.classList.toggle('fa-moon');
-            themeIcon.classList.toggle('fa-sun');
-            
-            // Toggle dark class
-            document.documentElement.classList.toggle('dark');
-            
-            // Save preference
-            if (document.documentElement.classList.contains('dark')) {
-                localStorage.setItem('color-theme', 'dark');
-            } else {
-                localStorage.setItem('color-theme', 'light');
-            }
-        });
-    </script>
+    <!-- ============================================
+         ORDEN DE CARGA OPTIMIZADO (CRÍTICO)
+    ============================================ -->
+    
+    <!-- 1️⃣ CONFIGURACIÓN GLOBAL (SIEMPRE PRIMERO) -->
+    <script src="/config/app-config.js"></script>
+    
+    <!-- 2️⃣ CORE MODULES (async para no bloquear) -->
+    <script src="/assets/js/core/utils.js" async></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/form-validator.js" async></script>
+    <script src="/assets/js/core/theme-manager.js" async></script>
+    <script src="/assets/js/core/toast-manager.js" async></script>
+    <script src="/assets/js/core/navbar-loader.js" async></script>
+    
+    <!-- 3️⃣ LÓGICA DE PÁGINA (defer para DOM listo) -->
+    <script src="/assets/js/pages/auth/login.js" defer></script>
 </body>
 </html>

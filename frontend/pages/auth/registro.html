@@ -1,3 +1,7 @@
+<!--
+/pages/auth/registro.html
+Página de registro de nuevos usuarios.
+-->>
 <!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
 <head>
@@ -16,7 +20,7 @@
     <link rel="stylesheet" href="/assets/css/animations.css">
     
     <!-- ✅ Config Tailwind -->
-    <script src="/assets/js/tailwind-config.js"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
     <!-- Navbar se cargará dinámicamente -->
@@ -286,15 +290,22 @@
         </div>
     </div>
 
-    <!-- ✅ Scripts modulares con rutas absolutas -->
-    <script src="/assets/js/navbar-loader.js"></script>
-    <script src="/assets/js/theme-manager.js"></script>
-    <script src="/assets/js/toast-manager.js"></script>
-    <script src="/assets/js/form-validator.js"></script>
-    <script src="/assets/js/api-client.js"></script>
-    <script src="/assets/js/utils.js"></script>
+    <!-- ============================================
+         ORDEN CORRECTO DE CARGA DE SCRIPTS
+         ============================================ -->
 
-    <!-- ✅ Lógica específica de registro -->
-    <script src="/assets/js/pages/registro.js"></script>
+    <!-- 1️⃣ PRIMERO: Configuración global (CRÍTICO) -->
+    <script src="/config/app-config.js"></script>
+
+    <!-- 2️⃣ DESPUÉS: Utilidades que dependen de config -->
+    <script src="/assets/js/core/api-client.js"></script>
+    <script src="/assets/js/core/form-validator.js"></script>
+    <script src="/assets/js/core/toast-manager.js"></script>
+    <script src="/assets/js/core/theme-manager.js"></script>
+    <script src="/assets/js/core/navbar-loader.js"></script>
+    <script src="/assets/js/core/utils.js"></script>
+
+    <!-- 3️⃣ FINALMENTE: Lógica específica de la página -->
+    <script src="/assets/js/pages/auth/registro.js"></script>
 </body>
 </html>

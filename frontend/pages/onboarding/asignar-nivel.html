@@ -1,25 +1,38 @@
+<!--
+/pages/onboarding/asignar-nivel.html
+Página de asignación de nivel para nuevos usuarios después del registro.
+-->
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asignar Nivel - SpeakLexi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ✅ PRELOAD CRÍTICO -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="/assets/css/custom-styles.css" as="style">
+    
+    <!-- ✅ CSS EXTERNO -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
+    
+    <!-- ✅ TAILWIND + CONFIG -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
+    
+    <!-- ✅ CSS INTERNO (crítico) -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <!-- ✅ META OPTIMIZACIÓN -->
+    <meta name="description" content="SpeakLexi - Asigna tu nivel de idioma para personalizar tu aprendizaje">
+    <meta name="theme-color" content="#4F46E5">
 </head>
-<body class="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors duration-300">
-    <div class="fixed top-4 right-4 z-40">
-        <button id="theme-toggle" class="p-2 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all">
-            <i class="fas fa-moon text-gray-700 dark:text-yellow-400" id="theme-icon"></i>
-        </button>
-    </div>
+<body class="h-full bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <!-- ✅ NAVBAR DINÁMICO -->
+    <div id="navbar-container"></div>
 
-    <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="min-h-screen flex items-center justify-center p-4 pt-20">
         <div class="max-w-4xl w-full">
             <div class="text-center mb-8">
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
@@ -32,363 +45,24 @@
         </div>
     </div>
 
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm w-full"></div>
 
-    <script type="module">
-        // Verificar tema guardado o preferencia del sistema
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.getElementById('theme-icon').className = 'fas fa-sun text-yellow-400';
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.getElementById('theme-icon').className = 'fas fa-moon text-gray-700';
-        }
-
-        // Toggle de tema
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            if (document.documentElement.classList.contains('dark')) {
-                localStorage.theme = 'dark';
-                document.getElementById('theme-icon').className = 'fas fa-sun text-yellow-400';
-            } else {
-                localStorage.theme = 'light';
-                document.getElementById('theme-icon').className = 'fas fa-moon text-gray-700';
-            }
-        });
-
-        const LEVELS = [
-            { id: "A1", name: "Principiante", description: "Empezando desde cero" },
-            { id: "A2", name: "Elemental", description: "Conocimientos básicos" },
-            { id: "B1", name: "Intermedio", description: "Conversación cotidiana" },
-            { id: "B2", name: "Intermedio Alto", description: "Fluidez en la mayoría de situaciones" },
-            { id: "C1", name: "Avanzado", description: "Dominio del idioma" },
-            { id: "C2", name: "Maestría", description: "Nivel nativo" }
-        ];
-
-        // Preguntas para cada idioma
-        const EVALUATION_QUESTIONS = {
-            'inglés': [
-                { question: "Complete: 'I ___ to the store yesterday'", options: ["go", "goes", "went", "going"], correct: 2 },
-                { question: "Which sentence is correct?", options: ["She don't like pizza", "She doesn't likes pizza", "She doesn't like pizza", "She not like pizza"], correct: 2 },
-                { question: "What does 'although' mean?", options: ["because", "but/however", "therefore", "also"], correct: 1 },
-                { question: "Choose the correct form: 'If I ___ rich, I would travel the world'", options: ["am", "was", "were", "be"], correct: 2 },
-                { question: "What is a synonym for 'ubiquitous'?", options: ["rare", "everywhere", "beautiful", "difficult"], correct: 1 },
-                { question: "Complete the idiom: 'It's raining cats and ___'", options: ["dogs", "birds", "fish", "mice"], correct: 0 },
-                { question: "Which is the correct passive form: 'They built the house in 1990'", options: ["The house built in 1990", "The house was built in 1990", "The house is built in 1990", "The house has built in 1990"], correct: 1 },
-                { question: "What does 'serendipity' mean?", options: ["A happy accident", "A sad moment", "A difficult situation", "A planned event"], correct: 0 },
-                { question: "Identify the correct tag question: 'She can swim, ___?'", options: ["can she", "can't she", "does she", "doesn't she"], correct: 1 },
-                { question: "Choose the correct phrasal verb: 'Please ___ the lights when you leave'", options: ["turn off", "turn on", "turn up", "turn down"], correct: 0 }
-            ],
-            'francés': [
-                { question: "Comment dit-on 'Bonjour' en français?", options: ["Bonjour", "Bonsoir", "Merci", "Au revoir"], correct: 0 },
-                { question: "Quelle est la forme correcte: 'Je ___ français'", options: ["est", "suis", "es", "sont"], correct: 1 },
-                { question: "Complétez: 'Nous ___ à Paris l'année dernière'", options: ["allons", "sommes allés", "irons", "allions"], correct: 1 },
-                { question: "Quelle phrase est correcte?", options: ["Je vais au cinéma", "Je va au cinéma", "Je aller au cinéma", "Je vais cinéma"], correct: 0 },
-                { question: "Que signifie 'bien que'?", options: ["parce que", "mais", "donc", "aussi"], correct: 1 },
-                { question: "Choisissez la forme correcte: 'Si j'___ riche, je voyagerais dans le monde entier'", options: ["étais", "serais", "sois", "suis"], correct: 0 },
-                { question: "Quel est un synonyme de 'ubiquitaire'?", options: ["rare", "partout", "beau", "difficile"], correct: 1 },
-                { question: "Complétez l'expression: 'Il pleut des cordes et des ___'", options: ["chiens", "chats", "poissons", "souris"], correct: 1 },
-                { question: "Quelle est la forme passive: 'Ils ont construit la maison en 1990'", options: ["La maison a été construite en 1990", "La maison est construite en 1990", "La maison a construit en 1990", "La maison était construite en 1990"], correct: 0 },
-                { question: "Que signifie 'sérendipité'?", options: ["Une heureuse découverte", "Un moment triste", "Une situation difficile", "Un événement planifié"], correct: 0 }
-            ],
-            'portugués': [
-                { question: "Como se diz 'Olá' em português?", options: ["Olá", "Adeus", "Obrigado", "Por favor"], correct: 0 },
-                { question: "Qual é a forma correta: 'Eu ___ português'", options: ["sou", "és", "é", "são"], correct: 0 },
-                { question: "Complete: 'Nós ___ para o Brasil no ano passado'", options: ["vamos", "fomos", "iremos", "íamos"], correct: 1 },
-                { question: "Qual frase está correta?", options: ["Eu vou ao cinema", "Eu vai ao cinema", "Eu ir ao cinema", "Eu vou cinema"], correct: 0 },
-                { question: "O que significa 'embora'?", options: ["porque", "mas", "portanto", "também"], correct: 1 },
-                { question: "Escolha a forma correta: 'Se eu ___ rico, viajaria pelo mundo'", options: ["fosse", "era", "seja", "sou"], correct: 0 },
-                { question: "Qual é um sinônimo de 'onipresente'?", options: ["raro", "em todo lugar", "bonito", "difícil"], correct: 1 },
-                { question: "Complete a expressão: 'Está chovendo a cântaros e ___'", options: ["cachorros", "gatos", "peixes", "ratos"], correct: 1 },
-                { question: "Qual é a forma passiva: 'Eles construíram a casa em 1990'", options: ["A casa foi construída em 1990", "A casa é construída em 1990", "A casa construiu em 1990", "A casa estava construída em 1990"], correct: 0 },
-                { question: "O que significa 'serendipidade'?", options: ["Um feliz acidente", "Um momento triste", "Uma situação difícil", "Um evento planejado"], correct: 0 }
-            ]
-        };
-
-        let step = 'choice'; // choice, evaluation, manual, results
-        let currentQuestion = 0;
-        let answers = [];
-        let selectedLevel = '';
-        let calculatedLevel = '';
-        let idioma = localStorage.getItem('idioma') || '';
-
-        const container = document.getElementById('content-container');
-        const subtitle = document.getElementById('subtitle');
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            const bgColor = type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500';
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in dark:bg-opacity-90`;
-            toast.innerHTML = `
-                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function renderChoice() {
-            subtitle.textContent = `Asigna tu nivel ${idioma ? 'de ' + idioma : ''}`;
-            container.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-colors duration-300">
-                    <div class="mb-6 text-center">
-                        <h2 class="text-3xl font-bold dark:text-white">Asigna tu Nivel</h2>
-                        <p class="mt-2 text-gray-600 dark:text-gray-300">
-                            Elige cómo quieres determinar tu nivel ${idioma ? 'de ' + idioma : ''}
-                        </p>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <button id="start-evaluation" class="group flex flex-col items-center gap-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300">
-                            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 group-hover:bg-purple-600 dark:group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                                <i class="fas fa-brain text-3xl"></i>
-                            </div>
-                            <div class="text-center">
-                                <h3 class="text-lg font-semibold dark:text-white">Realizar Evaluación</h3>
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                                    Responde 10 preguntas para determinar tu nivel
-                                </p>
-                            </div>
-                        </button>
-
-                        <button id="manual-selection" class="group flex flex-col items-center gap-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300">
-                            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 dark:group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">
-                                <i class="fas fa-book text-3xl"></i>
-                            </div>
-                            <div class="text-center">
-                                <h3 class="text-lg font-semibold dark:text-white">Seleccionar Nivel</h3>
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                                    Ya conozco mi nivel y quiero elegirlo manually
-                                </p>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('start-evaluation').addEventListener('click', () => {
-                const supportedLanguages = ['inglés', 'francés', 'portugués'];
-                if (!supportedLanguages.includes(idioma.toLowerCase())) {
-                    showToast(`Examen para otros idiomas en desarrollo. Selecciona tu nivel manualmente.`, 'info');
-                    return;
-                }
-                step = 'evaluation';
-                render();
-            });
-
-            document.getElementById('manual-selection').addEventListener('click', () => {
-                step = 'manual';
-                render();
-            });
-        }
-
-        function renderEvaluation() {
-            const questions = EVALUATION_QUESTIONS[idioma.toLowerCase()];
-            const question = questions[currentQuestion];
-            const progress = ((currentQuestion + 1) / questions.length) * 100;
-
-            subtitle.textContent = 'Evaluación de nivel';
-            container.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-colors duration-300">
-                    <div class="mb-6">
-                        <div class="mb-2 flex justify-between text-sm">
-                            <span class="text-gray-600 dark:text-gray-300">
-                                Pregunta ${currentQuestion + 1} de ${questions.length}
-                            </span>
-                            <span class="font-medium dark:text-white">${Math.round(progress)}%</span>
-                        </div>
-                        <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                            <div class="h-full bg-gradient-to-r from-purple-600 to-blue-600 rounded-full transition-all duration-500" style="width: ${progress}%"></div>
-                        </div>
-                    </div>
-
-                    <h2 class="mb-6 text-2xl font-bold dark:text-white">${question.question}</h2>
-
-                    <div class="grid gap-3">
-                        ${question.options.map((option, index) => `
-                            <button class="answer-btn rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 text-left hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 dark:text-white" data-index="${index}">
-                                ${option}
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-
-            document.querySelectorAll('.answer-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const answerIndex = parseInt(e.currentTarget.dataset.index);
-                    answers.push(answerIndex);
-
-                    if (currentQuestion < questions.length - 1) {
-                        currentQuestion++;
-                        render();
-                    } else {
-                        // Calcular nivel
-                        const correctAnswers = answers.filter((a, i) => a === questions[i].correct).length;
-                        const percentage = (correctAnswers / questions.length) * 100;
-
-                        if (percentage >= 90) calculatedLevel = "C2";
-                        else if (percentage >= 75) calculatedLevel = "C1";
-                        else if (percentage >= 60) calculatedLevel = "B2";
-                        else if (percentage >= 45) calculatedLevel = "B1";
-                        else if (percentage >= 30) calculatedLevel = "A2";
-                        else calculatedLevel = "A1";
-
-                        step = 'results';
-                        render();
-                    }
-                });
-            });
-        }
-
-        function renderResults() {
-            const questions = EVALUATION_QUESTIONS[idioma.toLowerCase()];
-            const correctAnswers = answers.filter((a, i) => a === questions[i].correct).length;
-            const percentage = Math.round((correctAnswers / questions.length) * 100);
-            const levelInfo = LEVELS.find(l => l.id === calculatedLevel);
-
-            subtitle.textContent = '¡Evaluación completada!';
-            container.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center transition-colors duration-300">
-                    <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                        <i class="fas fa-check-circle text-4xl text-green-600 dark:text-green-400"></i>
-                    </div>
-                    <h1 class="text-3xl font-bold mb-2 dark:text-white">Evaluación Completada</h1>
-                    <p class="text-gray-600 dark:text-gray-300 mb-4">
-                        Has respondido correctamente ${correctAnswers} de ${questions.length} preguntas
-                    </p>
-
-                    <div class="mb-6 rounded-xl bg-purple-50 dark:bg-purple-900/20 p-6 border-2 border-purple-200 dark:border-purple-800">
-                        <p class="text-sm font-medium text-purple-600 dark:text-purple-400">Tu nivel recomendado es</p>
-                        <h2 class="mt-2 text-4xl font-bold text-purple-600 dark:text-purple-400">${levelInfo.id}</h2>
-                        <p class="text-lg font-medium text-gray-900 dark:text-white">${levelInfo.name}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">${levelInfo.description}</p>
-                        <div class="mt-4">
-                            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">${percentage}%</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-300">Precisión</div>
-                        </div>
-                    </div>
-
-                    <button id="confirm-level" class="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity">
-                        Confirmar y Continuar
-                    </button>
-                </div>
-            `;
-
-            document.getElementById('confirm-level').addEventListener('click', () => updateLevel(calculatedLevel));
-        }
-
-        function renderManual() {
-            subtitle.textContent = 'Selecciona tu nivel';
-            container.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-colors duration-300">
-                    <h2 class="text-2xl font-bold text-center mb-4 dark:text-white">Selecciona tu Nivel</h2>
-                    <div class="grid gap-3 mb-6">
-                        ${LEVELS.map(level => `
-                            <button class="level-btn rounded-xl border-2 border-gray-200 dark:border-gray-700 p-4 text-left transition-all hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 dark:text-white" data-level="${level.id}">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <span class="text-lg font-bold mr-2">${level.id}</span>
-                                        <span class="font-semibold">${level.name}</span>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">${level.description}</p>
-                                    </div>
-                                    <i class="fas fa-circle text-gray-300 dark:text-gray-600 check-icon"></i>
-                                </div>
-                            </button>
-                        `).join('')}
-                    </div>
-
-                    <button id="confirm-manual" disabled class="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
-                        Confirmar Nivel
-                    </button>
-
-                    <div class="mt-4 text-center">
-                        <button id="back-btn" class="text-sm text-purple-600 dark:text-purple-400 hover:underline">
-                            Volver atrás
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            const confirmBtn = document.getElementById('confirm-manual');
-            document.querySelectorAll('.level-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const level = e.currentTarget.dataset.level;
-                    selectedLevel = level;
-
-                    // Actualizar UI
-                    document.querySelectorAll('.level-btn').forEach(b => {
-                        b.classList.remove('border-purple-500', 'dark:border-purple-400', 'bg-purple-50', 'dark:bg-purple-900/20');
-                        b.querySelector('.check-icon').className = 'fas fa-circle text-gray-300 dark:text-gray-600 check-icon';
-                    });
-                    e.currentTarget.classList.add('border-purple-500', 'dark:border-purple-400', 'bg-purple-50', 'dark:bg-purple-900/20');
-                    e.currentTarget.querySelector('.check-icon').className = 'fas fa-check-circle text-purple-600 dark:text-purple-400 check-icon';
-
-                    confirmBtn.disabled = false;
-                });
-            });
-
-            confirmBtn.addEventListener('click', () => updateLevel(selectedLevel));
-            document.getElementById('back-btn').addEventListener('click', () => {
-                step = 'choice';
-                render();
-            });
-        }
-
-        async function updateLevel(nivel) {
-            const correo = localStorage.getItem('correo');
-            const idioma = localStorage.getItem('idioma') || 'Inglés';
-            if (!correo) {
-                showToast('No se encontró el correo del usuario', 'error');
-                return;
-            }
-            const confirmBtn = document.querySelector('button[id^="confirm"]');
-            confirmBtn.disabled = true;
-            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Asignando nivel...';
-            try {
-                const res = await fetch('http://localhost:5000/api/auth/actualizar-nivel', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ correo, nivel, idioma })
-                });
-                const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.error || 'Error al actualizar nivel');
-                }
-                showToast(`✅ Nivel ${nivel} asignado correctamente`, 'success');
-                // Limpiar localStorage
-                localStorage.removeItem('correo');
-                localStorage.removeItem('idioma');
-                // Redirigir a login
-                setTimeout(() => {
-                    window.location.href = '/pages/auth/login.html';
-                }, 1500);
-            } catch (error) {
-                showToast(error.message, 'error');
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Confirmar y Continuar';
-            }
-        }
-
-        function render() {
-            if (step === 'choice') renderChoice();
-            else if (step === 'evaluation') renderEvaluation();
-            else if (step === 'results') renderResults();
-            else if (step === 'manual') renderManual();
-        }
-
-        // Iniciar
-        render();
-    </script>
-
-    <style>
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fade-in 0.3s ease-out;
-        }
-    </style>
+    <!-- ============================================
+         ORDEN DE CARGA OPTIMIZADO (CRÍTICO)
+    ============================================ -->
+    
+    <!-- 1️⃣ CONFIGURACIÓN GLOBAL (SIEMPRE PRIMERO) -->
+    <script src="/config/app-config.js"></script>
+    
+    <!-- 2️⃣ CORE MODULES (async para no bloquear) -->
+    <script src="/assets/js/core/utils.js" async></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/form-validator.js" async></script>
+    <script src="/assets/js/core/theme-manager.js" async></script>
+    <script src="/assets/js/core/toast-manager.js" async></script>
+    <script src="/assets/js/core/navbar-loader.js" async></script>
+    
+    <!-- 3️⃣ LÓGICA DE PÁGINA (defer para DOM listo) -->
+    <script src="/assets/js/pages/onboarding/asignar-nivel.js" defer></script>
 </body>
 </html>
