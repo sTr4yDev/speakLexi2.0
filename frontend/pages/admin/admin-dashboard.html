@@ -1,5 +1,5 @@
 <!--
-frontend/pages/admin-dashboard.html
+frontend/pages/admin/dashboard-admin.html
 -->
 <!DOCTYPE html>
 <html lang="es" class="h-full">
@@ -15,9 +15,44 @@ frontend/pages/admin-dashboard.html
     <!-- ✅ CSS EXTERNO -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- ✅ TAILWIND + CONFIG -->
+    <!-- ✅ TAILWIND CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/assets/js/tailwind-config.js"></script>
+    <script>
+        // Configuración inline de Tailwind
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7e22ce',
+                            800: '#6b21a8',
+                            900: '#581c87',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- ✅ CSS INTERNO -->
     <link rel="stylesheet" href="/assets/css/custom-styles.css">
@@ -50,7 +85,7 @@ frontend/pages/admin-dashboard.html
                 </div>
             </div>
 
-            <!-- Stats Cards Mejoradas -->
+            <!-- Stats Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
                     <div class="flex items-center justify-between">
@@ -109,7 +144,7 @@ frontend/pages/admin-dashboard.html
 
             <!-- Main Grid -->
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                <!-- Left Column - 2/3 width -->
+                <!-- Left Column -->
                 <div class="xl:col-span-2 space-y-8">
                     <!-- Gráfico de Actividad -->
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
@@ -216,67 +251,14 @@ frontend/pages/admin-dashboard.html
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <td class="py-3">
-                                            <div class="flex items-center gap-3">
-                                                <img src="https://ui-avatars.com/api/?name=Ana+Lopez&background=6366f1&color=fff" class="w-8 h-8 rounded-full" alt="">
-                                                <div>
-                                                    <p class="font-medium text-gray-900 dark:text-white">Ana López</p>
-                                                    <p class="text-sm text-gray-600 dark:text-gray-400">ana@email.com</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-3">
-                                            <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">Estudiante</span>
-                                        </td>
-                                        <td class="py-3">
-                                            <span class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full">Activo</span>
-                                        </td>
-                                        <td class="py-3 text-sm text-gray-600 dark:text-gray-400">Hoy</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <td class="py-3">
-                                            <div class="flex items-center gap-3">
-                                                <img src="https://ui-avatars.com/api/?name=Carlos+Ruiz&background=10b981&color=fff" class="w-8 h-8 rounded-full" alt="">
-                                                <div>
-                                                    <p class="font-medium text-gray-900 dark:text-white">Carlos Ruiz</p>
-                                                    <p class="text-sm text-gray-600 dark:text-gray-400">carlos@email.com</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-3">
-                                            <span class="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full">Profesor</span>
-                                        </td>
-                                        <td class="py-3">
-                                            <span class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full">Activo</span>
-                                        </td>
-                                        <td class="py-3 text-sm text-gray-600 dark:text-gray-400">Ayer</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <td class="py-3">
-                                            <div class="flex items-center gap-3">
-                                                <img src="https://ui-avatars.com/api/?name=Maria+Garcia&background=f59e0b&color=fff" class="w-8 h-8 rounded-full" alt="">
-                                                <div>
-                                                    <p class="font-medium text-gray-900 dark:text-white">María García</p>
-                                                    <p class="text-sm text-gray-600 dark:text-gray-400">maria@email.com</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-3">
-                                            <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">Estudiante</span>
-                                        </td>
-                                        <td class="py-3">
-                                            <span class="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 rounded-full">Pendiente</span>
-                                        </td>
-                                        <td class="py-3 text-sm text-gray-600 dark:text-gray-400">15/10/2025</td>
-                                    </tr>
+                                    <!-- Se llenará dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column - 1/3 width -->
+                <!-- Right Column -->
                 <div class="space-y-8">
                     <!-- Métricas del Sistema -->
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
@@ -400,18 +382,18 @@ frontend/pages/admin-dashboard.html
     </main>
 
     <!-- ============================================
-         ORDEN DE CARGA CORREGIDO (FIXED)
+         ORDEN DE CARGA CORREGIDO
     ============================================ -->
     
-    <!-- 1️⃣ CONFIGURACIÓN GLOBAL (SIEMPRE PRIMERO) -->
+    <!-- 1️⃣ CONFIGURACIÓN GLOBAL -->
     <script src="/config/app-config.js"></script>
     
-    <!-- 2️⃣ CORE MODULES (síncrono para dependencias) -->
+    <!-- 2️⃣ CORE MODULES -->
     <script src="/assets/js/core/utils.js"></script>
     <script src="/assets/js/core/api-client.js"></script>
     <script src="/assets/js/core/form-validator.js"></script>
-    <script src="/assets/js/core/theme-manager.js"></script>
     <script src="/assets/js/core/toast-manager.js"></script>
+    <script src="/assets/js/core/theme-manager.js"></script>
     
     <!-- 3️⃣ MÓDULOS ADICIONALES -->
     <script src="/assets/js/core/module-loader.js"></script>

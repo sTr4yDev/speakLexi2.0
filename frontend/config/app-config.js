@@ -36,7 +36,7 @@ const API_CONFIG = {
     RETRY_DELAY: 1000,
     
     // ============================================
-    // ENDPOINTS POR MÓDULO (según arquitectura)
+    // ENDPOINTS CORREGIDOS - CONSISTENTES CON REST
     // ============================================
     
     ENDPOINTS: {
@@ -93,13 +93,13 @@ const API_CONFIG = {
         // MÓDULO 2: GESTIÓN DE LECCIONES Y CONTENIDO
         // ========================================
         
-        // UC-08: Crear nuevas lecciones
+        // UC-08: Crear nuevas lecciones - RUTAS CORREGIDAS
         LECCIONES: {
-            LISTAR: '/lecciones',
-            CREAR: '/lecciones/crear',
-            DETALLE: '/lecciones/:id',
-            ACTUALIZAR: '/lecciones/:id',
-            ELIMINAR: '/lecciones/:id',
+            LISTAR: '/lecciones',           // GET /api/lecciones
+            CREAR: '/lecciones',            // POST /api/lecciones ✅ CORREGIDO
+            DETALLE: '/lecciones/:id',      // GET /api/lecciones/:id
+            ACTUALIZAR: '/lecciones/:id',   // PUT /api/lecciones/:id
+            ELIMINAR: '/lecciones/:id',     // DELETE /api/lecciones/:id
             
             // Contenido de la lección
             CONTENIDO: '/lecciones/:id/contenido',
