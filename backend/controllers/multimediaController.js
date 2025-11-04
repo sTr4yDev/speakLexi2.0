@@ -1,5 +1,5 @@
 const Multimedia = require('../models/multimedia');
-const Leccion = require('../models/leccion');
+const Leccion = require('../models/lecciones'); // ✅ CORREGIDO: 'lecciones' en plural
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -184,6 +184,33 @@ exports.actualizarOrden = async (req, res) => {
         console.error('Error actualizando orden:', error);
         res.status(500).json({
             error: 'Error interno del servidor al actualizar orden'
+        });
+    }
+};
+
+// @desc    Obtener archivo multimedia por ID
+// @route   GET /api/multimedia/:id
+// @access  Private
+exports.obtenerMultimedia = async (req, res) => {
+    try {
+        const multimediaId = req.params.id;
+
+        const archivo = await Multimedia.obtenerPorId(multimediaId);
+
+        if (!archivo) {
+            return res.status(404).json({
+                error: 'Archivo multimedia no encontrado'
+            });
+        }
+
+        res.json({
+            multimedia: archivo
+        });
+
+    } catch (error) {
+        console.error('Error obteniendo multimedia:', error);
+        res.status(500).json({
+            error: 'Error interno del servidor al obtener archivo multimedia'
         });
     }
 };

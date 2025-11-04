@@ -1,5 +1,5 @@
 // ==========================================================
-// server.js - SpeakLexi Backend - COMPLETO CON BASE DE DATOS
+// server.js - SpeakLexi Backend - CON LECCIONES Y MULTIMEDIA
 // ==========================================================
 
 require('dotenv').config();
@@ -16,15 +16,12 @@ const path = require('path');
 const { initializeDatabase, testConnection } = require('./config/database');
 
 // ==========================================================
-// IMPORTAR SOLO RUTAS QUE EXISTEN
+// IMPORTAR RUTAS
 // ==========================================================
 
 const authRoutes = require('./routes/auth-routes');
-
-// ❌ ESTAS RUTAS NO EXISTEN TODAVÍA - COMENTAR TEMPORALMENTE
-// const userRoutes = require('./routes/users');
-// const lessonRoutes = require('./routes/lessons');
-// const progressRoutes = require('./routes/progress');
+const leccionRoutes = require('./routes/leccionRoutes');  // ✅ AGREGADO
+const multimediaRoutes = require('./routes/multimediaRoutes');  // ✅ AGREGADO
 
 const app = express();
 
@@ -65,7 +62,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// ✅ AHORA (múltiples orígenes):
+// CORS
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
@@ -90,20 +87,21 @@ app.use(cors({
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Servir archivos estáticos (si los necesitas)
+// Servir archivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ==========================================================
-// RUTAS - SOLO LAS QUE EXISTEN
+// RUTAS - TODAS REGISTRADAS
 // ==========================================================
 
-// ✅ SOLO MONTAR LA RUTA QUE EXISTE
+// Autenticación
 app.use('/api/auth', authRoutes);
 
-// ❌ COMENTAR TEMPORALMENTE HASTA QUE CREES ESTAS RUTAS
-// app.use('/api/users', userRoutes);
-// app.use('/api/lessons', lessonRoutes);
-// app.use('/api/progress', progressRoutes);
+// ✅ LECCIONES - AGREGADO
+app.use('/api/lecciones', leccionRoutes);
+
+// ✅ MULTIMEDIA - AGREGADO  
+app.use('/api/multimedia', multimediaRoutes);
 
 // ==========================================================
 // RUTAS BÁSICAS DEL SISTEMA
@@ -121,6 +119,8 @@ app.get('/api/health', async (req, res) => {
     services: {
       database: dbStatus ? 'connected' : 'disconnected',
       authentication: 'available',
+      lessons: 'available',      // ✅ ACTUALIZADO
+      multimedia: 'available',   // ✅ ACTUALIZADO
       email: 'available'
     }
   });
@@ -135,12 +135,15 @@ app.get('/api/config', (req, res) => {
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
     features: {
       auth: true,
-      users: false,    // ⏳ Pendiente
-      lessons: false,  // ⏳ Pendiente
-      progress: false  // ⏳ Pendiente
+      users: false,
+      lessons: true,      // ✅ ACTUALIZADO
+      multimedia: true,   // ✅ ACTUALIZADO
+      progress: false
     },
     endpoints: {
       auth: '/api/auth',
+      lecciones: '/api/lecciones',      // ✅ AGREGADO
+      multimedia: '/api/multimedia',    // ✅ AGREGADO
       health: '/api/health',
       config: '/api/config'
     }
@@ -156,11 +159,27 @@ app.get('/', (req, res) => {
     availableEndpoints: [
       'GET  /api/health - Estado del sistema',
       'GET  /api/config - Configuración',
+      
+      '--- AUTENTICACIÓN ---',
       'POST /api/auth/registro - Registro de usuario',
       'POST /api/auth/login - Inicio de sesión',
       'POST /api/auth/verificar - Verificación de email',
       'POST /api/auth/recuperar-contrasena - Recuperación de contraseña',
-      'POST /api/auth/restablecer-contrasena - Restablecer contraseña'
+      'POST /api/auth/restablecer-contrasena - Restablecer contraseña',
+      
+      '--- LECCIONES ---',
+      'GET  /api/lecciones/nivel/:nivel - Listar lecciones por nivel',
+      'GET  /api/lecciones/:id - Obtener lección específica',
+      'POST /api/lecciones - Crear nueva lección',
+      'PUT  /api/lecciones/:id - Actualizar lección',
+      'DELETE /api/lecciones/:id - Eliminar lección',
+      'POST /api/lecciones/:id/progreso - Registrar progreso',
+      
+      '--- MULTIMEDIA ---',
+      'GET  /api/multimedia/leccion/:leccionId - Multimedia de lección',
+      'POST /api/multimedia/subir - Subir archivo',
+      'PUT  /api/multimedia/:id/orden - Actualizar orden',
+      'DELETE /api/multimedia/:id - Eliminar archivo'
     ],
     documentation: 'Consulta la documentación para más detalles'
   });
@@ -175,14 +194,13 @@ app.use('*', (req, res) => {
   res.status(404).json({
     error: 'Ruta no encontrada',
     path: req.originalUrl,
+    method: req.method,
     availableEndpoints: [
       '/api/health', 
       '/api/config', 
-      '/api/auth/registro',
-      '/api/auth/login',
-      '/api/auth/verificar',
-      '/api/auth/recuperar-contrasena',
-      '/api/auth/restablecer-contrasena'
+      '/api/auth/*',
+      '/api/lecciones/*',      // ✅ AGREGADO
+      '/api/multimedia/*'       // ✅ AGREGADO
     ],
     suggestion: 'Verifica la URL o consulta GET / para ver endpoints disponibles'
   });
@@ -229,6 +247,8 @@ initializeApp().then(() => {
     console.log(`📍 URL: http://${HOST}:${PORT}`);
     console.log(`📊 Entorno: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔐 Autenticación: http://${HOST}:${PORT}/api/auth`);
+    console.log(`📚 Lecciones: http://${HOST}:${PORT}/api/lecciones`);
+    console.log(`🎬 Multimedia: http://${HOST}:${PORT}/api/multimedia`);
     console.log(`❤️  Health: http://${HOST}:${PORT}/api/health`);
     console.log(`📝 Config: http://${HOST}:${PORT}/api/config`);
     console.log('='.repeat(50));

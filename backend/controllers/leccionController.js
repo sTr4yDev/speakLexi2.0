@@ -1,8 +1,9 @@
-const Leccion = require('../models/leccion');
+// backend/controllers/leccionController.js
+const Leccion = require('../models/lecciones');
 const Multimedia = require('../models/multimedia');
 
 // @desc    Crear nueva lección
-// @route   POST /api/lecciones/crear
+// @route   POST /api/lecciones
 // @access  Private (Profesor/Admin)
 exports.crearLeccion = async (req, res) => {
     try {
@@ -19,6 +20,7 @@ exports.crearLeccion = async (req, res) => {
         // Validar datos requeridos
         if (!titulo || !nivel || !idioma) {
             return res.status(400).json({
+                success: false,
                 error: 'Título, nivel e idioma son requeridos'
             });
         }
@@ -31,15 +33,18 @@ exports.crearLeccion = async (req, res) => {
             idioma,
             duracion_minutos: duracion_minutos || 30,
             orden: orden || 0,
+            estado: 'borrador',
             creado_por: req.user.id
         };
 
         const leccionId = await Leccion.crear(leccionData);
 
         res.status(201).json({
+            success: true,
             mensaje: 'Lección creada exitosamente',
-            leccion: {
+            data: {
                 id: leccionId,
+                leccion_id: leccionId,
                 ...leccionData
             }
         });
@@ -47,39 +52,32 @@ exports.crearLeccion = async (req, res) => {
     } catch (error) {
         console.error('Error creando lección:', error);
         res.status(500).json({
+            success: false,
             error: 'Error interno del servidor al crear lección'
         });
     }
 };
 
-// @desc    Obtener lección por ID
-// @route   GET /api/lecciones/:id
-// @access  Private
-exports.obtenerLeccion = async (req, res) => {
+// @desc    Listar TODAS las lecciones (para admin)
+// @route   GET /api/lecciones
+// @access  Private (Admin)
+exports.listarTodasLecciones = async (req, res) => {
     try {
-        const leccionId = req.params.id;
-        const leccion = await Leccion.obtenerPorId(leccionId);
+        const { pagina = 1, limite = 50, nivel, idioma, estado } = req.query;
 
-        if (!leccion) {
-            return res.status(404).json({
-                error: 'Lección no encontrada'
-            });
-        }
-
-        // Obtener multimedia asociada
-        const multimedia = await Multimedia.obtenerPorLeccion(leccionId);
+        const resultado = await Leccion.listarTodas(pagina, limite, { nivel, idioma, estado });
 
         res.json({
-            leccion: {
-                ...leccion,
-                multimedia
-            }
+            success: true,
+            data: resultado.lecciones,
+            paginacion: resultado.paginacion
         });
 
     } catch (error) {
-        console.error('Error obteniendo lección:', error);
+        console.error('Error listando todas las lecciones:', error);
         res.status(500).json({
-            error: 'Error interno del servidor al obtener lección'
+            success: false,
+            error: 'Error interno del servidor al listar lecciones'
         });
     }
 };
@@ -94,18 +92,59 @@ exports.listarLecciones = async (req, res) => {
 
         if (!idioma) {
             return res.status(400).json({
+                success: false,
                 error: 'El parámetro idioma es requerido'
             });
         }
 
         const resultado = await Leccion.listarPorNivel(nivel, idioma, pagina, limite);
 
-        res.json(resultado);
+        res.json({
+            success: true,
+            data: resultado.lecciones,
+            paginacion: resultado.paginacion
+        });
 
     } catch (error) {
         console.error('Error listando lecciones:', error);
         res.status(500).json({
+            success: false,
             error: 'Error interno del servidor al listar lecciones'
+        });
+    }
+};
+
+// @desc    Obtener lección por ID
+// @route   GET /api/lecciones/:id
+// @access  Private
+exports.obtenerLeccion = async (req, res) => {
+    try {
+        const leccionId = req.params.id;
+        const leccion = await Leccion.obtenerPorId(leccionId);
+
+        if (!leccion) {
+            return res.status(404).json({
+                success: false,
+                error: 'Lección no encontrada'
+            });
+        }
+
+        // Obtener multimedia asociada
+        const multimedia = await Multimedia.obtenerPorLeccion(leccionId);
+
+        res.json({
+            success: true,
+            data: {
+                ...leccion,
+                multimedia
+            }
+        });
+
+    } catch (error) {
+        console.error('Error obteniendo lección:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor al obtener lección'
         });
     }
 };
@@ -122,6 +161,7 @@ exports.actualizarLeccion = async (req, res) => {
         const leccionExistente = await Leccion.obtenerPorId(leccionId);
         if (!leccionExistente) {
             return res.status(404).json({
+                success: false,
                 error: 'Lección no encontrada'
             });
         }
@@ -129,6 +169,7 @@ exports.actualizarLeccion = async (req, res) => {
         // Verificar permisos (solo el creador o admin puede editar)
         if (leccionExistente.creado_por !== req.user.id && req.user.rol !== 'admin') {
             return res.status(403).json({
+                success: false,
                 error: 'No tienes permisos para editar esta lección'
             });
         }
@@ -137,10 +178,12 @@ exports.actualizarLeccion = async (req, res) => {
 
         if (actualizado) {
             res.json({
+                success: true,
                 mensaje: 'Lección actualizada exitosamente'
             });
         } else {
             res.status(400).json({
+                success: false,
                 error: 'No se pudo actualizar la lección'
             });
         }
@@ -148,6 +191,7 @@ exports.actualizarLeccion = async (req, res) => {
     } catch (error) {
         console.error('Error actualizando lección:', error);
         res.status(500).json({
+            success: false,
             error: 'Error interno del servidor al actualizar lección'
         });
     }
@@ -164,6 +208,7 @@ exports.eliminarLeccion = async (req, res) => {
         const leccionExistente = await Leccion.obtenerPorId(leccionId);
         if (!leccionExistente) {
             return res.status(404).json({
+                success: false,
                 error: 'Lección no encontrada'
             });
         }
@@ -171,6 +216,7 @@ exports.eliminarLeccion = async (req, res) => {
         // Verificar permisos
         if (leccionExistente.creado_por !== req.user.id && req.user.rol !== 'admin') {
             return res.status(403).json({
+                success: false,
                 error: 'No tienes permisos para eliminar esta lección'
             });
         }
@@ -179,10 +225,12 @@ exports.eliminarLeccion = async (req, res) => {
 
         if (eliminado) {
             res.json({
+                success: true,
                 mensaje: 'Lección eliminada exitosamente'
             });
         } else {
             res.status(400).json({
+                success: false,
                 error: 'No se pudo eliminar la lección'
             });
         }
@@ -190,6 +238,7 @@ exports.eliminarLeccion = async (req, res) => {
     } catch (error) {
         console.error('Error eliminando lección:', error);
         res.status(500).json({
+            success: false,
             error: 'Error interno del servidor al eliminar lección'
         });
     }
@@ -206,6 +255,7 @@ exports.registrarProgreso = async (req, res) => {
 
         if (progreso < 0 || progreso > 100) {
             return res.status(400).json({
+                success: false,
                 error: 'El progreso debe estar entre 0 y 100'
             });
         }
@@ -214,6 +264,7 @@ exports.registrarProgreso = async (req, res) => {
         const leccionExistente = await Leccion.obtenerPorId(leccionId);
         if (!leccionExistente) {
             return res.status(404).json({
+                success: false,
                 error: 'Lección no encontrada'
             });
         }
@@ -221,14 +272,18 @@ exports.registrarProgreso = async (req, res) => {
         await Leccion.registrarProgreso(usuarioId, leccionId, progreso);
 
         res.json({
+            success: true,
             mensaje: 'Progreso registrado exitosamente',
-            progreso,
-            completada: progreso === 100
+            data: {
+                progreso,
+                completada: progreso === 100
+            }
         });
 
     } catch (error) {
         console.error('Error registrando progreso:', error);
         res.status(500).json({
+            success: false,
             error: 'Error interno del servidor al registrar progreso'
         });
     }

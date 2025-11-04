@@ -30,28 +30,31 @@ const validarProgreso = [
 // Todas las rutas requieren autenticación
 router.use(authMiddleware.verificarToken);
 
-// Rutas públicas (para estudiantes y profesores)
+// ========================================
+// RUTAS REST ESTÁNDAR - ORDEN CORRECTO
+// ========================================
+
+// 1. Rutas específicas primero (antes de /:id)
+
+// ✅ NUEVO: Listar TODAS las lecciones (para admin)
+router.get('/', leccionController.listarTodasLecciones);
+
 router.get('/nivel/:nivel', 
     param('nivel').isIn(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']),
     leccionController.listarLecciones
 );
 
-router.get('/:id', 
-    param('id').isInt({ min: 1 }),
-    leccionController.obtenerLeccion
-);
-
-router.post('/:id/progreso',
-    param('id').isInt({ min: 1 }),
-    validarProgreso,
-    leccionController.registrarProgreso
-);
-
-// Rutas de profesor/admin
-router.post('/crear',
+// 2. Crear lección (REST estándar: POST /)
+router.post('/',
     authMiddleware.verificarRol('profesor', 'admin'),
     validarCrearLeccion,
     leccionController.crearLeccion
+);
+
+// 3. Rutas con :id (después de las específicas)
+router.get('/:id', 
+    param('id').isInt({ min: 1 }),
+    leccionController.obtenerLeccion
 );
 
 router.put('/:id',
@@ -65,5 +68,17 @@ router.delete('/:id',
     param('id').isInt({ min: 1 }),
     leccionController.eliminarLeccion
 );
+
+router.post('/:id/progreso',
+    param('id').isInt({ min: 1 }),
+    validarProgreso,
+    leccionController.registrarProgreso
+);
+
+// ========================================
+// ALTERNATIVA: Mantener compatibilidad
+// ========================================
+// Si quieres mantener /crear para compatibilidad
+// router.post('/crear', router.stack[1].route.stack[0].handle);
 
 module.exports = router;

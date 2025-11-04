@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-03 12:07:17
+# RAW LINKS — Actualizado 2025-11-03 18:56:58
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: bea3ee9ba534888e0157bb060bf1a724739282ca
+# Commit: a282fccd584c1460ef26e9de45d00db80550c97e
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -12,6 +12,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/models/usua
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/auth-routes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/leccion-routesee.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/multimedia-routes.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/scripts/crear-admin.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/server.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/generar-links.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/api-client.js
@@ -42,6 +43,16 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/toast-manager.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/utils.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/dashboard.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/actividades/actividad-base.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/actividades/completar-espacios.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/actividades/emparejamiento.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/actividades/escritura.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/actividades/seleccion-multiple.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/actividades/verdadero-falso.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/componentes/galeria-imagenes.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/componentes/guardado.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/componentes/progreso.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/editar-leccion.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/gestion-lecciones.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/auth/login.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/auth/registro.js
@@ -52,15 +63,21 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/onboarding/asignar-nivel.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/diag.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/index.html
-https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/dashboard-admin.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/admin-dashboard.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/editor-leccion.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/gestion-lecciones.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/gestion-multimedia.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/vista-previa.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/auth/login.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/auth/recuperar-contrasena.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/auth/registro.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/auth/restablecer-contrasena.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/auth/verificar-email.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/cambiar-curso.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/ejercicios-interactivos.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/estudiante-dashboard.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/leccion-activa.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/mis-progresos.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/perfil.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/onboarding/asignar-nivel.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/css/main.css

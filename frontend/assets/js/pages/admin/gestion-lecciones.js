@@ -1,5 +1,5 @@
 /* ============================================
-   SPEAKLEXI - GESTIÓN DE LECCIONES (ADMIN)
+   SPEAKLEXI - GESTIÓN DE LECCIONES (ADMIN) CORREGIDO
    Archivo: assets/js/pages/admin/gestion-lecciones.js
    ============================================ */
 (() => {
@@ -10,32 +10,39 @@
     const leccionesPorPagina = 10;
 
     async function init() {
+        console.log('🚀 Iniciando Gestión de Lecciones...');
+        
         await waitForDependencies();
-        if (!verificarPermisosAdmin()) return;
+        
+        if (!verificarPermisosAdmin()) {
+            return; // Detener si no tiene permisos
+        }
         
         setupEventListeners();
         await cargarLecciones();
+        
+        console.log('✅ Gestión de Lecciones inicializada');
     }
 
     function setupEventListeners() {
         // Botones principales
-        document.getElementById('btn-crear-leccion').addEventListener('click', mostrarModalCrear);
-        document.getElementById('btn-refrescar').addEventListener('click', cargarLecciones);
+        document.getElementById('btn-crear-leccion')?.addEventListener('click', mostrarModalCrear);
+        document.getElementById('btn-refrescar')?.addEventListener('click', cargarLecciones);
         
         // Modal crear lección
-        document.getElementById('btn-cancelar-crear').addEventListener('click', ocultarModalCrear);
-        document.getElementById('btn-guardar-leccion').addEventListener('click', crearLeccion);
+        document.getElementById('btn-cancelar-crear')?.addEventListener('click', ocultarModalCrear);
+        document.getElementById('btn-guardar-leccion')?.addEventListener('click', crearLeccion);
         
         // Filtros
-        document.getElementById('buscar-leccion').addEventListener('input', filtrarLecciones);
-        document.getElementById('filtro-nivel').addEventListener('change', filtrarLecciones);
+        document.getElementById('buscar-leccion')?.addEventListener('input', filtrarLecciones);
+        document.getElementById('filtro-nivel')?.addEventListener('change', filtrarLecciones);
         
         // Paginación
-        document.getElementById('btn-prev').addEventListener('click', () => cambiarPagina(-1));
-        document.getElementById('btn-next').addEventListener('click', () => cambiarPagina(1));
+        document.getElementById('btn-prev')?.addEventListener('click', () => cambiarPagina(-1));
+        document.getElementById('btn-next')?.addEventListener('click', () => cambiarPagina(1));
         
         // Enter para buscar
-        document.getElementById('buscar-leccion').addEventListener('keypress', (e) => {
+        document.getElementById('buscar-leccion')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 filtrarLecciones();
             }
@@ -46,19 +53,21 @@
         try {
             mostrarLoading(true);
             
-            // CORRECCIÓN: Ruta API correcta
-            const response = await window.apiClient.get('/api/lecciones');
+            // Usar endpoint correcto de APP_CONFIG
+            const endpoint = window.APP_CONFIG?.API?.ENDPOINTS?.LECCIONES?.LISTAR || '/lecciones';
+            const response = await window.apiClient.get(endpoint);
             
             if (response.success) {
-                leccionesData = response.data;
+                leccionesData = response.data || [];
                 actualizarEstadisticas();
                 mostrarLecciones();
+                window.toastManager.success('Lecciones cargadas correctamente');
             } else {
                 throw new Error(response.error || 'Error al cargar lecciones');
             }
         } catch (error) {
-            console.error('Error cargando lecciones:', error);
-            window.toastManager.error('Error al cargar las lecciones');
+            console.warn('⚠️ Error cargando lecciones, usando datos de demostración:', error);
+            window.toastManager.warning('Usando datos de demostración. Servidor no disponible.');
             
             // Datos de demostración
             leccionesData = obtenerLeccionesDemo();
@@ -81,7 +90,7 @@
                 duracion_minutos: 45,
                 orden: 1,
                 creado_en: new Date().toISOString(),
-                creado_por: "María Rodríguez"
+                creado_por: "Admin Demo"
             },
             {
                 id: 2,
@@ -93,7 +102,7 @@
                 duracion_minutos: 60,
                 orden: 2,
                 creado_en: new Date(Date.now() - 86400000).toISOString(),
-                creado_por: "María Rodríguez"
+                creado_por: "Admin Demo"
             },
             {
                 id: 3,
@@ -105,7 +114,7 @@
                 duracion_minutos: 50,
                 orden: 3,
                 creado_en: new Date(Date.now() - 172800000).toISOString(),
-                creado_por: "Carlos Méndez"
+                creado_por: "Admin Demo"
             }
         ];
     }
@@ -116,15 +125,22 @@
         const borrador = leccionesData.filter(l => l.estado === 'borrador').length;
         const inactivas = leccionesData.filter(l => l.estado === 'inactiva').length;
 
-        document.getElementById('total-lecciones').textContent = total;
-        document.getElementById('lecciones-activas').textContent = activas;
-        document.getElementById('lecciones-borrador').textContent = borrador;
-        document.getElementById('lecciones-inactivas').textContent = inactivas;
+        const totalEl = document.getElementById('total-lecciones');
+        const activasEl = document.getElementById('lecciones-activas');
+        const borradorEl = document.getElementById('lecciones-borrador');
+        const inactivasEl = document.getElementById('lecciones-inactivas');
+
+        if (totalEl) totalEl.textContent = total;
+        if (activasEl) activasEl.textContent = activas;
+        if (borradorEl) borradorEl.textContent = borrador;
+        if (inactivasEl) inactivasEl.textContent = inactivas;
     }
 
     function mostrarLecciones() {
         const tbody = document.getElementById('tabla-lecciones');
-        const leccionesFiltradas = filtrarLecciones();
+        if (!tbody) return;
+
+        const leccionesFiltradas = obtenerLeccionesFiltradas();
         const inicio = (paginaActual - 1) * leccionesPorPagina;
         const fin = inicio + leccionesPorPagina;
         const leccionesPagina = leccionesFiltradas.slice(inicio, fin);
@@ -147,7 +163,7 @@
                 <td class="py-4 px-4">
                     <div>
                         <p class="font-medium text-gray-900 dark:text-white">${escapeHtml(leccion.titulo)}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">${escapeHtml(leccion.descripcion) || 'Sin descripción'}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">${escapeHtml(leccion.descripcion || 'Sin descripción')}</p>
                     </div>
                 </td>
                 <td class="py-4 px-4">
@@ -169,16 +185,16 @@
                 <td class="py-4 px-4 text-sm text-gray-600 dark:text-gray-400">${formatearFecha(leccion.creado_en)}</td>
                 <td class="py-4 px-4">
                     <div class="flex gap-2">
-                        <button onclick="editarLeccion(${leccion.id})" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20" title="Editar">
+                        <button onclick="window.gestionLecciones.editarLeccion(${leccion.id})" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20" title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button onclick="verLeccion(${leccion.id})" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 transition-colors p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20" title="Ver">
+                        <button onclick="window.gestionLecciones.verLeccion(${leccion.id})" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 transition-colors p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20" title="Ver">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button onclick="gestionarMultimedia(${leccion.id})" class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 transition-colors p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20" title="Multimedia">
+                        <button onclick="window.gestionLecciones.gestionarMultimedia(${leccion.id})" class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 transition-colors p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20" title="Multimedia">
                             <i class="fas fa-file-upload"></i>
                         </button>
-                        <button onclick="eliminarLeccion(${leccion.id})" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20" title="Eliminar">
+                        <button onclick="window.gestionLecciones.eliminarLeccion(${leccion.id})" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -189,37 +205,51 @@
         actualizarPaginacion(leccionesFiltradas.length);
     }
 
-    function filtrarLecciones() {
-        const busqueda = document.getElementById('buscar-leccion').value.toLowerCase();
-        const nivelFiltro = document.getElementById('filtro-nivel').value;
+    function obtenerLeccionesFiltradas() {
+        const busquedaEl = document.getElementById('buscar-leccion');
+        const nivelFiltroEl = document.getElementById('filtro-nivel');
         
-        let filtradas = leccionesData.filter(leccion => {
-            const coincideBusqueda = leccion.titulo.toLowerCase().includes(busqueda) || 
-                                   (leccion.descripcion && leccion.descripcion.toLowerCase().includes(busqueda));
+        if (!busquedaEl || !nivelFiltroEl) return leccionesData;
+        
+        const busqueda = busquedaEl.value.toLowerCase();
+        const nivelFiltro = nivelFiltroEl.value;
+        
+        return leccionesData.filter(leccion => {
+            const coincideBusqueda = !busqueda || 
+                leccion.titulo.toLowerCase().includes(busqueda) || 
+                (leccion.descripcion && leccion.descripcion.toLowerCase().includes(busqueda));
             const coincideNivel = !nivelFiltro || leccion.nivel === nivelFiltro;
             
             return coincideBusqueda && coincideNivel;
         });
+    }
 
+    function filtrarLecciones() {
         paginaActual = 1;
         mostrarLecciones();
-        return filtradas;
     }
 
     function actualizarPaginacion(total) {
         const desde = Math.min((paginaActual - 1) * leccionesPorPagina + 1, total);
         const hasta = Math.min(paginaActual * leccionesPorPagina, total);
         
-        document.getElementById('mostrando-desde').textContent = desde;
-        document.getElementById('mostrando-hasta').textContent = hasta;
-        document.getElementById('total-registros').textContent = total;
+        const desdeEl = document.getElementById('mostrando-desde');
+        const hastaEl = document.getElementById('mostrando-hasta');
+        const totalEl = document.getElementById('total-registros');
+        const prevBtn = document.getElementById('btn-prev');
+        const nextBtn = document.getElementById('btn-next');
         
-        document.getElementById('btn-prev').disabled = paginaActual === 1;
-        document.getElementById('btn-next').disabled = hasta >= total;
+        if (desdeEl) desdeEl.textContent = desde;
+        if (hastaEl) hastaEl.textContent = hasta;
+        if (totalEl) totalEl.textContent = total;
+        
+        if (prevBtn) prevBtn.disabled = paginaActual === 1;
+        if (nextBtn) nextBtn.disabled = hasta >= total;
     }
 
     function cambiarPagina(direccion) {
-        const totalPaginas = Math.ceil(leccionesData.length / leccionesPorPagina);
+        const leccionesFiltradas = obtenerLeccionesFiltradas();
+        const totalPaginas = Math.ceil(leccionesFiltradas.length / leccionesPorPagina);
         const nuevaPagina = paginaActual + direccion;
         
         if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
@@ -229,18 +259,30 @@
     }
 
     function mostrarModalCrear() {
-        document.getElementById('modal-crear-leccion').classList.remove('hidden');
-        document.getElementById('modal-crear-leccion').classList.add('flex');
+        const modal = document.getElementById('modal-crear-leccion');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
 
     function ocultarModalCrear() {
-        document.getElementById('modal-crear-leccion').classList.add('hidden');
-        document.getElementById('modal-crear-leccion').classList.remove('flex');
-        document.getElementById('form-crear-leccion').reset();
+        const modal = document.getElementById('modal-crear-leccion');
+        const form = document.getElementById('form-crear-leccion');
+        
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        if (form) {
+            form.reset();
+        }
     }
 
     async function crearLeccion() {
         const form = document.getElementById('form-crear-leccion');
+        if (!form) return;
+        
         const formData = new FormData(form);
         
         // Validar campos requeridos
@@ -255,20 +297,21 @@
         
         const datosLeccion = {
             titulo: titulo,
-            descripcion: formData.get('descripcion'),
+            descripcion: formData.get('descripcion') || '',
             nivel: nivel,
             idioma: idioma,
             duracion_minutos: parseInt(formData.get('duracion_minutos') || 30),
             orden: parseInt(formData.get('orden') || 0),
-            contenido: formData.get('contenido'),
+            contenido: formData.get('contenido') || '',
             estado: 'borrador'
         };
 
         try {
             mostrarLoading(true);
             
-            // CORRECCIÓN: Ruta API correcta
-            const response = await window.apiClient.post('/api/lecciones', datosLeccion);
+            // Usar endpoint correcto de APP_CONFIG
+            const endpoint = window.APP_CONFIG?.API?.ENDPOINTS?.LECCIONES?.CREAR || '/lecciones';
+            const response = await window.apiClient.post(endpoint, datosLeccion);
             
             if (response.success) {
                 window.toastManager.success('Lección creada exitosamente');
@@ -277,8 +320,9 @@
                 
                 // Redirigir al editor para continuar editando
                 setTimeout(() => {
-                    if (response.data && response.data.id) {
-                        window.location.href = `/pages/admin/editor-leccion.html?id=${response.data.id}`;
+                    const leccionId = response.data?.id || response.data?.leccion_id;
+                    if (leccionId) {
+                        window.location.href = `/pages/admin/editor-leccion.html?id=${leccionId}`;
                     }
                 }, 1000);
                 
@@ -293,43 +337,47 @@
         }
     }
 
-    // Funciones globales para los botones de acción
-    window.editarLeccion = (id) => {
-        // CORRECCIÓN: Ruta correcta al editor
-        window.location.href = `/pages/admin/editor-leccion.html?id=${id}`;
-    };
-
-    window.verLeccion = (id) => {
-        window.location.href = `/pages/admin/vista-previa-leccion.html?id=${id}`;
-    };
-
-    window.gestionarMultimedia = (id) => {
-        window.location.href = `/pages/admin/gestion-multimedia.html?leccion_id=${id}`;
-    };
-
-    window.eliminarLeccion = async (id) => {
-        if (!confirm('¿Estás seguro de que quieres eliminar esta lección?\nEsta acción no se puede deshacer.')) return;
+    // Exportar funciones globalmente para los botones
+    window.gestionLecciones = {
+        editarLeccion: (id) => {
+            window.location.href = `/pages/admin/editor-leccion.html?id=${id}`;
+        },
         
-        try {
-            mostrarLoading(true);
-            
-            // CORRECCIÓN: Ruta API correcta
-            const response = await window.apiClient.delete(`/api/lecciones/${id}`);
-            
-            if (response.success) {
-                window.toastManager.success('Lección eliminada exitosamente');
-                await cargarLecciones();
-            } else {
-                throw new Error(response.error || 'Error al eliminar lección');
+        verLeccion: (id) => {
+            window.location.href = `/pages/admin/vista-previa.html?id=${id}`;
+        },
+        
+        gestionarMultimedia: (id) => {
+            window.location.href = `/pages/admin/gestion-multimedia.html?leccion_id=${id}`;
+        },
+        
+        eliminarLeccion: async (id) => {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta lección?\nEsta acción no se puede deshacer.')) {
+                return;
             }
-        } catch (error) {
-            console.error('Error eliminando lección:', error);
-            window.toastManager.error('Error al eliminar la lección');
-        } finally {
-            mostrarLoading(false);
+            
+            try {
+                mostrarLoading(true);
+                
+                const endpoint = window.APP_CONFIG?.API?.ENDPOINTS?.LECCIONES?.ELIMINAR?.replace(':id', id) || `/lecciones/${id}`;
+                const response = await window.apiClient.delete(endpoint);
+                
+                if (response.success) {
+                    window.toastManager.success('Lección eliminada exitosamente');
+                    await cargarLecciones();
+                } else {
+                    throw new Error(response.error || 'Error al eliminar lección');
+                }
+            } catch (error) {
+                console.error('Error eliminando lección:', error);
+                window.toastManager.error('Error al eliminar la lección');
+            } finally {
+                mostrarLoading(false);
+            }
         }
     };
 
+    // Funciones auxiliares
     function formatearFecha(fechaISO) {
         try {
             const fecha = new Date(fechaISO);
@@ -351,66 +399,86 @@
     }
 
     function mostrarLoading(mostrar) {
-        const loadingElements = document.querySelectorAll('.loading-indicator');
-        const contentElements = document.querySelectorAll('.content-indicator');
-        
-        if (mostrar) {
-            loadingElements.forEach(el => el.classList.remove('hidden'));
-            contentElements.forEach(el => el.classList.add('hidden'));
-        } else {
-            loadingElements.forEach(el => el.classList.add('hidden'));
-            contentElements.forEach(el => el.classList.remove('hidden'));
-        }
+        document.body.style.cursor = mostrar ? 'wait' : 'default';
     }
 
     async function waitForDependencies() {
-        const dependencies = ['apiClient', 'toastManager'];
-        const maxWaitTime = 5000; // 5 segundos máximo
+        const dependencies = ['APP_CONFIG', 'apiClient', 'toastManager', 'Utils'];
+        const maxWaitTime = 5000;
+        const startTime = Date.now();
         
-        return new Promise((resolve) => {
-            let elapsed = 0;
-            const checkDependencies = () => {
-                const allLoaded = dependencies.every(dep => window[dep]);
-                
-                if (allLoaded || elapsed >= maxWaitTime) {
-                    console.log('✅ Dependencias cargadas:', dependencies);
-                    resolve();
-                } else {
-                    elapsed += 100;
-                    setTimeout(checkDependencies, 100);
-                }
-            };
-            
-            checkDependencies();
-        });
+        while (dependencies.some(dep => !window[dep])) {
+            if (Date.now() - startTime > maxWaitTime) {
+                console.error('❌ Timeout esperando dependencias');
+                break;
+            }
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        console.log('✅ Dependencias cargadas:', dependencies.filter(dep => window[dep]));
     }
 
+    /**
+     * ✅ VERIFICACIÓN DE PERMISOS CORREGIDA
+     */
     function verificarPermisosAdmin() {
         try {
-            // En una implementación real, verificar el token JWT o sesión
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = localStorage.getItem('token');
+            // Usar Utils y APP_CONFIG para obtener el usuario
+            const usuario = window.Utils?.getFromStorage(window.APP_CONFIG?.STORAGE?.KEYS?.USUARIO) || 
+                           JSON.parse(localStorage.getItem('usuario') || '{}');
             
-            if (!token || user.role !== 'admin') {
-                window.toastManager.error('No tienes permisos para acceder a esta página');
-                setTimeout(() => {
-                    window.location.href = '/pages/auth/login.html';
-                }, 2000);
+            const token = window.Utils?.getFromStorage(window.APP_CONFIG?.STORAGE?.KEYS?.TOKEN) || 
+                         localStorage.getItem('token');
+            
+            console.log('👤 Usuario actual:', usuario);
+            console.log('🔑 Token presente:', !!token);
+            
+            // Verificar token
+            if (!token) {
+                console.warn('⚠️ No hay token de autenticación');
+                mostrarErrorPermisos('Debes iniciar sesión para acceder a esta página');
                 return false;
             }
             
+            // Verificar rol (usar 'rol' en español, no 'role')
+            const rol = (usuario.rol || usuario.role || '').toLowerCase();
+            console.log('👔 Rol del usuario:', rol);
+            
+            const rolesAdmin = ['admin', 'administrador'];
+            
+            if (!rolesAdmin.includes(rol)) {
+                console.warn('⚠️ Usuario sin permisos de admin. Rol:', rol);
+                mostrarErrorPermisos('No tienes permisos para acceder a esta página');
+                return false;
+            }
+            
+            console.log('✅ Usuario con permisos de admin verificado');
             return true;
+            
         } catch (error) {
-            console.error('Error verificando permisos:', error);
+            console.error('💥 Error verificando permisos:', error);
+            mostrarErrorPermisos('Error al verificar permisos');
             return false;
         }
+    }
+
+    function mostrarErrorPermisos(mensaje) {
+        if (window.toastManager) {
+            window.toastManager.error(mensaje);
+        } else {
+            alert(mensaje);
+        }
+        
+        setTimeout(() => {
+            window.location.href = '/pages/auth/login.html';
+        }, 2000);
     }
 
     // Inicializar cuando el DOM esté listo
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
-        init();
+        setTimeout(init, 100);
     }
 
 })();
