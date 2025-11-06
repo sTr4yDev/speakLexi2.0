@@ -121,12 +121,27 @@ const API_CONFIG = {
             VALIDAR_FORMATO: '/multimedia/validar'
         },
         
+        // ✅ NUEVOS ENDPOINTS DE CURSOS AGREGADOS
         CURSOS: {
             LISTAR: '/cursos',
             DETALLE: '/cursos/:id',
-            LECCIONES: '/cursos/:id/lecciones',
-            PROGRESO: '/cursos/:id/progreso',
-            INSCRIBIR: '/cursos/:id/inscribir'
+            CREAR: '/cursos',
+            ACTUALIZAR: '/cursos/:id',
+            ELIMINAR: '/cursos/:id',
+            POR_NIVEL: (nivel) => `/cursos/nivel/${nivel}`,
+            LECCIONES: (id) => `/cursos/${id}/lecciones`,
+            INSCRIBIR: (id) => `/cursos/${id}/inscribir`,
+            PROGRESO: (id) => `/cursos/${id}/progreso`,
+            SIGUIENTE_LECCION: (id) => `/cursos/${id}/siguiente-leccion`
+        },
+        
+        // ✅ NUEVOS ENDPOINTS DE ESTUDIANTE AGREGADOS
+        ESTUDIANTE: {
+            MIS_CURSOS: '/estudiante/mis-cursos',
+            ESTADISTICAS: '/estudiante/estadisticas',
+            PROGRESO_GENERAL: '/estudiante/progreso',
+            CERTIFICADOS: '/estudiante/certificados',
+            ACTIVIDAD_RECIENTE: '/estudiante/actividad-reciente'
         },
         
         // ========================================
@@ -297,6 +312,11 @@ const STORAGE_CONFIG = {
         NIVEL_ACTUAL: 'nivel_actual',
         CURSO_ACTUAL: 'curso_actual',
         
+        // Cursos del estudiante
+        CURSOS_INSCRITOS: 'cursos_inscritos',
+        CURSO_ACTIVO: 'curso_activo',
+        PROGRESO_CURSOS: 'progreso_cursos',
+        
         // Onboarding
         ONBOARDING_COMPLETADO: 'onboarding_completado',
         EMAIL_VERIFICADO: 'correo_verificado',
@@ -373,7 +393,23 @@ const UI_CONFIG = {
         REGISTRO: '/pages/auth/registro.html',
         VERIFICAR_EMAIL: '/pages/auth/verificar-email.html',
         ASIGNAR_NIVEL: '/pages/onboarding/asignar-nivel.html',
-        RECUPERAR_PASSWORD: '/pages/auth/recuperar-contrasena.html'
+        RECUPERAR_PASSWORD: '/pages/auth/recuperar-contrasena.html',
+        
+        // ✅ NUEVAS RUTAS PARA CURSOS
+        CURSOS: {
+            CATALOGO: '/pages/cursos/catalogo-cursos.html',
+            DETALLE: '/pages/cursos/detalle-curso.html',
+            LECCION: '/pages/cursos/leccion-curso.html',
+            PROGRESO: '/pages/cursos/progreso-curso.html'
+        },
+        
+        // ✅ NUEVAS RUTAS PARA ESTUDIANTE
+        ESTUDIANTE: {
+            DASHBOARD: '/pages/estudiante/estudiante-dashboard.html',
+            MIS_CURSOS: '/pages/estudiante/mis-cursos.html',
+            ESTADISTICAS: '/pages/estudiante/estadisticas-estudiante.html',
+            CERTIFICADOS: '/pages/estudiante/certificados.html'
+        }
     }
 };
 
@@ -562,7 +598,12 @@ const GAMIFICACION_CONFIG = {
         NIVEL_COMPLETADO: 100,
         LOGRO_DESBLOQUEADO: 25,
         PRIMER_LOGIN: 5,
-        COMENTARIO_PROFESOR: 15
+        COMENTARIO_PROFESOR: 15,
+        
+        // ✅ NUEVOS: Puntos específicos para cursos
+        CURSO_INSCRITO: 15,
+        CURSO_COMPLETADO: 200,
+        LECCION_CURSO_COMPLETADA: 25
     },
     
     // Niveles de XP (según tabla perfil_estudiantes: total_xp)
@@ -589,7 +630,13 @@ const GAMIFICACION_CONFIG = {
         'velocista',
         'estudioso',
         'social',
-        'explorador'
+        'explorador',
+        
+        // ✅ NUEVOS: Logros específicos para cursos
+        'primer_curso',
+        'curso_completado',
+        'especialista_curso',
+        'coleccionista_cursos'
     ],
     
     // Configuración de racha
@@ -639,20 +686,36 @@ const ROLES_CONFIG = {
             'ver_recompensas',        // UC-11
             'ver_ranking',            // UC-12
             'cambiar_curso',          // UC-06
-            'eliminar_cuenta'         // UC-07
+            'eliminar_cuenta',        // UC-07
+            
+            // ✅ NUEVOS: Permisos para cursos
+            'ver_cursos',
+            'inscribirse_cursos',
+            'ver_progreso_cursos',
+            'completar_lecciones_curso'
         ],
         profesor: [
             'ver_estadisticas',       // UC-13
             'revisar_retroalimentacion', // UC-14
             'planificar_contenido',   // UC-15
-            'dar_retroalimentacion'
+            'dar_retroalimentacion',
+            
+            // ✅ NUEVOS: Permisos para cursos
+            'crear_cursos',
+            'gestionar_cursos',
+            'ver_estadisticas_cursos'
         ],
         admin: [
             'gestionar_usuarios',
             'gestionar_contenido',    // UC-08, UC-09
             'ver_reportes',
             'crear_lecciones',        // UC-08
-            'agregar_multimedia'      // UC-09
+            'agregar_multimedia',     // UC-09
+            
+            // ✅ NUEVOS: Permisos para cursos
+            'gestionar_todos_cursos',
+            'asignar_cursos',
+            'ver_analiticas_cursos'
         ],
         mantenimiento: [
             'consultar_reportes',     // UC-16
@@ -689,6 +752,13 @@ const ERROR_CONFIG = {
         ARCHIVO_MUY_GRANDE: 'ARCHIVO_MUY_GRANDE',
         LECCION_NO_ENCONTRADA: 'LECCION_NO_ENCONTRADA',
         
+        // ✅ NUEVOS: Errores específicos para cursos
+        CURSO_NO_ENCONTRADO: 'CURSO_NO_ENCONTRADO',
+        CURSO_YA_INSCRITO: 'CURSO_YA_INSCRITO',
+        CURSO_NO_DISPONIBLE: 'CURSO_NO_DISPONIBLE',
+        LECCION_CURSO_NO_ENCONTRADA: 'LECCION_CURSO_NO_ENCONTRADA',
+        PROGRESO_CURSO_NO_ENCONTRADO: 'PROGRESO_CURSO_NO_ENCONTRADO',
+        
         // Progreso (UC-10, UC-11, UC-12)
         SIN_PROGRESO: 'SIN_PROGRESO',
         SIN_DATOS_RANKING: 'SIN_DATOS_RANKING',
@@ -722,6 +792,14 @@ const ERROR_CONFIG = {
         EMAIL_EN_USO: 'Este correo electrónico ya está registrado',
         FORMATO_NO_SOPORTADO: 'El formato del archivo no es compatible',
         ARCHIVO_MUY_GRANDE: 'El archivo es demasiado grande',
+        
+        // ✅ NUEVOS: Mensajes para cursos
+        CURSO_NO_ENCONTRADO: 'El curso solicitado no existe',
+        CURSO_YA_INSCRITO: 'Ya estás inscrito en este curso',
+        CURSO_NO_DISPONIBLE: 'Este curso no está disponible en este momento',
+        LECCION_CURSO_NO_ENCONTRADA: 'La lección del curso no fue encontrada',
+        PROGRESO_CURSO_NO_ENCONTRADO: 'No se encontró progreso para este curso',
+        
         SIN_PROGRESO: 'No hay progreso registrado para mostrar',
         SIN_DATOS_RANKING: 'No hay suficientes datos para generar el ranking',
         SIN_ESTADISTICAS: 'No hay estadísticas disponibles',
@@ -811,7 +889,7 @@ const APP_CONFIG = {
     STORAGE: STORAGE_CONFIG,
     UI: UI_CONFIG,
     TIMEOUTS: TIMEOUTS_CONFIG,
-    NIVELES: NIVELES_CONFIG,  // ← ✅ AGREGADO
+    NIVELES: NIVELES_CONFIG,
     VALIDATION: VALIDATION_CONFIG,
     GAMIFICACION: GAMIFICACION_CONFIG,
     ROLES: ROLES_CONFIG,
@@ -821,13 +899,41 @@ const APP_CONFIG = {
     navegarAlDashboard: navegarAlDashboard
 };
 
-/**
- * Exportar configuraciones
- */
+// ==========================================================
+// ✅ CONFIGURACIÓN GLOBAL AGREGADA - COMPATIBILIDAD
+// ==========================================================
+
 if (typeof window !== 'undefined') {
-    // Browser environment - hacer disponible globalmente
+    // Configuración global principal
     window.APP_CONFIG = APP_CONFIG;
     
+    // Configuración específica para compatibilidad con código existente
+    window.APP_CONFIG = {
+        // ...configuración existente...
+        
+        API: {
+            BASE_URL: 'http://localhost:5000',
+            ENDPOINTS: {
+                // ...endpoints existentes...
+                
+                // ✅ NUEVOS ENDPOINTS AGREGADOS
+                CURSOS: {
+                    LISTAR: '/api/cursos',
+                    OBTENER: (id) => `/api/cursos/${id}`,
+                    POR_NIVEL: (nivel) => `/api/cursos/nivel/${nivel}`,
+                    LECCIONES: (id) => `/api/cursos/${id}/lecciones`,
+                    INSCRIBIR: (id) => `/api/cursos/${id}/inscribir`,
+                    PROGRESO: (id) => `/api/cursos/${id}/progreso`,
+                    SIGUIENTE_LECCION: (id) => `/api/cursos/${id}/siguiente-leccion`
+                },
+                ESTUDIANTE: {
+                    MIS_CURSOS: '/api/estudiante/mis-cursos',
+                    ESTADISTICAS: '/api/estudiante/estadisticas'
+                }
+            }
+        }
+    };
+
     // También exportar individualmente para acceso directo
     window.SpeakLexiConfig = {
         ENV: APP_ENV,
@@ -835,7 +941,7 @@ if (typeof window !== 'undefined') {
         STORAGE: STORAGE_CONFIG,
         UI: UI_CONFIG,
         TIMEOUTS: TIMEOUTS_CONFIG,
-        NIVELES: NIVELES_CONFIG,  // ← ✅ AGREGADO
+        NIVELES: NIVELES_CONFIG,
         VALIDATION: VALIDATION_CONFIG,
         GAMIFICACION: GAMIFICACION_CONFIG,
         ROLES: ROLES_CONFIG,
@@ -861,6 +967,8 @@ if (typeof exports !== 'undefined') {
 if (APP_ENV.DEBUG && typeof console !== 'undefined') {
     console.log(`🚀 ${APP_ENV.APP_NAME} v${APP_ENV.VERSION} - Configuración cargada en modo: ${APP_ENV.MODE}`);
     console.log('📁 Módulos configurados: Usuarios, Lecciones, Aprendizaje, Desempeño, Mantenimiento');
-    console.log('✅ Configuración NIVELES agregada correctamente');
-    console.log('🎯 Niveles CEFR disponibles: A1, A2, B1, B2, C1, C2');
+    console.log('✅ Endpoints de CURSOS y ESTUDIANTE agregados correctamente');
+    console.log('🎯 Nuevos endpoints disponibles:');
+    console.log('   - CURSOS: listar, obtener, por nivel, lecciones, inscribir, progreso');
+    console.log('   - ESTUDIANTE: mis-cursos, estadísticas, progreso, certificados');
 }

@@ -111,7 +111,7 @@
         {
             name: "Estudiante Demo",
             email: "estudiante@speaklexi.com",
-            password: "estudiante123",
+            password: "Estudiante123!",
             role: "estudiante",
             description: "Acceso completo al módulo de aprendizaje",
             color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
@@ -119,7 +119,7 @@
         {
             name: "Profesor Demo",
             email: "profesor@speaklexi.com",
-            password: "profesor123",
+            password: "Profesor123!",
             role: "profesor",
             description: "Acceso a estadísticas y retroalimentación",
             color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
@@ -135,7 +135,7 @@
         {
             name: "Mantenimiento Demo",
             email: "mantenimiento@speaklexi.com",
-            password: "mantenimiento123",
+            password: "Mante123!",
             role: "mantenimiento",
             description: "Reportes y tareas programadas",
             color: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"

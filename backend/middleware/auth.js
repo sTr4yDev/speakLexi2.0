@@ -1,4 +1,5 @@
-//backend/middleware
+// backend/middleware/auth.js
+
 const jwt = require('jsonwebtoken');
 const database = require('../config/database');
 
@@ -70,23 +71,28 @@ const verificarToken = async (req, res, next) => {
     }
 };
 
-// @desc    Verificar rol de usuario
+// @desc    Verificar rol de usuario (versión mejorada)
 // @access  Private
-const verificarRol = (rolesPermitidos) => {
+const verificarRol = (...roles) => {
     return (req, res, next) => {
         if (!req.user) {
             return res.status(401).json({
-                error: 'Usuario no autenticado',
-                codigo: 'UNAUTHENTICATED'
+                success: false,
+                error: 'No autorizado - Usuario no autenticado'
             });
         }
 
-        if (!rolesPermitidos.includes(req.user.rol)) {
+        // Normalizar roles a minúsculas para comparación case-insensitive
+        const userRole = req.user.rol.toLowerCase();
+        const allowedRoles = roles.map(r => r.toLowerCase());
+
+        if (!allowedRoles.includes(userRole)) {
             return res.status(403).json({
-                error: 'No tienes permisos para realizar esta acción',
+                success: false,
+                error: 'No tienes permisos para esta acción',
                 codigo: 'INSUFFICIENT_PERMISSIONS',
-                rol_requerido: rolesPermitidos,
-                rol_actual: req.user.rol
+                rol_requerido: allowedRoles,
+                rol_actual: userRole
             });
         }
 
@@ -99,6 +105,7 @@ const verificarRol = (rolesPermitidos) => {
 const verificarEmail = (req, res, next) => {
     if (!req.user.email_verificado) {
         return res.status(403).json({
+            success: false,
             error: 'Debes verificar tu email antes de acceder a este recurso',
             codigo: 'EMAIL_NOT_VERIFIED'
         });
@@ -118,9 +125,16 @@ const logRequests = (req, res, next) => {
     next();
 };
 
+// @desc    Middleware de autorización (alias para compatibilidad)
+// @access  Private
+const authorize = (...roles) => {
+    return verificarRol(...roles);
+};
+
 module.exports = {
     verificarToken,
     verificarRol,
     verificarEmail,
-    logRequests
+    logRequests,
+    authorize  // Exportamos ambas para compatibilidad
 };

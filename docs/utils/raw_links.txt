@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-03 20:44:31
+# RAW LINKS — Actualizado 2025-11-05 08:24:31
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: 78a1a1c9e2fa1e478de48fe44049eff5137c71eb
+# Commit: ae993b9e4525948f1f54299565d45b364eb62588
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -52,6 +52,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/componentes/galeria-imagenes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/componentes/guardado.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/componentes/progreso.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/componentes/vista-previa.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/editar-leccion/editar-leccion.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/admin/gestion-lecciones.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/auth/login.js

@@ -22,6 +22,7 @@ const { initializeDatabase, testConnection } = require('./config/database');
 const authRoutes = require('./routes/auth-routes');
 const leccionRoutes = require('./routes/leccionRoutes');  // ✅ AGREGADO
 const multimediaRoutes = require('./routes/multimediaRoutes');  // ✅ AGREGADO
+const cursosRoutes = require('./routes/cursosRoutes'); // ← AGREGADO
 
 const app = express();
 
@@ -103,6 +104,9 @@ app.use('/api/lecciones', leccionRoutes);
 // ✅ MULTIMEDIA - AGREGADO  
 app.use('/api/multimedia', multimediaRoutes);
 
+// ✅ CURSOS - AGREGADO
+app.use('/api/cursos', cursosRoutes); // ← AGREGAR
+
 // ==========================================================
 // RUTAS BÁSICAS DEL SISTEMA
 // ==========================================================
@@ -121,6 +125,7 @@ app.get('/api/health', async (req, res) => {
       authentication: 'available',
       lessons: 'available',      // ✅ ACTUALIZADO
       multimedia: 'available',   // ✅ ACTUALIZADO
+      courses: 'available',      // ✅ AGREGADO
       email: 'available'
     }
   });
@@ -138,12 +143,14 @@ app.get('/api/config', (req, res) => {
       users: false,
       lessons: true,      // ✅ ACTUALIZADO
       multimedia: true,   // ✅ ACTUALIZADO
+      courses: true,      // ✅ AGREGADO
       progress: false
     },
     endpoints: {
       auth: '/api/auth',
       lecciones: '/api/lecciones',      // ✅ AGREGADO
       multimedia: '/api/multimedia',    // ✅ AGREGADO
+      cursos: '/api/cursos',            // ✅ AGREGADO
       health: '/api/health',
       config: '/api/config'
     }
@@ -166,6 +173,13 @@ app.get('/', (req, res) => {
       'POST /api/auth/verificar - Verificación de email',
       'POST /api/auth/recuperar-contrasena - Recuperación de contraseña',
       'POST /api/auth/restablecer-contrasena - Restablecer contraseña',
+      
+      '--- CURSOS ---',
+      'GET  /api/cursos - Listar todos los cursos',
+      'GET  /api/cursos/:id - Obtener curso específico',
+      'POST /api/cursos - Crear nuevo curso',
+      'PUT  /api/cursos/:id - Actualizar curso',
+      'DELETE /api/cursos/:id - Eliminar curso',
       
       '--- LECCIONES ---',
       'GET  /api/lecciones/nivel/:nivel - Listar lecciones por nivel',
@@ -199,8 +213,9 @@ app.use('*', (req, res) => {
       '/api/health', 
       '/api/config', 
       '/api/auth/*',
-      '/api/lecciones/*',      // ✅ AGREGADO
-      '/api/multimedia/*'       // ✅ AGREGADO
+      '/api/cursos/*',      // ✅ AGREGADO
+      '/api/lecciones/*',   // ✅ AGREGADO
+      '/api/multimedia/*'   // ✅ AGREGADO
     ],
     suggestion: 'Verifica la URL o consulta GET / para ver endpoints disponibles'
   });
@@ -247,7 +262,8 @@ initializeApp().then(() => {
     console.log(`📍 URL: http://${HOST}:${PORT}`);
     console.log(`📊 Entorno: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔐 Autenticación: http://${HOST}:${PORT}/api/auth`);
-    console.log(`📚 Lecciones: http://${HOST}:${PORT}/api/lecciones`);
+    console.log(`📚 Cursos: http://${HOST}:${PORT}/api/cursos`);        // ✅ AGREGADO
+    console.log(`📖 Lecciones: http://${HOST}:${PORT}/api/lecciones`);
     console.log(`🎬 Multimedia: http://${HOST}:${PORT}/api/multimedia`);
     console.log(`❤️  Health: http://${HOST}:${PORT}/api/health`);
     console.log(`📝 Config: http://${HOST}:${PORT}/api/config`);
