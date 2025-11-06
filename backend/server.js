@@ -1,5 +1,5 @@
 // ==========================================================
-// server.js - SpeakLexi Backend - CON LECCIONES Y MULTIMEDIA
+// server.js - SpeakLexi Backend - COMPLETO
 // ==========================================================
 
 require('dotenv').config();
@@ -20,9 +20,10 @@ const { initializeDatabase, testConnection } = require('./config/database');
 // ==========================================================
 
 const authRoutes = require('./routes/auth-routes');
-const leccionRoutes = require('./routes/leccionRoutes');  // ✅ AGREGADO
-const multimediaRoutes = require('./routes/multimediaRoutes');  // ✅ AGREGADO
-const cursosRoutes = require('./routes/cursosRoutes'); // ← AGREGADO
+const leccionRoutes = require('./routes/leccionRoutes');
+const multimediaRoutes = require('./routes/multimediaRoutes');
+const cursosRoutes = require('./routes/cursosRoutes');
+const ejercicioRoutes = require('./routes/ejercicioRoutes'); 
 
 const app = express();
 
@@ -33,7 +34,6 @@ const app = express();
 const initializeApp = async () => {
   console.log('🔧 Inicializando aplicación SpeakLexi...');
   
-  // Probar conexión a base de datos
   const dbConnected = await testConnection();
   if (!dbConnected) {
     console.log('⚠️  ADVERTENCIA: Base de datos no disponible');
@@ -42,7 +42,6 @@ const initializeApp = async () => {
     console.log('✅ Base de datos conectada correctamente');
   }
 
-  // Inicializar servicios adicionales aquí si es necesario
   console.log('✅ Aplicación inicializada correctamente');
 };
 
@@ -55,8 +54,8 @@ app.use(helmet());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000, // 15 minutos
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 100, // máximo 100 peticiones por ventana
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
   message: {
     error: 'Demasiadas peticiones desde esta IP, intenta más tarde.'
   }
@@ -72,9 +71,7 @@ const allowedOrigins = [
 ];
 app.use(cors({
   origin: function(origin, callback) {
-    // Permitir peticiones sin origin (como Postman o misma origin)
     if (!origin) return callback(null, true);
-
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'CORS policy: Origen no permitido';
       return callback(new Error(msg), false);
@@ -95,23 +92,16 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // RUTAS - TODAS REGISTRADAS
 // ==========================================================
 
-// Autenticación
 app.use('/api/auth', authRoutes);
-
-// ✅ LECCIONES - AGREGADO
 app.use('/api/lecciones', leccionRoutes);
-
-// ✅ MULTIMEDIA - AGREGADO  
 app.use('/api/multimedia', multimediaRoutes);
-
-// ✅ CURSOS - AGREGADO
-app.use('/api/cursos', cursosRoutes); // ← AGREGAR
+app.use('/api/cursos', cursosRoutes);
+app.use('/api/ejercicios', ejercicioRoutes); // ← NUEVO
 
 // ==========================================================
 // RUTAS BÁSICAS DEL SISTEMA
 // ==========================================================
 
-// Ruta de salud (con estado de BD)
 app.get('/api/health', async (req, res) => {
   const dbStatus = await testConnection();
   
@@ -123,15 +113,15 @@ app.get('/api/health', async (req, res) => {
     services: {
       database: dbStatus ? 'connected' : 'disconnected',
       authentication: 'available',
-      lessons: 'available',      // ✅ ACTUALIZADO
-      multimedia: 'available',   // ✅ ACTUALIZADO
-      courses: 'available',      // ✅ AGREGADO
+      lessons: 'available',
+      multimedia: 'available',
+      courses: 'available',
+      exercises: 'available', // ← NUEVO
       email: 'available'
     }
   });
 });
 
-// Ruta de configuración (útil para el frontend)
 app.get('/api/config', (req, res) => {
   res.json({
     appName: 'SpeakLexi',
@@ -141,23 +131,24 @@ app.get('/api/config', (req, res) => {
     features: {
       auth: true,
       users: false,
-      lessons: true,      // ✅ ACTUALIZADO
-      multimedia: true,   // ✅ ACTUALIZADO
-      courses: true,      // ✅ AGREGADO
+      lessons: true,
+      multimedia: true,
+      courses: true,
+      exercises: true, // ← NUEVO
       progress: false
     },
     endpoints: {
       auth: '/api/auth',
-      lecciones: '/api/lecciones',      // ✅ AGREGADO
-      multimedia: '/api/multimedia',    // ✅ AGREGADO
-      cursos: '/api/cursos',            // ✅ AGREGADO
+      lecciones: '/api/lecciones',
+      multimedia: '/api/multimedia',
+      cursos: '/api/cursos',
+      ejercicios: '/api/ejercicios', // ← NUEVO
       health: '/api/health',
       config: '/api/config'
     }
   });
 });
 
-// Ruta por defecto
 app.get('/', (req, res) => {
   res.json({ 
     message: 'Bienvenido a SpeakLexi API',
@@ -171,28 +162,29 @@ app.get('/', (req, res) => {
       'POST /api/auth/registro - Registro de usuario',
       'POST /api/auth/login - Inicio de sesión',
       'POST /api/auth/verificar - Verificación de email',
-      'POST /api/auth/recuperar-contrasena - Recuperación de contraseña',
-      'POST /api/auth/restablecer-contrasena - Restablecer contraseña',
       
       '--- CURSOS ---',
       'GET  /api/cursos - Listar todos los cursos',
       'GET  /api/cursos/:id - Obtener curso específico',
       'POST /api/cursos - Crear nuevo curso',
-      'PUT  /api/cursos/:id - Actualizar curso',
-      'DELETE /api/cursos/:id - Eliminar curso',
+      'GET  /api/cursos/:id/lecciones - Lecciones del curso',
+      'POST /api/cursos/:id/inscribir - Inscribirse',
       
       '--- LECCIONES ---',
-      'GET  /api/lecciones/nivel/:nivel - Listar lecciones por nivel',
+      'GET  /api/lecciones - Listar lecciones',
       'GET  /api/lecciones/:id - Obtener lección específica',
       'POST /api/lecciones - Crear nueva lección',
       'PUT  /api/lecciones/:id - Actualizar lección',
-      'DELETE /api/lecciones/:id - Eliminar lección',
-      'POST /api/lecciones/:id/progreso - Registrar progreso',
+      
+      '--- EJERCICIOS ---', 
+      'GET  /api/ejercicios/leccion/:leccion_id - Ejercicios de lección',
+      'POST /api/ejercicios - Crear ejercicio',
+      'PUT  /api/ejercicios/:id - Actualizar ejercicio',
+      'POST /api/ejercicios/:id/validar - Validar respuesta',
       
       '--- MULTIMEDIA ---',
       'GET  /api/multimedia/leccion/:leccionId - Multimedia de lección',
       'POST /api/multimedia/subir - Subir archivo',
-      'PUT  /api/multimedia/:id/orden - Actualizar orden',
       'DELETE /api/multimedia/:id - Eliminar archivo'
     ],
     documentation: 'Consulta la documentación para más detalles'
@@ -203,7 +195,6 @@ app.get('/', (req, res) => {
 // MANEJO DE ERRORES
 // ==========================================================
 
-// 404 - Ruta no encontrada
 app.use('*', (req, res) => {
   res.status(404).json({
     error: 'Ruta no encontrada',
@@ -213,15 +204,15 @@ app.use('*', (req, res) => {
       '/api/health', 
       '/api/config', 
       '/api/auth/*',
-      '/api/cursos/*',      // ✅ AGREGADO
-      '/api/lecciones/*',   // ✅ AGREGADO
-      '/api/multimedia/*'   // ✅ AGREGADO
+      '/api/cursos/*',
+      '/api/lecciones/*',
+      '/api/multimedia/*',
+      '/api/ejercicios/*' // ← NUEVO
     ],
     suggestion: 'Verifica la URL o consulta GET / para ver endpoints disponibles'
   });
 });
 
-// Manejo de errores global
 app.use((error, req, res, next) => {
   console.error('❌ Error del servidor:', error);
   
@@ -232,7 +223,6 @@ app.use((error, req, res, next) => {
     });
   }
   
-  // Error de base de datos
   if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
     return res.status(503).json({
       error: 'Servicio de base de datos no disponible',
@@ -253,7 +243,6 @@ app.use((error, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || 'localhost';
 
-// Inicializar y luego iniciar servidor
 initializeApp().then(() => {
   app.listen(PORT, HOST, () => {
     console.log('\n' + '='.repeat(50));
@@ -262,8 +251,9 @@ initializeApp().then(() => {
     console.log(`📍 URL: http://${HOST}:${PORT}`);
     console.log(`📊 Entorno: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔐 Autenticación: http://${HOST}:${PORT}/api/auth`);
-    console.log(`📚 Cursos: http://${HOST}:${PORT}/api/cursos`);        // ✅ AGREGADO
+    console.log(`📚 Cursos: http://${HOST}:${PORT}/api/cursos`);
     console.log(`📖 Lecciones: http://${HOST}:${PORT}/api/lecciones`);
+    console.log(`🎯 Ejercicios: http://${HOST}:${PORT}/api/ejercicios`); // ← NUEVO
     console.log(`🎬 Multimedia: http://${HOST}:${PORT}/api/multimedia`);
     console.log(`❤️  Health: http://${HOST}:${PORT}/api/health`);
     console.log(`📝 Config: http://${HOST}:${PORT}/api/config`);
@@ -276,7 +266,6 @@ initializeApp().then(() => {
   process.exit(1);
 });
 
-// Manejo graceful de cierre
 process.on('SIGINT', () => {
   console.log('\n🔻 Recibida señal de cierre (SIGINT)');
   console.log('👋 Cerrando servidor SpeakLexi...');
