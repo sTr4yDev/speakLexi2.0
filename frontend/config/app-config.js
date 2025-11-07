@@ -132,7 +132,7 @@ const API_CONFIG = {
             LECCIONES: (id) => `/cursos/${id}/lecciones`,
             INSCRIBIR: (id) => `/cursos/${id}/inscribir`,
             PROGRESO: (id) => `/cursos/${id}/progreso`,
-            SIGUIENTE_LECCION: (id) => `/cursos/${id}/siguiente-leccion`
+            SIGUIENTE_LECCION: (id) => `/cursos/${id}/siguiente-leccion` // ✅ CORREGIDO: comilla simple
         },
         
         // ✅ NUEVOS ENDPOINTS DE ESTUDIANTE AGREGADOS
@@ -900,56 +900,38 @@ const APP_CONFIG = {
 };
 
 // ==========================================================
-// ✅ CONFIGURACIÓN GLOBAL AGREGADA - COMPATIBILIDAD
+// ✅ CORRECCIÓN CRÍTICA: EXPORTAR TODO AL WINDOW GLOBAL
 // ==========================================================
-
 if (typeof window !== 'undefined') {
-    // Configuración global principal
+    // ✅ CORREGIDO: Exportar cada configuración individualmente
+    window.APP_ENV = APP_ENV;
+    window.API_CONFIG = API_CONFIG;
+    window.STORAGE_CONFIG = STORAGE_CONFIG;
+    window.UI_CONFIG = UI_CONFIG;
+    window.TIMEOUTS_CONFIG = TIMEOUTS_CONFIG;
+    window.NIVELES_CONFIG = NIVELES_CONFIG;
+    window.VALIDATION_CONFIG = VALIDATION_CONFIG;
+    window.GAMIFICACION_CONFIG = GAMIFICACION_CONFIG;
+    window.ROLES_CONFIG = ROLES_CONFIG;
+    window.ERROR_CONFIG = ERROR_CONFIG;
+    window.FORMAT_CONFIG = FORMAT_CONFIG;
+    window.TEST_USERS = TEST_USERS;
+    
+    // ✅ CORREGIDO: Exportar configuración completa
     window.APP_CONFIG = APP_CONFIG;
     
-    // Configuración específica para compatibilidad con código existente
-    window.APP_CONFIG = {
-        // ...configuración existente...
-        
-        API: {
-            BASE_URL: 'http://localhost:5000',
-            ENDPOINTS: {
-                // ...endpoints existentes...
-                
-                // ✅ NUEVOS ENDPOINTS AGREGADOS
-                CURSOS: {
-                    LISTAR: '/api/cursos',
-                    OBTENER: (id) => `/api/cursos/${id}`,
-                    POR_NIVEL: (nivel) => `/api/cursos/nivel/${nivel}`,
-                    LECCIONES: (id) => `/api/cursos/${id}/lecciones`,
-                    INSCRIBIR: (id) => `/api/cursos/${id}/inscribir`,
-                    PROGRESO: (id) => `/api/cursos/${id}/progreso`,
-                    SIGUIENTE_LECCION: (id) => `/api/cursos/${id}/siguiente-leccion`
-                },
-                ESTUDIANTE: {
-                    MIS_CURSOS: '/api/estudiante/mis-cursos',
-                    ESTADISTICAS: '/api/estudiante/estadisticas'
-                }
-            }
-        }
-    };
-
-    // También exportar individualmente para acceso directo
-    window.SpeakLexiConfig = {
-        ENV: APP_ENV,
-        API: API_CONFIG,
-        STORAGE: STORAGE_CONFIG,
-        UI: UI_CONFIG,
-        TIMEOUTS: TIMEOUTS_CONFIG,
-        NIVELES: NIVELES_CONFIG,
-        VALIDATION: VALIDATION_CONFIG,
-        GAMIFICACION: GAMIFICACION_CONFIG,
-        ROLES: ROLES_CONFIG,
-        ERROR: ERROR_CONFIG,
-        FORMAT: FORMAT_CONFIG,
-        TEST_USERS: TEST_USERS,
-        navegarAlDashboard: navegarAlDashboard
-    };
+    // Alias para compatibilidad
+    window.SpeakLexiConfig = APP_CONFIG;
+    
+    // Función helper
+    window.navegarAlDashboard = navegarAlDashboard;
+    
+    console.log('✅ SpeakLexi Config - Variables globales exportadas:');
+    console.log('   - APP_ENV:', window.APP_ENV?.MODE);
+    console.log('   - API_CONFIG:', !!window.API_CONFIG);
+    console.log('   - STORAGE_CONFIG:', !!window.STORAGE_CONFIG);
+    console.log('   - ROLES_CONFIG:', !!window.ROLES_CONFIG);
+    console.log('   - VALIDATION_CONFIG:', !!window.VALIDATION_CONFIG);
 }
 
 // Export para módulos ES6
@@ -968,7 +950,7 @@ if (APP_ENV.DEBUG && typeof console !== 'undefined') {
     console.log(`🚀 ${APP_ENV.APP_NAME} v${APP_ENV.VERSION} - Configuración cargada en modo: ${APP_ENV.MODE}`);
     console.log('📁 Módulos configurados: Usuarios, Lecciones, Aprendizaje, Desempeño, Mantenimiento');
     console.log('✅ Endpoints de CURSOS y ESTUDIANTE agregados correctamente');
-    console.log('🎯 Nuevos endpoints disponibles:');
-    console.log('   - CURSOS: listar, obtener, por nivel, lecciones, inscribir, progreso');
-    console.log('   - ESTUDIANTE: mis-cursos, estadísticas, progreso, certificados');
+    console.log('🎯 Variables globales disponibles:');
+    console.log('   - API_CONFIG, STORAGE_CONFIG, ROLES_CONFIG, VALIDATION_CONFIG');
+    console.log('   - APP_CONFIG (completo)');
 }

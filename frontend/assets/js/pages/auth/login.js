@@ -1,7 +1,7 @@
 /* ============================================
    SPEAKLEXI - PÁGINA DE LOGIN
    Archivo: assets/js/pages/auth/login.js
-   Usa: APP_CONFIG, apiClient, formValidator, toastManager
+   Usa: API_CONFIG, STORAGE_CONFIG, ROLES_CONFIG, apiClient, formValidator, toastManager
    ============================================ */
 
 (() => {
@@ -11,7 +11,9 @@
     // 1. ESPERA ACTIVA DE DEPENDENCIAS
     // ============================================
     const requiredDependencies = [
-        'APP_CONFIG',
+        'API_CONFIG',
+        'STORAGE_CONFIG', 
+        'ROLES_CONFIG',
         'apiClient', 
         'formValidator',
         'toastManager',
@@ -63,15 +65,14 @@
     }
 
     // ============================================
-    // 2. CONFIGURACIÓN DESDE APP_CONFIG
+    // 2. CONFIGURACIÓN DESDE APP_CONFIG (CORREGIDO)
     // ============================================
     const config = {
-        get API() { return window.APP_CONFIG?.API || {}; },
-        get ENDPOINTS() { return window.APP_CONFIG?.API?.ENDPOINTS || {}; },
-        get STORAGE() { return window.APP_CONFIG?.STORAGE?.KEYS || {}; },
-        get VALIDATION() { return window.APP_CONFIG?.VALIDATION || {}; },
-        get UI() { return window.APP_CONFIG?.UI || {}; },
-        get ROLES() { return window.APP_CONFIG?.ROLES || {}; }
+        get ENDPOINTS() { return window.API_CONFIG?.ENDPOINTS || {}; },
+        get STORAGE() { return window.STORAGE_CONFIG?.KEYS || {}; },
+        get VALIDATION() { return window.VALIDATION_CONFIG || {}; },
+        get UI() { return window.UI_CONFIG || {}; },
+        get ROLES() { return window.ROLES_CONFIG || {}; }
     };
 
     // ============================================
@@ -172,7 +173,7 @@
         setupEventListeners();
         cargarUsuariosPrueba();
         
-        if (window.APP_CONFIG?.ENV?.DEBUG) {
+        if (window.APP_ENV?.DEBUG) {
             console.log('🔧 Módulo Login listo:', { config, elementos });
         }
     }
@@ -260,8 +261,8 @@
 
             console.log('🔐 Intentando login...');
 
-            // ✅ USAR apiClient CON ENDPOINTS DE APP_CONFIG
-            const endpoint = config.ENDPOINTS.AUTH.LOGIN;
+            // ✅ USAR apiClient CON ENDPOINTS CORRECTO
+            const endpoint = window.API_CONFIG.ENDPOINTS.AUTH.LOGIN;
             const response = await window.apiClient.post(endpoint, datos);
 
             console.log('📥 Respuesta del servidor:', response);
@@ -294,8 +295,9 @@
             throw new Error('Respuesta inválida del servidor');
         }
 
-        // ✅ GUARDAR EN STORAGE USANDO APP_CONFIG
-        const { USUARIO, TOKEN } = config.STORAGE;
+        // ✅ GUARDAR EN STORAGE USANDO CONFIG CORRECTO
+        const TOKEN = window.STORAGE_CONFIG.KEYS.TOKEN;
+        const USUARIO = window.STORAGE_CONFIG.KEYS.USUARIO;
         console.log('💾 Guardando en localStorage:', { USUARIO, TOKEN });
         
         localStorage.setItem(TOKEN, token);
@@ -303,11 +305,11 @@
 
         window.toastManager.success(`¡Bienvenido ${usuario.nombre}!`);
 
-        // ✅ REDIRIGIR SEGÚN ROL USANDO APP_CONFIG
+        // ✅ REDIRIGIR SEGÚN ROL USANDO CONFIG CORRECTO
         const rol = usuario.rol?.toLowerCase();
         console.log('🎭 Rol del usuario:', rol);
         
-        let dashboardUrl = config.ROLES.RUTAS_DASHBOARD[rol];
+        let dashboardUrl = window.ROLES_CONFIG.RUTAS_DASHBOARD[rol];
         console.log('🔗 URL de dashboard (config):', dashboardUrl);
         
         // 🔧 AJUSTE: Si la ruta es absoluta, ajustarla según ubicación actual
@@ -368,7 +370,7 @@
     function manejarError(mensaje, error) {
         console.error('💥 Error:', error);
         
-        if (window.APP_CONFIG?.ENV?.DEBUG) {
+        if (window.APP_ENV?.DEBUG) {
             console.trace();
         }
         
