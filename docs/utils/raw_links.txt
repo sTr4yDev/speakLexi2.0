@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-05 18:28:24
+# RAW LINKS — Actualizado 2025-11-07 14:11:07
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: 314f9e4031af5050ff49e93a8fc2705e4e567168
+# Commit: e6b661ea4a7d81d0a545a5fcc9255851b8a717ac
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -12,6 +12,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/models/mult
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/models/usuario.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/auth-routes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/cursosRoutes.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/ejercicioRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/leccionRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/multimediaRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/scripts/crear-admin.py
@@ -27,6 +28,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/
 ========================= FRONTEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/authController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/cursosController.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/ejercicioController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/leccionController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/multimediaController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/middleware/auth.js
@@ -36,6 +38,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/middleware/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/package.json
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/scripts/debug.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/services/emailService.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/components/ejercicioRender.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/components/footer.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/components/navbar.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/css/animations.css

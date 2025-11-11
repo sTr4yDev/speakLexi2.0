@@ -1,5 +1,6 @@
 // backend/controllers/cursosController.js
 const Curso = require('../models/cursos');
+const db = require('../config/database'); // Necesitamos importar db para el nuevo método
 
 // @desc    Listar todos los cursos (con filtros opcionales)
 // @route   GET /api/cursos
@@ -50,6 +51,28 @@ exports.obtenerCursosPorNivel = async (req, res) => {
             success: false,
             error: 'Error interno del servidor al obtener cursos'
         });
+    }
+};
+
+// @desc    Obtener lecciones por nivel e idioma (NUEVO MÉTODO)
+// @route   GET /api/cursos/nivel/:nivel/idioma/:idioma
+// @access  Private
+// Función: Obtiene lecciones filtradas por nivel e idioma del usuario, incluyendo progreso individual
+exports.obtenerLeccionesPorNivelIdioma = async (req, res) => {
+    try {
+        const { nivel, idioma } = req.params;
+        const [lecciones] = await db.query(
+            `SELECT l.*, 
+                    COALESCE(pl.progreso, 0) as progreso,
+                    COALESCE(pl.completada, false) as completada
+             FROM lecciones l
+             LEFT JOIN progreso_lecciones pl ON l.id = pl.leccion_id AND pl.usuario_id = ?
+             WHERE l.nivel = ? AND l.idioma = ? AND l.estado = 'activa'
+             ORDER BY l.orden`,
+            [req.user.id, nivel, idioma]
+        );        res.json(lecciones);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };
 
