@@ -118,18 +118,25 @@ const verificarToken = async (req, res, next) => {
 };
 
 // ==========================================================
-// VERIFICAR ROL DE USUARIO
+// VERIFICAR ROL DE USUARIO - CORREGIDO
 // ==========================================================
 
 /**
  * Middleware para verificar que el usuario tenga uno de los roles permitidos
- * @param {...string} rolesPermitidos - Roles que pueden acceder
+ * @param {string|string[]} rolesPermitidos - Roles que pueden acceder (array o string)
  * @returns {Function} Middleware function
  * 
  * @example
- * router.get('/admin', verificarRol('admin', 'administrador'), controller)
+ * // Uso con array (RECOMENDADO):
+ * router.get('/ruta', verificarRol(['alumno']), controller)
+ * 
+ * // Uso con múltiples roles:
+ * router.get('/ruta', verificarRol(['profesor', 'admin']), controller)
+ * 
+ * // Uso con string único (también funciona):
+ * router.get('/ruta', verificarRol('alumno'), controller)
  */
-const verificarRol = (...rolesPermitidos) => {
+const verificarRol = (rolesPermitidos) => {
     return (req, res, next) => {
         // Verificar que el usuario esté autenticado
         if (!req.user) {
@@ -140,19 +147,28 @@ const verificarRol = (...rolesPermitidos) => {
             });
         }
 
+        // CORREGIDO: Asegurarse de que rolesPermitidos sea un array
+        let rolesArray;
+        if (Array.isArray(rolesPermitidos)) {
+            rolesArray = rolesPermitidos;
+        } else {
+            rolesArray = [rolesPermitidos];
+        }
+
         // Verificar si el rol del usuario está en los roles permitidos
-        if (!rolesPermitidos.includes(req.user.rol)) {
-            console.log(`❌ Acceso denegado: usuario con rol "${req.user.rol}" intentó acceder a recurso que requiere roles: ${rolesPermitidos.join(', ')}`);
+        if (!rolesArray.includes(req.user.rol)) {
+            console.log(`❌ Acceso denegado: usuario con rol "${req.user.rol}" intentó acceder a recurso que requiere roles: ${rolesArray.join(', ')}`);
             
             return res.status(403).json({
                 error: 'No tienes permisos para realizar esta acción',
                 codigo: 'INSUFFICIENT_PERMISSIONS',
-                rol_requerido: rolesPermitidos,
-                tu_rol: req.user.rol
+                rol_requerido: rolesArray,
+                tu_rol: req.user.rol,
+                usuario_id: req.user.id
             });
         }
 
-        console.log(`✅ Acceso permitido: usuario con rol "${req.user.rol}"`);
+        console.log(`✅ Acceso permitido: usuario con rol "${req.user.rol}" para roles: ${rolesArray.join(', ')}`);
         next();
     };
 };

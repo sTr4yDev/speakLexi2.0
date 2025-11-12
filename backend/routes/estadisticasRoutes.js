@@ -8,9 +8,6 @@ const router = express.Router();
 const estadisticasController = require('../controllers/estadisticasController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Todas las rutas requieren autenticación y rol de profesor
-router.use(authMiddleware);
-
 // =================================================================
 // RUTAS EXISTENTES
 // =================================================================
@@ -20,7 +17,11 @@ router.use(authMiddleware);
  * @desc    Obtener estadísticas generales del profesor
  * @access  Profesor
  */
-router.get('/generales', estadisticasController.obtenerEstadisticasGenerales);
+router.get('/generales',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    estadisticasController.obtenerEstadisticasGenerales
+);
 
 /**
  * @route   GET /api/estadisticas/alumnos
@@ -28,21 +29,33 @@ router.get('/generales', estadisticasController.obtenerEstadisticasGenerales);
  * @query   nivel, idioma, ordenar, limite
  * @access  Profesor
  */
-router.get('/alumnos', estadisticasController.obtenerListaAlumnos);
+router.get('/alumnos',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    estadisticasController.obtenerListaAlumnos
+);
 
 /**
  * @route   GET /api/estadisticas/alumno/:id
  * @desc    Obtener progreso individual detallado de un alumno
  * @access  Profesor
  */
-router.get('/alumno/:id', estadisticasController.obtenerProgresoIndividual);
+router.get('/alumno/:id',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    estadisticasController.obtenerProgresoIndividual
+);
 
 /**
  * @route   GET /api/estadisticas/tiempos-promedio
  * @desc    Obtener tiempos promedio por lección
  * @access  Profesor
  */
-router.get('/tiempos-promedio', estadisticasController.obtenerTiemposPromedio);
+router.get('/tiempos-promedio',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    estadisticasController.obtenerTiemposPromedio
+);
 
 /**
  * @route   GET /api/estadisticas/tasas-completitud
@@ -50,7 +63,11 @@ router.get('/tiempos-promedio', estadisticasController.obtenerTiemposPromedio);
  * @query   agrupar_por (nivel|idioma)
  * @access  Profesor
  */
-router.get('/tasas-completitud', estadisticasController.obtenerTasasCompletitud);
+router.get('/tasas-completitud',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    estadisticasController.obtenerTasasCompletitud
+);
 
 /**
  * @route   GET /api/estadisticas/tendencia
@@ -58,7 +75,11 @@ router.get('/tasas-completitud', estadisticasController.obtenerTasasCompletitud)
  * @query   periodo (semanal|mensual)
  * @access  Profesor
  */
-router.get('/tendencia', estadisticasController.obtenerTendencia);
+router.get('/tendencia',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    estadisticasController.obtenerTendencia
+);
 
 // =================================================================
 // 🆕 NUEVAS RUTAS PARA DASHBOARD PROFESOR
@@ -71,7 +92,7 @@ router.get('/tendencia', estadisticasController.obtenerTendencia);
  */
 router.get('/resumen-general',
     authMiddleware.verificarToken,
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),
     estadisticasController.obtenerResumenGeneral
 );
 
@@ -83,7 +104,7 @@ router.get('/resumen-general',
  */
 router.get('/estudiantes',
     authMiddleware.verificarToken,
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),
     estadisticasController.obtenerListaEstudiantes
 );
 
@@ -94,7 +115,7 @@ router.get('/estudiantes',
  */
 router.get('/estudiantes/:id',
     authMiddleware.verificarToken,
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),
     estadisticasController.obtenerDetalleEstudiante
 );
 
@@ -105,7 +126,7 @@ router.get('/estudiantes/:id',
  */
 router.get('/estudiantes-alerta',
     authMiddleware.verificarToken,
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),
     estadisticasController.obtenerEstudiantesAlerta
 );
 

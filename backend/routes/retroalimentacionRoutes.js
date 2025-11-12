@@ -8,16 +8,17 @@ const router = express.Router();
 const retroalimentacionController = require('../controllers/retroalimentacionController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Todas las rutas requieren autenticación
-router.use(authMiddleware);
-
 /**
  * @route   POST /api/retroalimentacion
  * @desc    Crear un nuevo comentario/retroalimentación
  * @body    leccion_id, tipo, asunto, mensaje, es_privado
  * @access  Estudiante/Profesor
  */
-router.post('/', retroalimentacionController.crearComentario);
+router.post('/',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['alumno', 'profesor', 'admin']),
+    retroalimentacionController.crearComentario
+);
 
 /**
  * @route   GET /api/retroalimentacion
@@ -25,14 +26,22 @@ router.post('/', retroalimentacionController.crearComentario);
  * @query   tipo, leccion_id, solo_sin_respuesta, limite, offset
  * @access  Profesor
  */
-router.get('/', retroalimentacionController.obtenerComentarios);
+router.get('/',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    retroalimentacionController.obtenerComentarios
+);
 
 /**
  * @route   GET /api/retroalimentacion/estadisticas
  * @desc    Obtener estadísticas de retroalimentación
  * @access  Profesor
  */
-router.get('/estadisticas', retroalimentacionController.obtenerEstadisticas);
+router.get('/estadisticas',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    retroalimentacionController.obtenerEstadisticas
+);
 
 /**
  * @route   GET /api/retroalimentacion/analisis/recurrentes
@@ -40,14 +49,21 @@ router.get('/estadisticas', retroalimentacionController.obtenerEstadisticas);
  * @query   periodo (días)
  * @access  Profesor
  */
-router.get('/analisis/recurrentes', retroalimentacionController.analizarRecurrentes);
+router.get('/analisis/recurrentes',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    retroalimentacionController.analizarRecurrentes
+);
 
 /**
  * @route   GET /api/retroalimentacion/:id
  * @desc    Obtener detalles de un comentario específico
  * @access  Profesor/Estudiante (autor)
  */
-router.get('/:id', retroalimentacionController.obtenerComentarioPorId);
+router.get('/:id',
+    authMiddleware.verificarToken,
+    retroalimentacionController.obtenerComentarioPorId
+);
 
 /**
  * @route   POST /api/retroalimentacion/:id/responder
@@ -55,13 +71,21 @@ router.get('/:id', retroalimentacionController.obtenerComentarioPorId);
  * @body    mensaje
  * @access  Profesor
  */
-router.post('/:id/responder', retroalimentacionController.responderComentario);
+router.post('/:id/responder',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    retroalimentacionController.responderComentario
+);
 
 /**
  * @route   PATCH /api/retroalimentacion/:id/resolver
  * @desc    Marcar comentario como resuelto
  * @access  Profesor
  */
-router.patch('/:id/resolver', retroalimentacionController.marcarResuelto);
+router.patch('/:id/resolver',
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['profesor', 'admin']),
+    retroalimentacionController.marcarResuelto
+);
 
 module.exports = router;

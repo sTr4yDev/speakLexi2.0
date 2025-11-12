@@ -1,31 +1,49 @@
 const express = require('express');
 const router = express.Router();
 const progresoController = require('../controllers/progresoController');
-const { protect, authorize } = require('../middleware/auth');
+const authMiddleware = require('../middleware/authMiddleware');
 
 /**
  * RUTAS: Progreso de Lecciones y Cursos
- * Todas las rutas requieren autenticación (protect)
- * Algunas solo para alumnos (authorize('alumno'))
  */
+
+// ===================================
+// RUTAS PARA DASHBOARD ESTUDIANTE
+// ===================================
+
+// Obtener resumen completo del dashboard - CORREGIDO
+router.get(
+    '/resumen', 
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['alumno']),
+    progresoController.obtenerResumenEstudiante  // ✅ CAMBIADO AQUÍ
+);
+
+// Obtener lecciones recomendadas
+router.get(
+    '/lecciones-recomendadas', 
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['alumno']),
+    progresoController.obtenerLeccionesRecomendadas
+);
 
 // ===================================
 // RUTAS DE REGISTRO DE PROGRESO
 // ===================================
 
-// Registrar progreso de lección (POST)
+// Registrar progreso de lección
 router.post(
     '/registrar', 
-    protect, 
-    authorize('alumno'), 
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['alumno']),
     progresoController.registrarProgresoLeccion
 );
 
 // Sincronizar progreso (para offline)
 router.post(
     '/sincronizar', 
-    protect, 
-    authorize('alumno'), 
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['alumno']),
     progresoController.sincronizarProgreso
 );
 
@@ -33,17 +51,26 @@ router.post(
 // RUTAS DE CONSULTA DE PROGRESO
 // ===================================
 
-// Obtener resumen de progreso del usuario
-router.get('/resumen', protect, progresoController.obtenerResumenProgreso);
-
 // Obtener historial de progreso
-router.get('/historial', protect, progresoController.obtenerHistorialProgreso);
+router.get(
+    '/historial', 
+    authMiddleware.verificarToken,
+    progresoController.obtenerHistorialProgreso
+);
 
 // Obtener progreso por lección específica
-router.get('/leccion/:leccionId', protect, progresoController.obtenerProgresoPorLeccion);
+router.get(
+    '/leccion/:leccionId', 
+    authMiddleware.verificarToken,
+    progresoController.obtenerProgresoPorLeccion
+);
 
 // Obtener progreso por curso específico
-router.get('/curso/:cursoId', protect, progresoController.obtenerProgresoPorCurso);
+router.get(
+    '/curso/:cursoId', 
+    authMiddleware.verificarToken,
+    progresoController.obtenerProgresoPorCurso
+);
 
 // ===================================
 // ACTUALIZACIÓN DE PROGRESO DE CURSO
@@ -52,8 +79,8 @@ router.get('/curso/:cursoId', protect, progresoController.obtenerProgresoPorCurs
 // Actualizar progreso de curso (cuando se completa una lección)
 router.post(
     '/curso/:cursoId/actualizar', 
-    protect, 
-    authorize('alumno'), 
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['alumno']),
     progresoController.actualizarProgresoCurso
 );
 

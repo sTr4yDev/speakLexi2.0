@@ -1,5 +1,5 @@
 // ==========================================================
-// server.js - SpeakLexi Backend - COMPLETO CON TESTING
+// server.js - SpeakLexi Backend - COMPLETO CON MÓDULO 3
 // ==========================================================
 
 require('dotenv').config();
@@ -23,7 +23,16 @@ const authRoutes = require('./routes/auth-routes');
 const leccionRoutes = require('./routes/leccionRoutes');
 const multimediaRoutes = require('./routes/multimediaRoutes');
 const cursosRoutes = require('./routes/cursosRoutes');
-const ejercicioRoutes = require('./routes/ejercicioRoutes'); 
+const ejercicioRoutes = require('./routes/ejercicioRoutes');
+
+// ==========================================================
+// IMPORTAR RUTAS DE MÓDULO 3: GESTIÓN DE APRENDIZAJE
+// ==========================================================
+const progresoRoutes = require('./routes/progresoRoutes');
+const gamificacionRoutes = require('./routes/gamificacionRoutes');
+const estadisticasRoutes = require('./routes/estadisticasRoutes');
+const retroalimentacionRoutes = require('./routes/retroalimentacionRoutes');
+const planificacionRoutes = require('./routes/planificacionRoutes');
 
 // ==========================================================
 // RUTAS DE TESTING (SOLO DESARROLLO)
@@ -119,6 +128,17 @@ app.use('/api/cursos', cursosRoutes);
 app.use('/api/ejercicios', ejercicioRoutes);
 
 // ==========================================================
+// RUTAS DE MÓDULO 3: GESTIÓN DE APRENDIZAJE
+// ==========================================================
+app.use('/api/progreso', progresoRoutes);
+app.use('/api/gamificacion', gamificacionRoutes);
+app.use('/api/estadisticas', estadisticasRoutes);
+app.use('/api/retroalimentacion', retroalimentacionRoutes);
+app.use('/api/planificacion', planificacionRoutes);
+
+console.log('✅ Módulo 3 (Aprendizaje) registrado');
+
+// ==========================================================
 // RUTAS DE TESTING (SOLO EN DESARROLLO)
 // ==========================================================
 
@@ -143,7 +163,13 @@ app.get('/api/health', async (req, res) => {
       multimedia: 'available',
       courses: 'available',
       exercises: 'available',
-      email: 'available'
+      email: 'available',
+      // AGREGAR SERVICIOS DEL MÓDULO 3
+      progress: 'available',
+      gamification: 'available',
+      statistics: 'available',
+      feedback: 'available',
+      planning: 'available'
   };
 
   // Agregar servicio de testing solo en desarrollo
@@ -169,7 +195,12 @@ app.get('/api/config', (req, res) => {
       multimedia: true,
       courses: true,
       exercises: true,
-      progress: false
+      // AGREGAR FEATURES DEL MÓDULO 3
+      progress: true,
+      gamification: true,
+      statistics: true,
+      feedback: true,
+      planning: true
   };
 
   const endpoints = {
@@ -178,6 +209,12 @@ app.get('/api/config', (req, res) => {
       multimedia: '/api/multimedia',
       cursos: '/api/cursos',
       ejercicios: '/api/ejercicios',
+      // AGREGAR ENDPOINTS DEL MÓDULO 3
+      progreso: '/api/progreso',
+      gamificacion: '/api/gamificacion',
+      estadisticas: '/api/estadisticas',
+      retroalimentacion: '/api/retroalimentacion',
+      planificacion: '/api/planificacion',
       health: '/api/health',
       config: '/api/config'
   };
@@ -230,7 +267,15 @@ app.get('/', (req, res) => {
     '--- MULTIMEDIA ---',
     'GET  /api/multimedia/leccion/:leccionId - Multimedia de lección',
     'POST /api/multimedia/subir - Subir archivo',
-    'DELETE /api/multimedia/:id - Eliminar archivo'
+    'DELETE /api/multimedia/:id - Eliminar archivo',
+
+    '--- PROGRESO Y APRENDIZAJE ---',
+    'GET  /api/progreso/resumen - Resumen del dashboard',
+    'GET  /api/progreso/lecciones-recomendadas - Lecciones recomendadas',
+    'POST /api/progreso/registrar - Registrar progreso',
+    'GET  /api/progreso/historial - Historial de progreso',
+    'GET  /api/gamificacion/puntos - Puntos y logros',
+    'GET  /api/estadisticas/rendimiento - Estadísticas de rendimiento'
   ];
 
   // Agregar endpoints de testing solo en desarrollo
@@ -267,7 +312,13 @@ app.use('*', (req, res) => {
     '/api/cursos/*',
     '/api/lecciones/*',
     '/api/multimedia/*',
-    '/api/ejercicios/*'
+    '/api/ejercicios/*',
+    // AGREGAR ENDPOINTS DEL MÓDULO 3
+    '/api/progreso/*',
+    '/api/gamificacion/*',
+    '/api/estadisticas/*',
+    '/api/retroalimentacion/*',
+    '/api/planificacion/*'
   ];
 
   // Agregar testing solo en desarrollo
@@ -338,6 +389,13 @@ initializeApp().then(() => {
     console.log(`📖 Lecciones: http://${HOST}:${PORT}/api/lecciones`);
     console.log(`🎯 Ejercicios: http://${HOST}:${PORT}/api/ejercicios`);
     console.log(`🎬 Multimedia: http://${HOST}:${PORT}/api/multimedia`);
+    
+    // MOSTRAR MÓDULO 3
+    console.log(`📈 Progreso: http://${HOST}:${PORT}/api/progreso`);
+    console.log(`🏆 Gamificación: http://${HOST}:${PORT}/api/gamificacion`);
+    console.log(`📊 Estadísticas: http://${HOST}:${PORT}/api/estadisticas`);
+    console.log(`💬 Retroalimentación: http://${HOST}:${PORT}/api/retroalimentacion`);
+    console.log(`📅 Planificación: http://${HOST}:${PORT}/api/planificacion`);
     
     // Mostrar testing solo en desarrollo
     if (process.env.NODE_ENV === 'development') {
