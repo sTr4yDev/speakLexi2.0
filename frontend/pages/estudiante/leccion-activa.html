@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lección Activa - SpeakLexi 2.0</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        /* Animaciones personalizadas */
+        @keyframes slide-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fade-out {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        .animate-slide-in {
+            animation: slide-in 0.3s ease-out;
+        }
+        
+        .animate-fade-out {
+            animation: fade-out 0.3s ease-out;
+        }
+        
+        /* Estilos para ejercicios */
+        .ejercicio-container {
+            transition: all 0.3s ease;
+        }
+        
+        .espacio-blanco:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Estilos para inputs de radio y checkbox mejorados */
+        input[type="radio"]:checked + span {
+            font-weight: 600;
+        }
+        
+        /* Estilos para resultados */
+        .resultado-correcto {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+        
+        .resultado-incorrecto {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        
+        /* Loading spinner */
+        .loader {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Dark mode optimizations */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1f2937;
+                color: #f9fafb;
+            }
+        }
+        
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Progress bar animation */
+        #barra-progreso {
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Toast notifications */
+        .toast {
+            animation: toast-in 0.3s ease-out;
+        }
+        
+        @keyframes toast-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .toast-out {
+            animation: toast-out 0.3s ease-in;
+        }
+        
+        @keyframes toast-out {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    
+    <!-- Navbar (se carga dinámicamente) -->
+    <div id="navbar-container"></div>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-7xl">
+        
+        <!-- Loading State -->
+        <div id="loading-state" class="flex flex-col items-center justify-center min-h-screen">
+            <div class="loader mb-4"></div>
+            <p class="text-gray-600 dark:text-gray-300">Cargando lección...</p>
+        </div>
+        
+        <!-- Content Container (se llena dinámicamente) -->
+        <div id="contenido-leccion" class="hidden">
+            <!-- El contenido se genera dinámicamente con JavaScript -->
+        </div>
+        
+        <!-- Error State (oculto por defecto) -->
+        <div id="error-state" class="hidden">
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 text-center max-w-2xl mx-auto">
+                <i class="fas fa-exclamation-circle text-red-500 text-5xl mb-4"></i>
+                <h2 class="text-2xl font-bold text-red-700 dark:text-red-300 mb-2">Error al cargar la lección</h2>
+                <p id="error-message" class="text-red-600 dark:text-red-400 mb-4">
+                    No se pudo cargar la lección. Por favor, intenta nuevamente.
+                </p>
+                <div class="flex gap-3 justify-center">
+                    <button 
+                        onclick="window.location.reload()"
+                        class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                        <i class="fas fa-redo mr-2"></i>Reintentar
+                    </button>
+                    <button 
+                        onclick="window.location.href = '/pages/estudiante/estudiante-dashboard.html'"
+                        class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver al Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+    
+    <!-- Footer (se carga dinámicamente) -->
+    <div id="footer-container"></div>
+    
+    <!-- Modal para confirmaciones -->
+    <div id="modal-confirmacion" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md mx-4">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-3" id="modal-titulo">
+                Confirmar acción
+            </h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-6" id="modal-mensaje">
+                ¿Estás seguro de que deseas continuar?
+            </p>
+            <div class="flex gap-3 justify-end">
+                <button 
+                    id="modal-cancelar"
+                    class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 transition-colors">
+                    Cancelar
+                </button>
+                <button 
+                    id="modal-confirmar"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container para notificaciones -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+        <!-- Las notificaciones se agregan aquí dinámicamente -->
+    </div>
+    
+    <!-- Scripts -->
+    
+    <!-- Config PRIMERO -->
+    <script src="/config/app-config.js"></script>
+    
+    <!-- Core utilities -->
+    <script src="/assets/js/core/utils.js"></script>
+    <script src="/assets/js/core/api-client.js"></script>
+    <script src="/assets/js/core/theme-manager.js"></script>
+    
+    <!-- Cargar navbar y footer -->
+    <script src="/assets/js/core/navbar-loader.js"></script>
+    
+    <!-- IMPORTANTE: Cargar EjercicioRenderer ANTES de leccion-activa.js -->
+    <script src="/assets/components/ejercicioRender.js"></script>
+    
+    <!-- Cargar la lógica de la página (SIN type="module") -->
+    <script src="/assets/js/pages/estudiante/leccion-activa.js"></script>
+    
+    <!-- Script para manejar estados de carga -->
+    <script>
+        // Manejar estados de carga
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 Página cargada, inicializando...');
+            
+            // Verificar que tenemos un ID de lección
+            const urlParams = new URLSearchParams(window.location.search);
+            const leccionId = urlParams.get('id');
+            
+            if (!leccionId) {
+                mostrarError('No se especificó una lección. Por favor, selecciona una lección desde el dashboard.');
+                return;
+            }
+            
+            console.log(`📚 Cargando lección ID: ${leccionId}`);
+            
+            // Verificar que las dependencias estén cargadas después de un breve delay
+            setTimeout(() => {
+                const dependenciasCargadas = verificarDependencias();
+                if (!dependenciasCargadas) {
+                    mostrarError('Error de configuración del sistema. Algunas dependencias no se cargaron correctamente. Recarga la página.');
+                    return;
+                }
+                
+                console.log('✅ Todo listo - leccion-activa.js se inicializará automáticamente');
+            }, 100);
+        });
+        
+        // Función para verificar que todas las dependencias estén cargadas
+        function verificarDependencias() {
+            const dependencias = {
+                'APP_CONFIG': typeof window.APP_CONFIG !== 'undefined',
+                'apiClient': typeof window.apiClient !== 'undefined',
+                'EjercicioRenderer': typeof window.EjercicioRenderer !== 'undefined'
+            };
+            
+            console.log('🔍 Verificando dependencias:', dependencias);
+            
+            const faltantes = Object.keys(dependencias).filter(key => !dependencias[key]);
+            
+            if (faltantes.length > 0) {
+                console.error('❌ Dependencias faltantes:', faltantes);
+                
+                // Intentar soluciones alternativas
+                if (faltantes.includes('apiClient') && typeof window.APIClient !== 'undefined') {
+                    console.log('⚠️  apiClient no encontrado, pero APIClient sí existe - usando APIClient');
+                    window.apiClient = window.APIClient;
+                    dependencias.apiClient = true;
+                    faltantes.splice(faltantes.indexOf('apiClient'), 1);
+                }
+                
+                // Si aún hay dependencias faltantes, mostrar error
+                if (faltantes.length > 0) {
+                    return false;
+                }
+            }
+            
+            console.log('✅ Todas las dependencias cargadas correctamente');
+            return true;
+        }
+        
+        // Función auxiliar para mostrar errores
+        function mostrarError(mensaje) {
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            const errorMessage = document.getElementById('error-message');
+            
+            if (loadingState) loadingState.classList.add('hidden');
+            if (errorState) errorState.classList.remove('hidden');
+            if (errorMessage) errorMessage.textContent = mensaje;
+            
+            console.error('❌ Error mostrado al usuario:', mensaje);
+        }
+        
+        // Sistema de toasts mejorado
+        function mostrarToast(mensaje, tipo = 'info', duracion = 5000) {
+            const toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) return;
+            
+            const colores = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            const iconos = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${colores[tipo] || colores.info} p-4 rounded-lg shadow-lg flex items-center gap-3`;
+            toast.innerHTML = `
+                <i class="fas ${iconos[tipo] || iconos.info}"></i>
+                <span>${mensaje}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto-remover después del tiempo especificado
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, duracion);
+        }
+        
+        // Manejar navegación con teclado globalmente
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + S para guardar progreso
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                const btnGuardar = document.getElementById('btn-guardar-progreso');
+                if (btnGuardar) btnGuardar.click();
+            }
+            
+            // Navegación con flechas
+            if (e.key === 'ArrowLeft') {
+                const btnAnterior = document.getElementById('btn-anterior');
+                if (btnAnterior && !btnAnterior.disabled) {
+                    btnAnterior.click();
+                    e.preventDefault();
+                }
+            } else if (e.key === 'ArrowRight') {
+                const btnSiguiente = document.getElementById('btn-siguiente');
+                if (btnSiguiente && !btnSiguiente.disabled) {
+                    btnSiguiente.click();
+                    e.preventDefault();
+                }
+            }
+            
+            // Enter para validar (cuando no hay texto seleccionado)
+            if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                const activeElement = document.activeElement;
+                if (!activeElement || (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA')) {
+                    const btnValidar = document.getElementById('btn-validar');
+                    if (btnValidar) {
+                        btnValidar.click();
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
+        
+        // Prevenir pérdida de progreso al salir
+        window.addEventListener('beforeunload', (e) => {
+            // Solo mostrar advertencia si hay progreso sin guardar
+            const progresoActual = document.getElementById('barra-progreso');
+            const ejerciciosCompletados = document.querySelectorAll('[data-completado="true"]');
+            
+            if (progresoActual && parseInt(progresoActual.style.width) > 0 && ejerciciosCompletados.length > 0) {
+                e.preventDefault();
+                e.returnValue = '¿Estás seguro de que deseas salir? Tu progreso podría no haberse guardado.';
+            }
+        });
+        
+        // Sistema de temas
+        function aplicarTema() {
+            const temaGuardado = localStorage.getItem('theme');
+            const prefiereOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (temaGuardado === 'dark' || (!temaGuardado && prefiereOscuro)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        
+        // Aplicar tema al cargar
+        aplicarTema();
+        
+        // Sistema de modal
+        function mostrarModal(titulo, mensaje, onConfirm) {
+            const modal = document.getElementById('modal-confirmacion');
+            const modalTitulo = document.getElementById('modal-titulo');
+            const modalMensaje = document.getElementById('modal-mensaje');
+            const modalCancelar = document.getElementById('modal-cancelar');
+            const modalConfirmar = document.getElementById('modal-confirmar');
+            
+            if (!modal || !modalTitulo || !modalMensaje) return;
+            
+            modalTitulo.textContent = titulo;
+            modalMensaje.textContent = mensaje;
+            
+            // Limpiar event listeners anteriores
+            const nuevoCancelar = modalCancelar.cloneNode(true);
+            const nuevoConfirmar = modalConfirmar.cloneNode(true);
+            
+            modalCancelar.parentNode.replaceChild(nuevoCancelar, modalCancelar);
+            modalConfirmar.parentNode.replaceChild(nuevoConfirmar, modalConfirmar);
+            
+            // Nuevos event listeners
+            nuevoCancelar.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+            
+            nuevoConfirmar.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                if (onConfirm) onConfirm();
+            });
+            
+            // Cerrar al hacer clic fuera
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+            
+            modal.classList.remove('hidden');
+        }
+        
+        // Hacer funciones globales
+        window.mostrarToast = mostrarToast;
+        window.mostrarModal = mostrarModal;
+        window.mostrarError = mostrarError;
+        
+        // Log para debugging
+        console.log('✅ leccion-activa.html cargado completamente');
+        
+        // Verificar librerías después de que se carguen
+        setTimeout(() => {
+            console.log('📦 Estado de librerías:', {
+                tailwind: typeof tailwind !== 'undefined',
+                fontAwesome: document.querySelector('link[href*="font-awesome"]') !== null,
+                ejercicioRenderer: typeof EjercicioRenderer !== 'undefined',
+                apiClient: typeof window.apiClient !== 'undefined',
+                APP_CONFIG: typeof window.APP_CONFIG !== 'undefined',
+                utils: typeof window.utils !== 'undefined',
+                themeManager: typeof window.themeManager !== 'undefined'
+            });
+        }, 1000);
+    </script>
+    
+    <!-- Google Analytics (opcional) -->
+    <!-- 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=TU-ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'TU-ID');
+    </script>
+    -->
+    
+</body>
+</html>

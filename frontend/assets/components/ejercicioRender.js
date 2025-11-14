@@ -1,5 +1,3 @@
-// frontend/assets/js/components/ejercicio-renderer.js
-
 /**
  * EjercicioRenderer - Renderiza todos los tipos de ejercicios
  * Tipos soportados:
@@ -433,7 +431,7 @@ class EjercicioRenderer {
     }
 }
 
-// Exportar globalmente
+// Exportar globalmente para uso en leccion-activa.js
 window.EjercicioRenderer = EjercicioRenderer;
 
 // Inicializar contador de palabras para ejercicios de escritura
@@ -448,4 +446,4 @@ document.addEventListener('input', (e) => {
     }
 });
 
-console.log('✅ EjercicioRenderer cargado');
+console.log('✅ EjercicioRenderer cargado correctamente');
