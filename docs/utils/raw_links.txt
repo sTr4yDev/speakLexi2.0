@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-13 09:18:47
+# RAW LINKS — Actualizado 2025-11-14 14:19:42
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: 5f8177525c9ea09298295cb175bab229c271c560
+# Commit: 1ba1dffb9078937f5b12d45539586aa4aede5fd1
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -34,6 +34,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/server.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 3/README_RAPIDO.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 4/API-REFERENCE.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 4/README_RAPIDO.md
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/crear-ejercicios.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/crear-lecciones.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/generar-links.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/api-client.js

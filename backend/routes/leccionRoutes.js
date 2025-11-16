@@ -1,3 +1,4 @@
+// backend/routes/leccionRoutes.js
 const express = require('express');
 const router = express.Router();
 const leccionController = require('../controllers/leccionController');
@@ -27,8 +28,49 @@ const validarProgreso = [
         .withMessage('El progreso debe estar entre 0 y 100')
 ];
 
+// Validadores para las nuevas rutas de catálogo
+const validarFiltrosCatalogo = [
+    query('limit')
+        .optional()
+        .isInt({ min: 1, max: 100 })
+        .withMessage('Límite debe ser entre 1 y 100'),
+    query('offset')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Offset debe ser un número positivo'),
+    query('nivel')
+        .optional()
+        .isIn(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'])
+        .withMessage('Nivel inválido')
+];
+
 // Todas las rutas requieren autenticación
 router.use(authMiddleware.verificarToken);
+
+// ========================================
+// RUTAS DE CATÁLOGO Y METADATOS
+// ========================================
+
+// ✅ CATÁLOGO COMPLETO con filtros
+router.get('/catalogo', 
+    validarFiltrosCatalogo,
+    leccionController.obtenerCatalogo
+);
+
+// ✅ IDIOMAS DISPONIBLES
+router.get('/idiomas', leccionController.obtenerIdiomas);
+
+// ✅ NIVELES DISPONIBLES
+router.get('/niveles', leccionController.obtenerNiveles);
+
+// ✅ ESTADÍSTICAS DE PROGRESO DEL USUARIO
+router.get('/estadisticas/progreso', leccionController.obtenerEstadisticasProgreso);
+
+// ✅ LECCIONES RECIENTES DEL USUARIO
+router.get('/recientes', 
+    query('limit').optional().isInt({ min: 1, max: 20 }),
+    leccionController.obtenerLeccionesRecientes
+);
 
 // ========================================
 // RUTAS REST ESTÁNDAR - ORDEN CORRECTO
@@ -36,9 +78,10 @@ router.use(authMiddleware.verificarToken);
 
 // 1. Rutas específicas primero (antes de /:id)
 
-// ✅ NUEVO: Listar TODAS las lecciones (para admin)
+// ✅ Listar TODAS las lecciones (para admin)
 router.get('/', leccionController.listarTodasLecciones);
 
+// ✅ Listar lecciones por nivel
 router.get('/nivel/:nivel', 
     param('nivel').isIn(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']),
     leccionController.listarLecciones
@@ -51,34 +94,51 @@ router.post('/',
     leccionController.crearLeccion
 );
 
-// 3. Rutas con :id (después de las específicas)
+// ========================================
+// RUTAS CON :id (después de las específicas)
+// ========================================
+
+// ✅ Obtener lección específica
 router.get('/:id', 
     param('id').isInt({ min: 1 }),
     leccionController.obtenerLeccion
 );
 
+// ✅ Actualizar lección
 router.put('/:id',
     authMiddleware.verificarRol('profesor', 'admin'),
     param('id').isInt({ min: 1 }),
     leccionController.actualizarLeccion
 );
 
+// ✅ Eliminar lección
 router.delete('/:id',
     authMiddleware.verificarRol('profesor', 'admin'),
     param('id').isInt({ min: 1 }),
     leccionController.eliminarLeccion
 );
 
+// ✅ Registrar progreso de lección
 router.post('/:id/progreso',
     param('id').isInt({ min: 1 }),
     validarProgreso,
     leccionController.registrarProgreso
 );
 
+// ✅ Completar lección (con validación de aprobación)
+router.post('/:id/completar',
+    param('id').isInt({ min: 1 }),
+    body('ejercicios_correctos').isInt({ min: 0 }),
+    body('total_ejercicios').isInt({ min: 1 }),
+    body('xp_acumulado').optional().isInt({ min: 0 }),
+    leccionController.completarLeccion
+);
+
 // ========================================
-// ALTERNATIVA: Mantener compatibilidad
+// RUTAS DE COMPATIBILIDAD (OPCIONAL)
 // ========================================
-// Si quieres mantener /crear para compatibilidad
-// router.post('/crear', router.stack[1].route.stack[0].handle);
+
+// Si necesitas mantener compatibilidad con rutas anteriores
+// router.get('/:id/obtener', leccionController.obtenerLeccion); // Alternativa
 
 module.exports = router;

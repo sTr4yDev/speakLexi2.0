@@ -349,7 +349,12 @@ class EjercicioRenderer {
     }
 
     mostrarResultadosSeleccionMultiple(resultado) {
-        const correctas = resultado.respuesta_correcta.respuestas;
+        // ✅ Manejar ambos formatos: nuevo y legacy  
+        const correctas = resultado.correctas || 
+                          resultado.data?.respuesta_correcta?.respuestas || 
+                          resultado.respuesta_correcta?.respuestas || 
+                          [];
+        
         const preguntas = this.ejercicio.contenido.preguntas || [];
         
         preguntas.forEach((pregunta, index) => {
@@ -371,11 +376,16 @@ class EjercicioRenderer {
 
     mostrarResultadosCompletarEspacios(resultado) {
         const inputs = document.querySelectorAll(`input[data-ejercicio="${this.ejercicio.id}"]`);
-        const correctas = resultado.respuesta_correcta.respuestas;
+        
+        // ✅ Manejar ambos formatos
+        const correctas = resultado.correctas || 
+                          resultado.data?.respuesta_correcta?.respuestas || 
+                          resultado.respuesta_correcta?.respuestas || 
+                          [];
         
         inputs.forEach((input, index) => {
             input.disabled = true;
-            const esCorrecta = input.value.trim().toLowerCase() === correctas[index].toLowerCase();
+            const esCorrecta = input.value.trim().toLowerCase() === correctas[index]?.toLowerCase();
             
             if (esCorrecta) {
                 input.classList.add('border-green-500', 'bg-green-50');
@@ -387,7 +397,12 @@ class EjercicioRenderer {
     }
 
     mostrarResultadosVerdaderoFalso(resultado) {
-        const correctas = resultado.respuesta_correcta.respuestas;
+        // ✅ Manejar ambos formatos
+        const correctas = resultado.correctas || 
+                          resultado.data?.respuesta_correcta?.respuestas || 
+                          resultado.respuesta_correcta?.respuestas || 
+                          [];
+        
         const afirmaciones = this.ejercicio.contenido.afirmaciones || [];
         
         afirmaciones.forEach((_, index) => {

@@ -162,11 +162,14 @@ exports.eliminarEjercicio = async (req, res) => {
     }
 };
 
-// Validar respuesta de ejercicio
+// Validar respuesta de ejercicio - VERSIÓN CORREGIDA
 exports.validarRespuesta = async (req, res) => {
     try {
         const { id } = req.params;
-        const { respuesta_usuario } = req.body;
+        const respuesta_usuario = req.body;
+
+        console.log('📝 Validando ejercicio ID:', id);
+        console.log('📥 Respuesta recibida:', JSON.stringify(respuesta_usuario));
 
         // Obtener ejercicio
         const [ejercicios] = await pool.execute(
@@ -184,26 +187,130 @@ exports.validarRespuesta = async (req, res) => {
         const ejercicio = ejercicios[0];
         const respuestaCorrecta = JSON.parse(ejercicio.respuesta_correcta);
 
-        // Validar según tipo
+        console.log('✅ Ejercicio encontrado:', ejercicio.tipo);
+        console.log('🎯 Respuesta correcta:', respuestaCorrecta);
+
         let esCorrecta = false;
         let puntuacion = 0;
 
         switch (ejercicio.tipo) {
             case 'seleccion_multiple':
-                esCorrecta = JSON.stringify(respuesta_usuario) === JSON.stringify(respuestaCorrecta.respuestas);
+                // ✅ Maneja ambos formatos
+                const respuestaUsuarioSM = respuesta_usuario.respuestas || respuesta_usuario;
+                esCorrecta = JSON.stringify(respuestaUsuarioSM) === JSON.stringify(respuestaCorrecta.respuestas);
                 puntuacion = esCorrecta ? ejercicio.puntos_maximos : 0;
                 break;
 
             case 'completar_espacios':
-                const respuestasUsuario = Array.isArray(respuesta_usuario) ? respuesta_usuario : respuesta_usuario.respuestas;
+                // ✅ Maneja ambos formatos
+                const respuestasUsuario = respuesta_usuario.respuestas || respuesta_usuario;
+                
+                // Validar que sea un array
+                if (!Array.isArray(respuestasUsuario)) {
+                    throw new Error('Formato de respuesta inválido para completar_espacios');
+                }
+                
                 const correctas = respuestasUsuario.filter((r, i) => 
-                    r.toLowerCase().trim() === respuestaCorrecta.respuestas[i].toLowerCase().trim()
+                    r && respuestaCorrecta.respuestas[i] && 
+                    r.toString().toLowerCase().trim() === respuestaCorrecta.respuestas[i].toString().toLowerCase().trim()
                 ).length;
+                
                 puntuacion = Math.round((correctas / respuestaCorrecta.respuestas.length) * ejercicio.puntos_maximos);
                 esCorrecta = puntuacion === ejercicio.puntos_maximos;
                 break;
 
-            // Agregar más tipos según necesites
+            case 'verdadero_falso':
+                // ✅ CORRECCIÓN: Manejar array de respuestas V/F
+                const respuestasUsuarioVF = respuesta_usuario.respuestas || [respuesta_usuario.respuesta];
+                const respuestasCorrectasVF = respuestaCorrecta.respuestas || [respuestaCorrecta.respuesta];
+                
+                console.log('🔍 V/F Usuario:', respuestasUsuarioVF);
+                console.log('🔍 V/F Correctas:', respuestasCorrectasVF);
+                
+                // Validar que ambos sean arrays
+                if (!Array.isArray(respuestasUsuarioVF) || !Array.isArray(respuestasCorrectasVF)) {
+                    throw new Error('Formato de respuesta inválido para verdadero_falso');
+                }
+                
+                // Contar respuestas correctas
+                const correctasVF = respuestasUsuarioVF.filter((r, i) => 
+                    r === respuestasCorrectasVF[i]
+                ).length;
+                
+                // Calcular puntuación proporcional
+                puntuacion = Math.round((correctasVF / respuestasCorrectasVF.length) * ejercicio.puntos_maximos);
+                esCorrecta = puntuacion === ejercicio.puntos_maximos;
+                
+                console.log(`✅ V/F: ${correctasVF}/${respuestasCorrectasVF.length} correctas = ${puntuacion} puntos`);
+                break;
+
+            case 'emparejamiento':
+                // ✅ CORRECCIÓN: Validar emparejamientos correctamente
+                const respuestasUsuarioEmp = respuesta_usuario.respuestas || respuesta_usuario.emparejamientos || respuesta_usuario;
+                const respuestasCorrectasEmp = respuestaCorrecta.respuestas || respuestaCorrecta.emparejamientos || respuestaCorrecta;
+                
+                console.log('🔍 Emparejamiento Usuario:', respuestasUsuarioEmp);
+                console.log('🔍 Emparejamiento Correctas:', respuestasCorrectasEmp);
+                
+                // Validar que ambos sean arrays
+                if (!Array.isArray(respuestasUsuarioEmp) || !Array.isArray(respuestasCorrectasEmp)) {
+                    throw new Error('Formato de respuesta inválido para emparejamiento');
+                }
+                
+                // Contar emparejamientos correctos
+                const correctasEmp = respuestasUsuarioEmp.filter((r, i) => 
+                    r !== null && r !== undefined && r === respuestasCorrectasEmp[i]
+                ).length;
+                
+                // Calcular puntuación proporcional
+                puntuacion = Math.round((correctasEmp / respuestasCorrectasEmp.length) * ejercicio.puntos_maximos);
+                esCorrecta = puntuacion === ejercicio.puntos_maximos;
+                
+                console.log(`✅ Emparejamiento: ${correctasEmp}/${respuestasCorrectasEmp.length} correctos = ${puntuacion} puntos`);
+                break;
+
+            case 'escritura':
+                // ✅ Ejercicios de escritura libre - Se validan manualmente o con IA
+                const textoUsuario = respuesta_usuario.texto || respuesta_usuario.respuesta || '';
+                const palabrasMinimas = respuestaCorrecta.palabras_minimas || 50;
+                const palabrasEscritas = textoUsuario.trim().split(/\s+/).filter(p => p.length > 0).length;
+                
+                console.log('📝 Escritura - Palabras escritas:', palabrasEscritas);
+                console.log('📝 Escritura - Palabras mínimas:', palabrasMinimas);
+                
+                // Por ahora, solo validamos que cumpla con el mínimo de palabras
+                // En el futuro se puede agregar validación con IA o revisión manual
+                if (palabrasEscritas >= palabrasMinimas) {
+                    puntuacion = ejercicio.puntos_maximos;
+                    esCorrecta = true;
+                    console.log('✅ Escritura: Cumple con palabras mínimas');
+                } else {
+                    // Puntuación proporcional si no alcanza el mínimo
+                    puntuacion = Math.round((palabrasEscritas / palabrasMinimas) * ejercicio.puntos_maximos);
+                    esCorrecta = false;
+                    console.log(`⚠️ Escritura: Solo ${palabrasEscritas}/${palabrasMinimas} palabras`);
+                }
+                break;
+
+            default:
+                return res.status(400).json({
+                    success: false,
+                    error: `Tipo de ejercicio no soportado: ${ejercicio.tipo}`
+                });
+        }
+
+        console.log('📊 Resultado validación:', { esCorrecta, puntuacion });
+
+        // ✅ OTORGAR XP SI LA RESPUESTA ES CORRECTA
+        if (puntuacion > 0) {
+            const Gamificacion = require('../models/gamificacionModel');
+            await Gamificacion.otorgarXP(
+                req.user.id, 
+                puntuacion, 
+                'ejercicio_completado',
+                `Ejercicio: ${ejercicio.titulo}`
+            );
+            console.log(`🎉 XP otorgado: ${puntuacion} puntos al usuario ${req.user.id}`);
         }
 
         // Guardar resultado
@@ -221,8 +328,17 @@ exports.validarRespuesta = async (req, res) => {
             JSON.stringify(respuesta_usuario)
         ]);
 
+        // ✅ FORMATO CORRECIDO - Compatible con frontend
         res.json({
             success: true,
+            esCorrecta: esCorrecta,
+            puntuacion: puntuacion,
+            puntuacionMaxima: ejercicio.puntos_maximos,
+            respuestas: respuesta_usuario.respuestas || [respuesta_usuario.respuesta] || respuesta_usuario,
+            correctas: respuestaCorrecta.respuestas || [respuestaCorrecta.respuesta] || respuestaCorrecta,
+            explicacion: ejercicio.explicacion || '',
+            tipo: ejercicio.tipo,
+            // Mantener data para compatibilidad con otras partes del sistema
             data: {
                 correcto: esCorrecta,
                 puntuacion_obtenida: puntuacion,
@@ -232,10 +348,10 @@ exports.validarRespuesta = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error validando respuesta:', error);
+        console.error('❌ Error validando respuesta:', error);
         res.status(500).json({
             success: false,
-            error: 'Error al validar respuesta'
+            error: 'Error al validar respuesta: ' + error.message
         });
     }
 };

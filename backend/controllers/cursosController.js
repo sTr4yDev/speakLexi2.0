@@ -418,3 +418,24 @@ exports.obtenerEstadisticas = async (req, res) => {
         });
     }
 };
+
+// @desc    Obtener cursos del estudiante
+// @route   GET /api/cursos/estudiante/mis-cursos
+// @access  Private (Estudiante)
+exports.obtenerMisCursos = async (req, res) => {
+    try {
+        const usuarioId = req.user.id;
+        const cursos = await Curso.obtenerCursosEstudiante(usuarioId);
+
+        res.json({
+            success: true,
+            data: cursos
+        });
+    } catch (error) {
+        console.error('Error obteniendo mis cursos:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor'
+        });
+    }
+};

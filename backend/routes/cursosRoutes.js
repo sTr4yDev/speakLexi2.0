@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const cursosController = require('../controllers/cursosController');
-const { protect, authorize } = require('../middleware/auth');
+const { verificarToken, authorize } = require('../middleware/auth');
 
 // ============================================
 // RUTAS PÚBLICAS
@@ -18,13 +18,24 @@ router.get('/nivel/:nivel', cursosController.obtenerCursosPorNivel);
 // RUTAS PROTEGIDAS - ESTUDIANTES
 // ============================================
 
-// ⚠️ IMPORTANTE: Esta ruta DEBE ir ANTES de '/:id'
 // Obtener mis cursos inscritos
 router.get(
     '/estudiante/mis-cursos', 
-    protect, 
+    verificarToken, 
     authorize('alumno', 'estudiante'), 
     cursosController.obtenerMisCursos
+);
+
+// ============================================
+// RUTAS PROTEGIDAS - ADMIN
+// ============================================
+
+// Obtener estadísticas de cursos
+router.get(
+    '/admin/estadisticas', 
+    verificarToken, 
+    authorize('admin'), 
+    cursosController.obtenerEstadisticas
 );
 
 // ============================================
@@ -35,12 +46,12 @@ router.get(
 router.get('/:id', cursosController.obtenerCurso);
 
 // Obtener lecciones de un curso (con progreso si está autenticado)
-router.get('/:id/lecciones', protect, cursosController.obtenerLeccionesCurso);
+router.get('/:id/lecciones', verificarToken, cursosController.obtenerLeccionesCurso);
 
 // Inscribirse a un curso
 router.post(
     '/:id/inscribir', 
-    protect, 
+    verificarToken, 
     authorize('alumno', 'estudiante'), 
     cursosController.inscribirEstudiante
 );
@@ -48,7 +59,7 @@ router.post(
 // Obtener progreso en un curso
 router.get(
     '/:id/progreso', 
-    protect, 
+    verificarToken, 
     authorize('alumno', 'estudiante'), 
     cursosController.obtenerProgresoEstudiante
 );
@@ -56,7 +67,7 @@ router.get(
 // Obtener siguiente lección
 router.get(
     '/:id/siguiente-leccion', 
-    protect, 
+    verificarToken, 
     authorize('alumno', 'estudiante'), 
     cursosController.obtenerSiguienteLeccion
 );
@@ -68,7 +79,7 @@ router.get(
 // Crear nuevo curso
 router.post(
     '/', 
-    protect, 
+    verificarToken, 
     authorize('profesor', 'admin'), 
     cursosController.crearCurso
 );
@@ -76,7 +87,7 @@ router.post(
 // Actualizar curso
 router.put(
     '/:id', 
-    protect, 
+    verificarToken, 
     authorize('profesor', 'admin'), 
     cursosController.actualizarCurso
 );
@@ -84,18 +95,9 @@ router.put(
 // Eliminar curso
 router.delete(
     '/:id', 
-    protect, 
+    verificarToken, 
     authorize('admin'), 
     cursosController.eliminarCurso
-);
-
-// ⚠️ IMPORTANTE: Esta ruta DEBE ir ANTES de '/:id' o usar un prefijo diferente
-// Obtener estadísticas de cursos
-router.get(
-    '/admin/estadisticas', 
-    protect, 
-    authorize('admin'), 
-    cursosController.obtenerEstadisticas
 );
 
 module.exports = router;

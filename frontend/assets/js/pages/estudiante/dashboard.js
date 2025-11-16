@@ -1,6 +1,6 @@
 /* ============================================
-   SPEAKLEXI - Dashboard Estudiante CORREGIDO
-   Maneja usuarios nuevos y existentes
+   SPEAKLEXI - Dashboard Estudiante COMPLETO
+   Con integración de lecciones
    ============================================ */
 
 (async () => {
@@ -57,7 +57,6 @@
             try {
                 console.log('🔄 Cargando resumen del estudiante...');
                 
-                // ✅ apiClient.get() YA DEVUELVE EL OBJETO PARSEADO
                 const resultado = await client.get('/progreso/resumen');
                 
                 console.log('🔍 DEBUG Resultado completo:', resultado);
@@ -122,7 +121,6 @@
             try {
                 console.log('🔄 Cargando lecciones recomendadas...');
                 
-                // ✅ apiClient.get() YA DEVUELVE EL OBJETO PARSEADO
                 const resultado = await client.get('/progreso/lecciones-recomendadas');
                 
                 console.log('📚 Resultado lecciones recomendadas:', resultado);
@@ -202,7 +200,7 @@
                                 </div>
                                 
                                 <button onclick="comenzarPrimeraLeccion()" class="bg-white text-purple-600 font-bold py-4 px-8 rounded-xl hover:bg-gray-100 transition-colors shadow-lg text-lg">
-                                    <i class="fas fa-play mr-2"></i>Comenzar mi Primera Lección
+                                    <i class="fas fa-play mr-2"></i>Explorar Mis Lecciones
                                 </button>
                             </div>
                         </div>
@@ -406,9 +404,9 @@
                             </div>
                             
                             <div class="flex-shrink-0">
-                                <button onclick="comenzarPrimeraLeccion()" class="w-full lg:w-auto bg-white text-purple-600 font-semibold py-4 px-8 rounded-xl hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transform hover:scale-105">
-                                    <i class="fas fa-play"></i>
-                                    <span>Comenzar Lección</span>
+                                <button onclick="verMisLecciones()" class="w-full lg:w-auto bg-white text-purple-600 font-semibold py-4 px-8 rounded-xl hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transform hover:scale-105">
+                                    <i class="fas fa-book-open mr-2"></i>
+                                    <span>Explorar Lecciones</span>
                                 </button>
                             </div>
                         </div>
@@ -454,7 +452,7 @@
                         
                         <div class="flex-shrink-0">
                             <button onclick="iniciarLeccion(${leccionActiva.id})" class="w-full lg:w-auto bg-white text-purple-600 font-semibold py-4 px-8 rounded-xl hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transform hover:scale-105">
-                                <i class="fas fa-play"></i>
+                                <i class="fas fa-play mr-2"></i>
                                 <span>Continuar Lección</span>
                             </button>
                         </div>
@@ -556,7 +554,7 @@
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white">Lecciones Recientes</h3>
-                        <button onclick="verTodasLecciones()" class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold transition-colors duration-200">Ver todas</button>
+                        <button onclick="verMisLecciones()" class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold transition-colors duration-200">Ver todas</button>
                     </div>
                     
                     <div class="space-y-4">
@@ -706,6 +704,12 @@
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h3>
                     
                     <div class="grid grid-cols-2 gap-3">
+                        <!-- NUEVO: Botón para Mis Lecciones -->
+                        <button onclick="verMisLecciones()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group transform hover:-translate-y-0.5">
+                            <i class="fas fa-book-open text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Mis Lecciones</span>
+                        </button>
+                        
                         <button onclick="verLeccionesRecomendadas()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group transform hover:-translate-y-0.5">
                             <i class="fas fa-search text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
                             <span class="text-sm text-gray-700 dark:text-gray-300">Buscar Lecciones</span>
@@ -719,11 +723,6 @@
                         <button onclick="mostrarAyuda()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group transform hover:-translate-y-0.5">
                             <i class="fas fa-question-circle text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
                             <span class="text-sm text-gray-700 dark:text-gray-300">Ayuda</span>
-                        </button>
-                        
-                        <button onclick="recargarDashboard()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group transform hover:-translate-y-0.5">
-                            <i class="fas fa-sync-alt text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Actualizar</span>
                         </button>
                     </div>
                 </div>
@@ -898,10 +897,16 @@
             window.location.reload();
         };
 
-        // ✅ NUEVA FUNCIÓN PARA USUARIOS NUEVOS
+        // ✅ NUEVA FUNCIÓN PARA MIS LECCIONES
+        window.verMisLecciones = function() {
+            console.log('📚 Navegando a Mis Lecciones');
+            window.location.href = '/pages/estudiante/lecciones.html';
+        };
+
+        // ✅ FUNCIÓN PARA USUARIOS NUEVOS
         window.comenzarPrimeraLeccion = function() {
             console.log('🚀 Usuario nuevo comenzando primera lección');
-            window.location.href = '/pages/estudiante/lecciones.html?filtro=principiante';
+            window.location.href = '/pages/estudiante/lecciones.html';
         };
 
         // ===================================

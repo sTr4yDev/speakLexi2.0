@@ -1,0 +1,1359 @@
+{
+  "Alemán": {
+    "A1": {
+      "Sich Vorstellen": {
+        "vocabulario": ["Name", "Alter", "Nationalität", "Land", "Stadt", "Beruf", "Student", "Lehrer"],
+        "verbos": ["bin", "bist", "ist", "wohne", "arbeite", "studiere"],
+        "adjetivos": ["jung", "alt", "ledig", "verheiratet"],
+        "frases_clave": ["Ich heiße...", "Ich komme aus...", "Ich wohne in...", "Ich bin Student", "Freut mich"],
+        "gramatica": ["Verb 'sein'", "Persönliche Informationen", "Präsens"],
+        "contextos": ["Vorstellungen", "Begegnungen", "Formulare"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie antwortet man auf 'Wie heißt du?'",
+              "opciones": ["Ich bin 25 Jahre alt", "Ich heiße Maria", "Ich wohne in Berlin", "Ich bin Student"],
+              "correcta": 1
+            }
+          ],
+          "verdadero_falso": [
+            {"afirmacion": "Man verwendet 'bin' mit 'ich'", "respuesta": true}
+          ],
+          "completar_espacios": [
+            {"texto": "Ich ___ Peter. Ich ___ 25 Jahre alt.", "respuestas": ["heiße", "bin"]}
+          ],
+          "emparejamiento": [
+            {"izquierda": "Wie heißt du?", "derecha": "Ich heiße..."}
+          ]
+        }
+      },
+
+      "Zahlen 1-100": {
+        "vocabulario": ["eins", "zehn", "zwanzig", "dreißig", "vierzig", "fünfzig", "hundert"],
+        "verbos": ["zählen", "addieren"],
+        "adjetivos": ["erste", "letzte"],
+        "frases_clave": ["Wie viele?", "Ich habe drei Äpfel"],
+        "gramatica": ["Kardinalzahlen", "Plurale"],
+        "contextos": ["zählen", "Alter", "Preise"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie sagt man 25?",
+              "opciones": ["fünfundzwanzig", "zweiundfünfzig", "fünfzehn"],
+              "correcta": 0
+            }
+          ],
+          "completar_espacios": [
+            {"texto": "Es gibt ___ Tage in einer Woche.", "respuestas": ["sieben"]}
+          ]
+        }
+      },
+
+      "Farben und Formen": {
+        "vocabulario": ["rot", "blau", "grün", "gelb", "Kreis", "Quadrat", "Dreieck"],
+        "verbos": ["malen", "zeichnen"],
+        "adjetivos": ["hell", "dunkel", "rund"],
+        "frases_clave": ["Welche Farbe ist das?", "Es ist blau"],
+        "gramatica": ["Adjektivposition"],
+        "contextos": ["Beschreibung", "Kunst"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welche Form hat drei Seiten?",
+              "opciones": ["Kreis", "Quadrat", "Dreieck"],
+              "correcta": 2
+            }
+          ]
+        }
+      },
+
+      "Die Familie": {
+        "vocabulario": ["Mutter", "Vater", "Bruder", "Schwester", "Kind", "Oma"],
+        "verbos": ["haben", "lieben"],
+        "adjetivos": ["groß", "klein"],
+        "frases_clave": ["Das ist meine Mutter", "Ich habe zwei Brüder"],
+        "gramatica": ["Possessivadjektive"],
+        "contextos": ["Familie", "Fotos"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wer ist die Mutter deines Vaters?",
+              "opciones": ["Oma", "Tante", "Schwester"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Tage und Monate": {
+        "vocabulario": ["Montag", "Dienstag", "Januar", "Februar", "Wochenende"],
+        "verbos": ["beginnen", "enden"],
+        "adjetivos": ["erste", "letzte"],
+        "frases_clave": ["Welcher Tag ist heute?", "Es ist Montag"],
+        "gramatica": ["Zeitpräpositionen"],
+        "contextos": ["Kalender", "Termine"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welcher Tag kommt nach Freitag?",
+              "opciones": ["Donnerstag", "Samstag", "Sonntag"],
+              "correcta": 1
+            }
+          ]
+        }
+      },
+
+      "Körperteile": {
+        "vocabulario": ["Kopf", "Augen", "Nase", "Mund", "Hände", "Füße"],
+        "verbos": ["sehen", "hören", "berühren"],
+        "adjetivos": ["links", "rechts"],
+        "frases_clave": ["Ich habe zwei Augen", "Ich habe Kopfschmerzen"],
+        "gramatica": ["Körperteile"],
+        "contextos": ["Gesundheit", "Beschreibung"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Womit sieht man?",
+              "opciones": ["Ohren", "Augen", "Nase"],
+              "correcta": 1
+            }
+          ]
+        }
+      },
+
+      "Essen und Getränke": {
+        "vocabulario": ["Apfel", "Brot", "Wasser", "Milch", "Kaffee", "Tee"],
+        "verbos": ["essen", "trinken", "kochen"],
+        "adjetivos": ["heiß", "kalt", "lecker"],
+        "frases_clave": ["Ich habe Hunger", "Ich möchte..."],
+        "gramatica": ["Artikel"],
+        "contextos": ["Restaurant", "Einkaufen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was trinkt man oft morgens?",
+              "opciones": ["Kaffee oder Tee", "Pizza", "Brot"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Das Haus": {
+        "vocabulario": ["Haus", "Küche", "Zimmer", "Bad", "Tisch", "Stuhl"],
+        "verbos": ["wohnen", "schlafen", "kochen"],
+        "adjetivos": ["groß", "klein", "gemütlich"],
+        "frases_clave": ["Ich wohne in einem Haus", "Mein Zimmer ist oben"],
+        "gramatica": ["Es gibt"],
+        "contextos": ["Wohnen", "Beschreibung"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wo schläft man?",
+              "opciones": ["Küche", "Bad", "Zimmer"],
+              "correcta": 2
+            }
+          ]
+        }
+      },
+
+      "Begrüßungen": {
+        "vocabulario": ["Hallo", "Auf Wiedersehen", "Danke", "Bitte"],
+        "verbos": ["begrüßen", "treffen"],
+        "adjetivos": ["höflich", "freundlich"],
+        "frases_clave": ["Hallo", "Wie geht's?", "Auf Wiedersehen"],
+        "gramatica": ["Höflichkeitsformeln"],
+        "contextos": ["Begegnungen", "Höflichkeit"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie sagt man 'hello' auf Deutsch?",
+              "opciones": ["Hallo", "Auf Wiedersehen", "Danke"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Alphabet und Aussprache": {
+        "vocabulario": ["Alphabet", "Buchstabe", "Laut", "Wort"],
+        "verbos": ["buchstabieren", "aussprechen"],
+        "adjetivos": ["Vokal", "Konsonant"],
+        "frases_clave": ["Wie buchstabiert man das?", "Kannst du das wiederholen?"],
+        "gramatica": ["Deutsches Alphabet"],
+        "contextos": ["Rechtschreibung", "Aussprache"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie viele Buchstaben im deutschen Alphabet?",
+              "opciones": ["26", "30", "28"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "A2": {
+      "Im Restaurant": {
+        "vocabulario": ["Restaurant", "Speisekarte", "Kellner", "bestellen", "Rechnung"],
+        "verbos": ["essen", "trinken", "bezahlen"],
+        "adjetivos": ["lecker", "teuer", "gut"],
+        "frases_clave": ["Ich möchte...", "Die Rechnung, bitte"],
+        "gramatica": ["Höflichkeitsformeln"],
+        "contextos": ["Restaurant", "Bestellung"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie bittet man um die Rechnung?",
+              "opciones": ["Die Rechnung, bitte", "Ich will gehen", "Wo ist die Toilette?"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Einkaufen": {
+        "vocabulario": ["Geschäft", "kaufen", "Preis", "teuer", "billig"],
+        "verbos": ["kaufen", "verkaufen", "bezahlen"],
+        "adjetivos": ["teuer", "billig"],
+        "frases_clave": ["Wie viel kostet das?", "Ich schaue nur"],
+        "gramatica": ["Fragen mit 'wie viel'"],
+        "contextos": ["Einkaufen", "Käufe"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie fragt man nach dem Preis?",
+              "opciones": ["Wie viel kostet das?", "Wie spät ist es?", "Wo ist die Toilette?"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Öffentlicher Verkehr": {
+        "vocabulario": ["Bus", "Zug", "Station", "Fahrkarte", "Bahnsteig"],
+        "verbos": ["nehmen", "ankommen", "abfahren"],
+        "adjetivos": ["schnell", "langsam"],
+        "frases_clave": ["Welcher Bus fährt ins Zentrum?", "Eine Fahrkarte nach..."],
+        "gramatica": ["Fragen mit 'welcher'"],
+        "contextos": ["Transport", "Reisen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wo wartet man auf den Zug?",
+              "opciones": ["Bahnsteig", "Bushaltestelle", "Taxi"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Im Hotel": {
+        "vocabulario": ["Hotel", "Zimmer", "Schlüssel", "Reservierung"],
+        "verbos": ["reservieren", "ankommen", "abreisen"],
+        "adjetivos": ["verfügbar", "belegt"],
+        "frases_clave": ["Ich habe eine Reservierung", "Zimmerschlüssel"],
+        "gramatica": ["Präsens für Reservierungen"],
+        "contextos": ["Hotel", "Reisen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was sagt man bei der Ankunft im Hotel?",
+              "opciones": ["Ich habe eine Reservierung", "Ich will gehen", "Wie ist das Wetter?"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Personen Beschreiben": {
+        "vocabulario": ["groß", "klein", "dünn", "dick", "blond", "brünett"],
+        "verbos": ["sein", "haben"],
+        "adjetivos": ["körperlich", "persönlich"],
+        "frases_clave": ["Er ist groß", "Sie hat blonde Haare"],
+        "gramatica": ["Adjektivreihenfolge"],
+        "contextos": ["Beschreibung", "Personen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welches Wort beschreibt die Haarfarbe?",
+              "opciones": ["groß", "blond", "dünn"],
+              "correcta": 1
+            }
+          ]
+        }
+      },
+
+      "Wetter": {
+        "vocabulario": ["Wetter", "Sonne", "Regen", "Wind", "Schnee"],
+        "verbos": ["regnen", "schneien"],
+        "adjetivos": ["sonnig", "regnerisch"],
+        "frases_clave": ["Wie ist das Wetter?", "Es ist schön"],
+        "gramatica": ["Fragen zum Wetter"],
+        "contextos": ["Wetter", "Gespräche"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie beschreibt man sonniges Wetter?",
+              "opciones": ["Es ist sonnig", "Es regnet", "Es schneit"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Hobbys": {
+        "vocabulario": ["Hobby", "Sport", "Musik", "Lesen"],
+        "verbos": ["spielen", "hören", "lesen"],
+        "adjetivos": ["interessant", "langweilig"],
+        "frases_clave": ["Was sind deine Hobbys?", "Ich spiele gern Fußball"],
+        "gramatica": ["Gern + Infinitiv"],
+        "contextos": ["Hobbys", "Gespräche"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was sind Freizeitaktivitäten?",
+              "opciones": ["Hobbys", "Arbeit", "Hausaufgaben"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Beim Arzt": {
+        "vocabulario": ["Arzt", "krank", "Schmerz", "Fieber", "Medizin"],
+        "verbos": ["Schmerzen haben", "sich fühlen", "untersuchen"],
+        "adjetivos": ["krank", "gesund"],
+        "frases_clave": ["Ich fühle mich nicht wohl", "Ich habe Kopfschmerzen"],
+        "gramatica": ["Körperschmerzen ausdrücken"],
+        "contextos": ["Gesundheit", "Arzt"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was sagt man bei Kopfschmerzen?",
+              "opciones": ["Ich habe Kopfschmerzen", "Ich habe Bauchschmerzen", "Ich habe Fieber"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Wegbeschreibungen": {
+        "vocabulario": ["Straße", "links", "rechts", "geradeaus"],
+        "verbos": ["abbiegen", "gehen", "weitergehen"],
+        "adjetivos": ["nah", "weit"],
+        "frases_clave": ["Biegen Sie links ab", "Es ist geradeaus"],
+        "gramatica": ["Imperativ"],
+        "contextos": ["Wegbeschreibungen", "Stadt"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie fragt man nach dem Weg?",
+              "opciones": ["Wie komme ich zum Bahnhof?", "Wie spät ist es?", "Wie viel kostet das?"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Tägliche Routine": {
+        "vocabulario": ["aufwachen", "Frühstück", "arbeiten", "Abendessen", "schlafen"],
+        "verbos": ["aufwachen", "essen", "arbeiten"],
+        "adjetivos": ["täglich", "gewöhnlich"],
+        "frases_clave": ["Ich wache um 7 Uhr auf", "Ich gehe zur Arbeit"],
+        "gramatica": ["Präsens für Routinen"],
+        "contextos": ["Routine", "Alltag"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was macht man morgens?",
+              "opciones": ["Frühstück", "Abendessen", "schlafen"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Perfekt": {
+        "vocabulario": ["gestern", "letzte Woche", "fertig", "besucht"],
+        "verbos": ["bin gewesen", "habe gemacht", "habe gegessen"],
+        "adjetivos": ["vergangen", "fertig"],
+        "frases_clave": ["Ich bin gestern ins Kino gegangen", "Ich habe die Arbeit beendet"],
+        "gramatica": ["Perfekt"],
+        "contextos": ["Vergangenheit", "Erfahrungen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welche Zeit für vergangene Handlungen?",
+              "opciones": ["Perfekt", "Präsens", "Futur"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Zukunft": {
+        "vocabulario": ["morgen", "nächste Woche", "bald"],
+        "verbos": ["werden + Infinitiv"],
+        "adjetivos": ["zukünftig", "nächste"],
+        "frases_clave": ["Ich werde morgen abreisen", "Es wird regnen"],
+        "gramatica": ["Futur I"],
+        "contextos": ["Pläne", "Zukunft"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie bildet man das Futur?",
+              "opciones": ["werden + Infinitiv", "sein + Infinitiv", "haben + Infinitiv"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "B1": {
+      "Meinungen Äußern": {
+        "vocabulario": ["Meinung", "denken", "glauben", "einverstanden"],
+        "verbos": ["denken", "glauben", "einverstanden sein"],
+        "adjetivos": ["persönlich", "allgemein"],
+        "frases_clave": ["Meiner Meinung nach...", "Ich denke, dass..."],
+        "gramatica": ["Meinungsäußerungen"],
+        "contextos": ["Diskussionen", "Debatten"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie äußert man eine Meinung?",
+              "opciones": ["Meiner Meinung nach...", "Laut den Fakten...", "Wissenschaftler sagen..."],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Vorschläge Machen": {
+        "vocabulario": ["Vorschlag", "Idee", "Empfehlung"],
+        "verbos": ["vorschlagen", "empfehlen", "raten"],
+        "adjetivos": ["gut", "besser"],
+        "frases_clave": ["Wie wäre es mit...?", "Ich schlage vor..."],
+        "gramatica": ["Konjunktiv für Vorschläge"],
+        "contextos": ["Pläne", "Entscheidungen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie macht man einen Vorschlag?",
+              "opciones": ["Wie wäre es mit Kino?", "Ich muss gehen", "Ich war gestern dort"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Geschichten Erzählen": {
+        "vocabulario": ["Geschichte", "Figur", "Ereignis"],
+        "verbos": ["passieren", "geschehen", "erzählen"],
+        "adjetivos": ["interessant", "langweilig"],
+        "frases_clave": ["Es war einmal...", "Plötzlich..."],
+        "gramatica": ["Vergangenheit für Geschichten"],
+        "contextos": ["Erzählungen", "Erfahrungen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie beginnt ein Märchen?",
+              "opciones": ["Es war einmal", "Das Ende", "Plötzlich"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Vergleiche": {
+        "vocabulario": ["Vergleich", "ähnlich", "verschieden"],
+        "verbos": ["vergleichen", "ähneln"],
+        "adjetivos": ["größer", "besser", "schlechter"],
+        "frases_clave": ["Das ist größer als", "Das ist das Beste"],
+        "gramatica": ["Komparativ und Superlativ"],
+        "contextos": ["Auswahl", "Beschreibung"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie bildet man den Komparativ von 'groß'?",
+              "opciones": ["größer", "mehr groß", "am größten"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Konjunktiv": {
+        "vocabulario": ["Bedingung", "wenn", "Ergebnis"],
+        "verbos": ["würde sein", "würde haben", "würde machen"],
+        "adjetivos": ["bedingt", "hypothetisch"],
+        "frases_clave": ["Wenn ich reich wäre...", "Wenn es regnet..."],
+        "gramatica": ["Konjunktiv II"],
+        "contextos": ["Hypothesen", "Wünsche"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welche Zeit für hypothetische Situationen?",
+              "opciones": ["Konjunktiv", "Präsens", "Vergangenheit"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Am Arbeitsplatz": {
+        "vocabulario": ["Arbeit", "Kollege", "Chef", "Meeting"],
+        "verbos": ["arbeiten", "organisieren", "teilnehmen"],
+        "adjetivos": ["beruflich", "beschäftigt"],
+        "frases_clave": ["Ich arbeite als...", "Wir haben ein Meeting"],
+        "gramatica": ["Berufsvokabular"],
+        "contextos": ["Arbeit", "Büro"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie nennt man die Menschen, mit denen man arbeitet?",
+              "opciones": ["Kollegen", "Studenten", "Kunden"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Technologie": {
+        "vocabulario": ["Computer", "Internet", "E-Mail", "Passwort"],
+        "verbos": ["benutzen", "herunterladen", "teilen"],
+        "adjetivos": ["digital", "online"],
+        "frases_clave": ["Ich benutze meinen Computer", "Ich teile Fotos"],
+        "gramatica": ["Technologievokabular"],
+        "contextos": ["Technologie", "Kommunikation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was braucht man zum Schutz von Accounts?",
+              "opciones": ["Passwort", "Computer", "Internet"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Reisen": {
+        "vocabulario": ["Reise", "Ziel", "Hotel", "Flug"],
+        "verbos": ["reisen", "besuchen", "buchen"],
+        "adjetivos": ["international", "touristisch"],
+        "frases_clave": ["Ich reise nach Japan", "Wir haben Museen besucht"],
+        "gramatica": ["Vergangenheit für Reisen"],
+        "contextos": ["Reisen", "Tourismus"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wo übernachtet man auf Reisen?",
+              "opciones": ["Hotel", "Flughafen", "Bahnhof"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Kultur": {
+        "vocabulario": ["Kultur", "Tradition", "Fest", "Feier"],
+        "verbos": ["feiern", "beobachten"],
+        "adjetivos": ["kulturell", "traditionell"],
+        "frases_clave": ["Wir feiern Weihnachten", "Es ist eine Tradition"],
+        "gramatica": ["Kulturvokabular"],
+        "contextos": ["Kultur", "Traditionen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was sind alte Bräuche?",
+              "opciones": ["Traditionen", "Innovationen", "Entdeckungen"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Umwelt": {
+        "vocabulario": ["Umwelt", "Verschmutzung", "Recycling"],
+        "verbos": ["recyceln", "schützen", "verschmutzen"],
+        "adjetivos": ["ökologisch", "sauber"],
+        "frases_clave": ["Die Umwelt schützen", "Recycling hilft"],
+        "gramatica": ["Modalverben für Ratschläge"],
+        "contextos": ["Ökologie", "Umwelt"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was bedeutet 'recyceln'?",
+              "opciones": ["Materialien wiederverwenden", "verschmutzen", "wegwerfen"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Bildung": {
+        "vocabulario": ["Bildung", "Schule", "Universität", "Prüfung"],
+        "verbos": ["studieren", "lernen", "unterrichten"],
+        "adjetivos": ["bildend", "akademisch"],
+        "frases_clave": ["Ich studiere Deutsch", "Wir haben eine Prüfung"],
+        "gramatica": ["Bildungsvokabular"],
+        "contextos": ["Bildung", "Studium"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wo geht man für höhere Bildung hin?",
+              "opciones": ["Universität", "Grundschule", "Kindergarten"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Sport": {
+        "vocabulario": ["Sport", "Übung", "Mannschaft", "Spiel"],
+        "verbos": ["spielen", "machen", "gewinnen"],
+        "adjetivos": ["sportlich", "fit"],
+        "frases_clave": ["Ich spiele Fußball", "Übung ist gesund"],
+        "gramatica": ["Sportverben"],
+        "contextos": ["Sport", "Fitness"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welches Verb mit 'Fußball'?",
+              "opciones": ["spielen", "machen", "gehen"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Medien": {
+        "vocabulario": ["Medien", "Zeitung", "Fernsehen", "Journalist"],
+        "verbos": ["berichten", "senden", "interviewen"],
+        "adjetivos": ["medial", "aktuell"],
+        "frases_clave": ["Ich lese die Zeitung", "Der Journalist berichtete"],
+        "gramatica": ["Medienvokabular"],
+        "contextos": ["Medien", "Nachrichten"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wo liest man Nachrichten?",
+              "opciones": ["Zeitung", "Restaurant", "Stadion"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Beschwerden": {
+        "vocabulario": ["Beschwerde", "Problem", "Lösung", "Rückerstattung"],
+        "verbos": ["sich beschweren", "bitten", "lösen"],
+        "adjetivos": ["höflich", "vernünftig"],
+        "frases_clave": ["Ich möchte mich beschweren", "Können Sie mir helfen?"],
+        "gramatica": ["Höfliche Bitten"],
+        "contextos": ["Kundenservice", "Probleme"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie bittet man höflich um Hilfe?",
+              "opciones": ["Können Sie mir helfen?", "Hilf mir!", "Ich will Hilfe"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Passiv": {
+        "vocabulario": ["Passiv", "Aktiv", "Subjekt", "Objekt"],
+        "verbos": ["wird gemacht", "wurde gebaut"],
+        "adjetivos": ["passiv", "aktiv"],
+        "frases_clave": ["Das Buch wurde geschrieben", "Deutsch wird gesprochen"],
+        "gramatica": ["Passivbildung"],
+        "contextos": ["Formelles Schreiben", "Berichte"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie bildet man das Passiv?",
+              "opciones": ["werden + Partizip II", "haben + Partizip II", "machen + Infinitiv"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "B2": {
+      "Professionelle E-Mails": {
+        "vocabulario": ["E-Mail", "professionell", "Betreff", "Anhang"],
+        "verbos": ["senden", "empfangen", "anhängen"],
+        "adjetivos": ["formell", "professionell"],
+        "frases_clave": ["Sehr geehrter Herr...", "Anbei finden Sie..."],
+        "gramatica": ["Formelle Struktur"],
+        "contextos": ["Professionelle Kommunikation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie beginnt man eine formelle E-Mail?",
+              "opciones": ["Sehr geehrter Herr", "Hallo", "Hi"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Meetings": {
+        "vocabulario": ["Meeting", "Tagesordnung", "Teilnehmer", "Entscheidung"],
+        "verbos": ["leiten", "teilnehmen", "beschließen"],
+        "adjetivos": ["produktiv", "effizient"],
+        "frases_clave": ["Beginnen wir mit dem ersten Punkt", "Was ist der Aktionsplan?"],
+        "gramatica": ["Meeting-Sprache"],
+        "contextos": ["Professionelle Meetings"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie nennt man die Liste der Meeting-Themen?",
+              "opciones": ["Tagesordnung", "Protokoll", "Bericht"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Verhandlung": {
+        "vocabulario": ["Verhandlung", "Kompromiss", "Vereinbarung", "Angebot"],
+        "verbos": ["verhandeln", "anbieten", "akzeptieren"],
+        "adjetivos": ["verhandelbar", "vernünftig"],
+        "frases_clave": ["Was ist Ihr bestes Angebot?", "Können wir einen Kompromiss finden?"],
+        "gramatica": ["Konjunktiv für Verhandlungen"],
+        "contextos": ["Verhandlungen", "Geschäfte"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist ein Kompromiss?",
+              "opciones": ["gegenseitige Vereinbarung", "Stillstand", "Forderung"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Präsentationen": {
+        "vocabulario": ["Präsentation", "Publikum", "Folie", "Schlussfolgerung"],
+        "verbos": ["präsentieren", "demonstrieren", "zusammenfassen"],
+        "adjetivos": ["überzeugend", "klar"],
+        "frases_clave": ["Ich beginne mit einem Überblick", "Zusammenfassend..."],
+        "gramatica": ["Präsentationssprache"],
+        "contextos": ["Präsentationen", "Konferenzen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wer sieht eine Präsentation?",
+              "opciones": ["Publikum", "Präsentatoren", "Organisatoren"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Argumentation": {
+        "vocabulario": ["Argument", "These", "Beweis", "Gegenargument"],
+        "verbos": ["argumentieren", "unterstützen", "widerlegen"],
+        "adjetivos": ["überzeugend", "logisch"],
+        "frases_clave": ["Die Beweise legen nahe...", "Andererseits..."],
+        "gramatica": ["Argumentationsstrukturen"],
+        "contextos": ["Debatten", "Überzeugendes Schreiben"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was stützt ein Argument?",
+              "opciones": ["Beweise", "Meinungen", "Gefühle"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Redewendungen": {
+        "vocabulario": ["Redewendung", "idiomatisch", "bildlich", "wörtlich"],
+        "verbos": ["bedeuten", "andeuten"],
+        "adjetivos": ["idiomatisch", "bildlich"],
+        "frases_clave": ["Es regnet in Strömen", "Hals- und Beinbruch!"],
+        "gramatica": ["Feste Ausdrücke"],
+        "contextos": ["Umgangssprache", "Kultur"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was bedeutet 'die Katze im Sack kaufen'?",
+              "opciones": ["etwas Ungeprüftes kaufen", "eine Katze kaufen", "im Dunkeln kaufen"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Bewerbungsgespräche": {
+        "vocabulario": ["Bewerbungsgespräch", "Bewerber", "Arbeitgeber", "Qualifikationen"],
+        "verbos": ["sich bewerben", "demonstrieren", "verhandeln"],
+        "adjetivos": ["qualifiziert", "erfahren"],
+        "frases_clave": ["Erzählen Sie mir von sich", "Was sind Ihre Stärken?"],
+        "gramatica": ["Bewerbungsfragen"],
+        "contextos": ["Arbeit", "Karriere"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was bespricht man in einem Bewerbungsgespräch?",
+              "opciones": ["Qualifikationen", "Wetter", "Urlaub"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Wirtschaft": {
+        "vocabulario": ["Wirtschaft", "Investition", "Markt", "Inflation"],
+        "verbos": ["investieren", "sparen", "ausgeben"],
+        "adjetivos": ["wirtschaftlich", "finanziell"],
+        "frases_clave": ["Die Börse schwankt", "Inflation betrifft..."],
+        "gramatica": ["Wirtschaftsterminologie"],
+        "contextos": ["Wirtschaft", "Finanzen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Inflation?",
+              "opciones": ["Preisanstieg", "Rezession", "Investition"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Wissenschaft": {
+        "vocabulario": ["Wissenschaft", "Forschung", "Entdeckung", "Analyse"],
+        "verbos": ["forschen", "entdecken", "analysieren"],
+        "adjetivos": ["wissenschaftlich", "technologisch"],
+        "frases_clave": ["Die Forschung zeigt...", "Technologie schreitet voran"],
+        "gramatica": ["Wissenschaftssprache"],
+        "contextos": ["Wissenschaft", "Technologie"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was bedeutet KI?",
+              "opciones": ["Künstliche Intelligenz", "Komplexe Ideen", "Kreatives Internet"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Literatur": {
+        "vocabulario": ["Literatur", "Roman", "Poesie", "Thema"],
+        "verbos": ["schreiben", "lesen", "interpretieren"],
+        "adjetivos": ["literarisch", "kreativ"],
+        "frases_clave": ["Dieser Roman erforscht...", "Die Poesie ist berührend"],
+        "gramatica": ["Literarische Analyse"],
+        "contextos": ["Literatur", "Kunst"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie nennt man eine Literaturkategorie?",
+              "opciones": ["Genre", "Kapitel", "Seite"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Politik": {
+        "vocabulario": ["Politik", "Regierung", "Wahl", "Demokratie"],
+        "verbos": ["regieren", "wählen", "wählen"],
+        "adjetivos": ["politisch", "demokratisch"],
+        "frases_clave": ["Die Regierung hat angekündigt...", "Bürger wählen"],
+        "gramatica": ["Politische Rede"],
+        "contextos": ["Politik", "Gesellschaft"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welches System erlaubt die Wahl von Führungspersonen?",
+              "opciones": ["Demokratie", "Diktatur", "Monarchie"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Gesundheit": {
+        "vocabulario": ["Gesundheit", "Wohlbefinden", "Ernährung", "Übung"],
+        "verbos": ["trainieren", "essen", "vorbeugen"],
+        "adjetivos": ["gesund", "fit"],
+        "frases_clave": ["Übung verbessert die Gesundheit", "Ernährung ist wichtig"],
+        "gramatica": ["Gesundheitsratschläge"],
+        "contextos": ["Gesundheit", "Fitness"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Wohlbefinden?",
+              "opciones": ["Gesamte Gesundheit", "Krankheit", "Müdigkeit"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Erweiterte Zeitformen": {
+        "vocabulario": ["Plusquamperfekt", "Futur II", "Konjunktiv Perfekt"],
+        "verbos": ["hatte gemacht", "wird gemacht haben"],
+        "adjetivos": ["abgeschlossen", "zukünftig"],
+        "frases_clave": ["Ich hatte bereits beendet", "Ich werde morgen fertig sein"],
+        "gramatica": ["Zusammengesetzte Zeiten"],
+        "contextos": ["Erzählungen", "Projektionen"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welche Zeit für eine Handlung vor einer anderen vergangenen Handlung?",
+              "opciones": ["Plusquamperfekt", "Perfekt", "Präsens"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Indirekte Rede": {
+        "vocabulario": ["indirekte Rede", "direkte Rede", "einleitendes Verb"],
+        "verbos": ["hat gesagt", "hat gefragt", "hat erklärt"],
+        "adjetivos": ["direkt", "indirekt"],
+        "frases_clave": ["Er sagte, er sei müde", "Sie fragte, ob..."],
+        "gramatica": ["Redeumwandlung"],
+        "contextos": ["Berichte", "Gespräche"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie wandelt man 'Ich bin glücklich' in indirekte Rede um?",
+              "opciones": ["Er sagte, er sei glücklich", "Er sagte, er ist glücklich", "Er sagte ich bin glücklich"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Erweiterte Konnektoren": {
+        "vocabulario": ["Konnektor", "Übergang", "Kohäsion"],
+        "verbos": ["verbinden", "vereinen"],
+        "adjetivos": ["kohärent", "logisch"],
+        "frases_clave": ["Darüber hinaus...", "Allerdings...", "Folglich..."],
+        "gramatica": ["Logische Konnektoren"],
+        "contextos": ["Akademisches Schreiben", "Argumentation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Welcher Konnektor zeigt Gegensatz?",
+              "opciones": ["allerdings", "darüber hinaus", "folglich"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "C1": {
+      "Verfassen von Aufsätzen": {
+        "vocabulario": ["Aufsatz", "These", "Argument", "Schlussfolgerung"],
+        "verbos": ["argumentieren", "demonstrieren", "schließen"],
+        "adjetivos": ["argumentativ", "überzeugend"],
+        "frases_clave": ["Die Hauptthese ist...", "Zusammenfassend..."],
+        "gramatica": ["Aufsatzstruktur"],
+        "contextos": ["Akademisches Schreiben"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist die These eines Aufsatzes?",
+              "opciones": ["Hauptargument", "Beweis", "Schlussfolgerung"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Kritische Analyse": {
+        "vocabulario": ["Analyse", "Kritik", "Bewertung", "Interpretation"],
+        "verbos": ["analysieren", "bewerten", "interpretieren"],
+        "adjetivos": ["kritisch", "objektiv"],
+        "frases_clave": ["Diese Analyse zeigt...", "Die Bewertung offenbart..."],
+        "gramatica": ["Analytische Sprache"],
+        "contextos": ["Analyse", "Kritik"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Analyse?",
+              "opciones": ["detaillierte Untersuchung", "Ignoranz", "Zusammenfassung"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Akademische Rede": {
+        "vocabulario": ["akademisch", "Forschung", "Zitat", "Methodologie"],
+        "verbos": ["zitieren", "referieren", "theoretisieren"],
+        "adjetivos": ["akademisch", "gelehrt"],
+        "frases_clave": ["Laut Forschung...", "Die Literatur legt nahe..."],
+        "gramatica": ["Akademische Sprache"],
+        "contextos": ["Universität", "Forschung"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Wie zitiert man eine Quelle?",
+              "opciones": ["mit einem Zitat", "ignorierend", "kopierend"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Akademische Präsentationen": {
+        "vocabulario": ["Präsentation", "Ergebnisse", "Methodologie", "F&A"],
+        "verbos": ["präsentieren", "demonstrieren", "zusammenfassen"],
+        "adjetivos": ["akademisch", "erforscht"],
+        "frases_clave": ["Diese Präsentation untersucht...", "Die Ergebnisse deuten darauf hin..."],
+        "gramatica": ["Akademische Präsentation"],
+        "contextos": ["Konferenzen", "Seminare"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Worauf basiert eine akademische Präsentation?",
+              "opciones": ["Forschung", "Meinungen", "Vermutungen"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Professionelles Verfassen": {
+        "vocabulario": ["professionell", "Bericht", "Memos", "Klarheit"],
+        "verbos": ["verfassen", "überarbeiten", "korrigieren"],
+        "adjetivos": ["professionell", "klar"],
+        "frases_clave": ["Dieser Bericht beschreibt...", "Anbei finden Sie..."],
+        "gramatica": ["Professioneller Stil"],
+        "contextos": ["Unternehmen", "Kommunikation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist essentiell beim professionellen Schreiben?",
+              "opciones": ["Klarheit", "komplizierte Sätze", "informelle Sprache"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Sprachliche Nuancen": {
+        "vocabulario": ["Nuance", "Konnotation", "Implikation", "Register"],
+        "verbos": ["andeuten", "implizieren", "kommunizieren"],
+        "adjetivos": ["nuanciert", "implizit"],
+        "frases_clave": ["Die subtilen Implikationen...", "Der Ton deutet an..."],
+        "gramatica": ["Implizite Bedeutung"],
+        "contextos": ["Erweiterte Kommunikation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was sind Nuancen?",
+              "opciones": ["Bedeutungssubtilitäten", "Definitionen", "Übersetzungen"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Philosophie": {
+        "vocabulario": ["Philosophie", "Ethik", "Moral", "Vernunft"],
+        "verbos": ["philosophieren", "argumentieren", "debattieren"],
+        "adjetivos": ["philosophisch", "moralisch"],
+        "frases_clave": ["Aus ethischer Sicht...", "Das philosophische Argument..."],
+        "gramatica": ["Philosophische Rede"],
+        "contextos": ["Philosophie", "Ethik"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Ethik?",
+              "opciones": ["moralische Prinzipien", "Physik", "Biologie"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Forschung": {
+        "vocabulario": ["Forschung", "Methodologie", "quantitativ", "qualitativ"],
+        "verbos": ["forschen", "analysieren", "sammeln"],
+        "adjetivos": ["methodologisch", "empirisch"],
+        "frases_clave": ["Die angewandte Methodologie...", "Die gesammelten Daten..."],
+        "gramatica": ["Forschungsterminologie"],
+        "contextos": ["Forschung", "Wissenschaft"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Methodologie?",
+              "opciones": ["Forschungsansatz", "Vermutung", "Annahme"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Literaturkritik": {
+        "vocabulario": ["Kritik", "literarisch", "Symbol", "Thema"],
+        "verbos": ["kritisieren", "interpretieren", "dekonstruieren"],
+        "adjetivos": ["literarisch", "symbolisch"],
+        "frases_clave": ["Eine sorgfältige Lektüre zeigt...", "Die narrative Struktur..."],
+        "gramatica": ["Literarische Analyse"],
+        "contextos": ["Literatur", "Kritik"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Literaturkritik?",
+              "opciones": ["Analyse von Werken", "Buchverkauf", "Geschichtenschreiben"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Interkulturelle Kommunikation": {
+        "vocabulario": ["interkulturell", "Sensibilität", "Normen", "Werte"],
+        "verbos": ["kommunizieren", "anpassen", "verstehen"],
+        "adjetivos": ["interkulturell", "sensibel"],
+        "frases_clave": ["Kulturelle Sensibilität...", "Missverständnisse können..."],
+        "gramatica": ["Interkulturelle Konzepte"],
+        "contextos": ["Globale Kommunikation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist interkulturelle Kommunikation?",
+              "opciones": ["Kommunikation zwischen Kulturen", "lokaler Dialog", "regionale Sprache"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Komplexe Strukturen": {
+        "vocabulario": ["Struktur", "komplex", "Subordination", "Einbettung"],
+        "verbos": ["strukturieren", "einbetten", "koordinieren"],
+        "adjetivos": ["komplex", "eingebettet"],
+        "frases_clave": ["Die Satzstruktur...", "Einbettung schafft..."],
+        "gramatica": ["Komplexe Syntax"],
+        "contextos": ["Erweiterte Sprache"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was sind komplexe Sätze?",
+              "opciones": ["mehrere Sätze", "einfache Sätze", "Wörter"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Rhetorik": {
+        "vocabulario": ["Rhetorik", "Überzeugung", "Argument", "Appell"],
+        "verbos": ["überzeugen", "argumentieren", "beeinflussen"],
+        "adjetivos": ["rhetorisch", "überzeugend"],
+        "frases_clave": ["Der rhetorische Appell...", "Die persuasive Technik..."],
+        "gramatica": ["Rhetorische Mittel"],
+        "contextos": ["Überzeugung", "Argumentation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Rhetorik?",
+              "opciones": ["Kunst der Überzeugung", "Grammatik", "Rechtschreibung"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "C2": {
+      "Beherrschung von Ausdrücken": {
+        "vocabulario": ["Ausdruck", "idiomatisch", "Sprichwort", "bildlich"],
+        "verbos": ["beherrschen", "verstehen", "verwenden"],
+        "adjetivos": ["idiomatisch", "fließend"],
+        "frases_clave": ["Das ist ein Kinderspiel", "Es regnet in Strömen"],
+        "gramatica": ["Native Ausdrücke"],
+        "contextos": ["Muttersprachlicher Gebrauch"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was bedeutet 'ins Gras beißen'?",
+              "opciones": ["sterben", "etwas beißen", "laut sprechen"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Pragmatische Nuancen": {
+        "vocabulario": ["Pragmatik", "Nuance", "implizit", "Kontext"],
+        "verbos": ["andeuten", "implizieren", "interpretieren"],
+        "adjetivos": ["pragmatisch", "nuanciert"],
+        "frases_clave": ["Die pragmatische Bedeutung...", "Zwischen den Zeilen lesen..."],
+        "gramatica": ["Kontextuelle Interpretation"],
+        "contextos": ["Erweiterte Verständnis"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Pragmatik?",
+              "opciones": ["Sprache im Kontext", "Syntax", "Phonetik"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Dialektale Variationen": {
+        "vocabulario": ["Dialekt", "Variation", "regional", "Akzent"],
+        "verbos": ["variieren", "differieren", "sprechen"],
+        "adjetivos": ["dialektal", "regional"],
+        "frases_clave": ["Diese regionale Variation...", "Der Dialekt unterscheidet sich..."],
+        "gramatica": ["Sprachliche Variationen"],
+        "contextos": ["Sprachliche Vielfalt"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist ein Dialekt?",
+              "opciones": ["regionale Varietät", "Akzent", "Sprache"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Erweiterte literarische Sprache": {
+        "vocabulario": ["literarisch", "Figur", "Symbol", "Allegorie"],
+        "verbos": ["symbolisieren", "repräsentieren", "evozieren"],
+        "adjetivos": ["literarisch", "symbolisch"],
+        "frases_clave": ["Die reiche Bildsprache evoziert...", "Funktioniert als Allegorie..."],
+        "gramatica": ["Literarische Mittel"],
+        "contextos": ["Erweiterte Literatur"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist eine Allegorie?",
+              "opciones": ["erweiterte Metapher", "Vergleich", "Referenz"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Übersetzung": {
+        "vocabulario": ["Übersetzung", "Interpretation", "Äquivalent", "Anpassung"],
+        "verbos": ["übersetzen", "interpretieren", "anpassen"],
+        "adjetivos": ["übersetzerisch", "äquivalent"],
+        "frases_clave": ["Die Übersetzung erfasst...", "Kulturelle Anpassung..."],
+        "gramatica": ["Übersetzungskonzepte"],
+        "contextos": ["Übersetzung", "Mediation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Übersetzung?",
+              "opciones": ["schriftliche Umwandlung", "Interpretation", "Erklärung"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Fachsprache": {
+        "vocabulario": ["spezialisiert", "Jargon", "Terminologie", "technisch"],
+        "verbos": ["spezialisieren", "verwenden", "anwenden"],
+        "adjetivos": ["spezialisiert", "technisch"],
+        "frases_clave": ["Die technische Terminologie...", "Der Berufsjargon..."],
+        "gramatica": ["Spezialisiertes Vokabular"],
+        "contextos": ["Spezialisierte Bereiche"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Jargon?",
+              "opciones": ["spezialisiertes Vokabular", "Slang", "Alltagssprache"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Humor": {
+        "vocabulario": ["Humor", "Wortspiel", "Ironie", "Satire"],
+        "verbos": ["scherzen", "ironisieren", "satirisieren"],
+        "adjetivos": ["humorvoll", "ironisch"],
+        "frases_clave": ["Intelligentes Wortspiel", "Die Ironie der Situation..."],
+        "gramatica": ["Humoristische Mittel"],
+        "contextos": ["Humor", "Unterhaltung"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist ein Wortspiel?",
+              "opciones": ["sprachlicher Scherz", "Geschichte", "Tatsache"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Register und Stil": {
+        "vocabulario": ["Register", "Stil", "Formalität", "Ton"],
+        "verbos": ["anpassen", "angleichen", "variieren"],
+        "adjetivos": ["formell", "informell", "angemessen"],
+        "frases_clave": ["Das formelle Register...", "Der angemessene Stil..."],
+        "gramatica": ["Registervariation"],
+        "contextos": ["Stilistische Anpassung"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Register?",
+              "opciones": ["Formalitätsniveau", "Akzent", "Dialekt"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Sprachgeschichte": {
+        "vocabulario": ["Geschichte", "Evolution", "Etymologie", "Ursprung"],
+        "verbos": ["evolvieren", "ableiten", "beeinflussen"],
+        "adjetivos": ["historisch", "etymologisch"],
+        "frases_clave": ["Die Etymologie des Wortes...", "Sprachevolution..."],
+        "gramatica": ["Historische Konzepte"],
+        "contextos": ["Sprachgeschichte"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Etymologie?",
+              "opciones": ["Studium der Ursprünge", "Grammatik", "Rechtschreibung"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Vollständige Beherrschung": {
+        "vocabulario": ["Beherrschung", "Perfektion", "Flüssigkeit", "Exzellenz"],
+        "verbos": ["beherrschen", "perfektionieren", "ausdrücken"],
+        "adjetivos": ["perfekt", "beherrschend", "fließend"],
+        "frases_clave": ["Vollständige Sprachbeherrschung", "Anspruchsvolle Ausdrucksweise..."],
+        "gramatica": ["Sprachliche Exzellenz"],
+        "contextos": ["Erweiterte Beherrschung"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Was ist Beherrschung?",
+              "opciones": ["vollständige Kommandierung", "Anfang", "Lernen"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    }
+  }
+}

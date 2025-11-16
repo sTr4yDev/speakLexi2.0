@@ -1,0 +1,1359 @@
+{
+  "Francés": {
+    "A1": {
+      "Se Présenter": {
+        "vocabulario": ["nom", "âge", "nationalité", "pays", "ville", "métier", "étudiant", "professeur", "ingénieur"],
+        "verbos": ["suis", "es", "est", "habite", "travaille", "étudie"],
+        "adjectivos": ["jeune", "vieux", "célibataire", "marié"],
+        "frases_clave": ["Je m'appelle...", "Je suis de...", "J'habite à...", "Je suis étudiant", "Enchanté"],
+        "gramatica": ["Verbe 'être'", "Informations personnelles", "Présent simple"],
+        "contextos": ["présentations", "rencontres", "formulaires"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment répondre à 'Comment tu t'appelles ?'",
+              "opciones": ["J'ai 25 ans", "Je m'appelle Marie", "J'habite à Paris", "Je suis étudiant"],
+              "correcta": 1
+            }
+          ],
+          "verdadero_falso": [
+            {"afirmacion": "On utilise 'suis' avec 'je'", "respuesta": true}
+          ],
+          "completar_espacios": [
+            {"texto": "Je m'___ Pierre. J'___ 25 ans.", "respuestas": ["appelle", "ai"]}
+          ],
+          "emparejamiento": [
+            {"izquierda": "Comment tu t'appelles ?", "derecha": "Je m'appelle..."}
+          ]
+        }
+      },
+
+      "Nombres 1-100": {
+        "vocabulario": ["un", "dix", "vingt", "trente", "quarante", "cinquante", "cent"],
+        "verbos": ["compter", "ajouter"],
+        "adjectivos": ["premier", "dernier"],
+        "frases_clave": ["Combien ?", "J'ai trois pommes"],
+        "gramatica": ["Nombres cardinaux", "Pluriels"],
+        "contextos": ["compter", "âges", "prix"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment dit-on 25 ?",
+              "opciones": ["vingt-cinq", "cinquante-deux", "quinze"],
+              "correcta": 0
+            }
+          ],
+          "completar_espacios": [
+            {"texto": "Il y a ___ jours dans une semaine.", "respuestas": ["sept"]}
+          ]
+        }
+      },
+
+      "Couleurs et Formes": {
+        "vocabulario": ["rouge", "bleu", "vert", "jaune", "cercle", "carré", "triangle"],
+        "verbos": ["colorier", "dessiner"],
+        "adjectivos": ["clair", "foncé", "rond"],
+        "frases_clave": ["De quelle couleur est-ce ?", "C'est bleu"],
+        "gramatica": ["Position des adjectifs"],
+        "contextos": ["description", "art"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quelle forme a trois côtés ?",
+              "opciones": ["cercle", "carré", "triangle"],
+              "correcta": 2
+            }
+          ]
+        }
+      },
+
+      "La Famille": {
+        "vocabulario": ["mère", "père", "frère", "sœur", "enfant", "grand-mère"],
+        "verbos": ["avoir", "aimer"],
+        "adjectivos": ["grand", "petit"],
+        "frases_clave": ["Voici ma mère", "J'ai deux frères"],
+        "gramatica": ["Adjectifs possessifs"],
+        "contextos": ["famille", "photos"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qui est la mère de ton père ?",
+              "opciones": ["grand-mère", "tante", "sœur"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Jours et Mois": {
+        "vocabulario": ["lundi", "mardi", "janvier", "février", "week-end"],
+        "verbos": ["commencer", "finir"],
+        "adjectivos": ["premier", "dernier"],
+        "frases_clave": ["Quel jour sommes-nous ?", "C'est lundi"],
+        "gramatica": ["Prépositions de temps"],
+        "contextos": ["calendrier", "rendez-vous"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quel jour vient après vendredi ?",
+              "opciones": ["jeudi", "samedi", "dimanche"],
+              "correcta": 1
+            }
+          ]
+        }
+      },
+
+      "Parties du Corps": {
+        "vocabulario": ["tête", "yeux", "nez", "bouche", "mains", "pieds"],
+        "verbos": ["voir", "entendre", "toucher"],
+        "adjectivos": ["gauche", "droit"],
+        "frases_clave": ["J'ai deux yeux", "J'ai mal à la tête"],
+        "gramatica": ["Parties du corps"],
+        "contextos": ["santé", "description"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Avec quoi voit-on ?",
+              "opciones": ["oreilles", "yeux", "nez"],
+              "correcta": 1
+            }
+          ]
+        }
+      },
+
+      "Nourriture et Boissons": {
+        "vocabulario": ["pomme", "pain", "eau", "lait", "café", "thé"],
+        "verbos": ["manger", "boire", "cuisiner"],
+        "adjectivos": ["chaud", "froid", "délicieux"],
+        "frases_clave": ["J'ai faim", "Je voudrais..."],
+        "gramatica": ["Articles partitifs"],
+        "contextos": ["restaurant", "courses"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que boit-on souvent le matin ?",
+              "opciones": ["café ou thé", "pizza", "pain"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "La Maison": {
+        "vocabulario": ["maison", "cuisine", "chambre", "salle de bain", "table", "chaise"],
+        "verbos": ["habiter", "dormir", "cuisiner"],
+        "adjectivos": ["grand", "petit", "confortable"],
+        "frases_clave": ["J'habite dans une maison", "Ma chambre est en haut"],
+        "gramatica": ["Il y a"],
+        "contextos": ["logement", "description"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Où dort-on ?",
+              "opciones": ["cuisine", "salle de bain", "chambre"],
+              "correcta": 2
+            }
+          ]
+        }
+      },
+
+      "Salutations": {
+        "vocabulario": ["bonjour", "au revoir", "merci", "s'il vous plaît"],
+        "verbos": ["saluer", "rencontrer"],
+        "adjectivos": ["poli", "amical"],
+        "frases_clave": ["Bonjour", "Comment ça va ?", "Au revoir"],
+        "gramatica": ["Formules de politesse"],
+        "contextos": ["rencontres", "courtoisie"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment dire 'hello' en français ?",
+              "opciones": ["bonjour", "au revoir", "merci"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Alphabet et Prononciation": {
+        "vocabulario": ["alphabet", "lettre", "son", "mot"],
+        "verbos": ["épeler", "prononcer"],
+        "adjectivos": ["voyelle", "consonne"],
+        "frases_clave": ["Comment ça s'écrit ?", "Peux-tu répéter ?"],
+        "gramatica": ["Alphabet français"],
+        "contextos": ["orthographe", "prononciation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Combien de lettres dans l'alphabet français ?",
+              "opciones": ["24", "26", "28"],
+              "correcta": 1
+            }
+          ]
+        }
+      }
+    },
+
+    "A2": {
+      "Au Restaurant": {
+        "vocabulario": ["restaurant", "menu", "serveur", "commander", "addition"],
+        "verbos": ["manger", "boire", "payer"],
+        "adjectivos": ["délicieux", "cher", "bon"],
+        "frases_clave": ["Je voudrais...", "L'addition, s'il vous plaît"],
+        "gramatica": ["Formules de politesse"],
+        "contextos": ["restaurant", "commande"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment demander l'addition ?",
+              "opciones": ["L'addition, s'il vous plaît", "Je veux partir", "Où sont les toilettes ?"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Faire les Courses": {
+        "vocabulario": ["magasin", "acheter", "prix", "cher", "bon marché"],
+        "verbos": ["acheter", "vendre", "payer"],
+        "adjectivos": ["cher", "bon marché"],
+        "frases_clave": ["Combien ça coûte ?", "Je regarde seulement"],
+        "gramatica": ["Questions avec 'combien'"],
+        "contextos": ["shopping", "achats"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment demander le prix ?",
+              "opciones": ["Combien ça coûte ?", "Quelle heure est-il ?", "Où sont les toilettes ?"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Transport Public": {
+        "vocabulario": ["bus", "train", "station", "billet", "quai"],
+        "verbos": ["prendre", "arriver", "partir"],
+        "adjectivos": ["rapide", "lent"],
+        "frases_clave": ["Quel bus va au centre-ville ?", "Un billet pour..."],
+        "gramatica": ["Questions avec 'quel'"],
+        "contextos": ["transport", "voyage"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Où attend-on le train ?",
+              "opciones": ["quai", "arrêt de bus", "taxi"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "À l'Hôtel": {
+        "vocabulario": ["hôtel", "chambre", "clé", "réservation"],
+        "verbos": ["réserver", "arriver", "partir"],
+        "adjectivos": ["disponible", "occupé"],
+        "frases_clave": ["J'ai une réservation", "Clé de la chambre"],
+        "gramatica": ["Présent pour réservations"],
+        "contextos": ["hôtel", "voyage"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que dire en arrivant à l'hôtel ?",
+              "opciones": ["J'ai une réservation", "Je veux partir", "Quel temps fait-il ?"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Décrire les Personnes": {
+        "vocabulario": ["grand", "petit", "mince", "gros", "blond", "brun"],
+        "verbos": ["être", "avoir"],
+        "adjectivos": ["physique", "personnel"],
+        "frases_clave": ["Il est grand", "Elle a les cheveux blonds"],
+        "gramatica": ["Ordre des adjectifs"],
+        "contextos": ["description", "personnes"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quel mot décrit la couleur des cheveux ?",
+              "opciones": ["grand", "blond", "mince"],
+              "correcta": 1
+            }
+          ]
+        }
+      },
+
+      "Temps et Météo": {
+        "vocabulario": ["temps", "soleil", "pluie", "vent", "neige"],
+        "verbos": ["pleuvoir", "neiger"],
+        "adjectivos": ["ensoleillé", "pluvieux"],
+        "frases_clave": ["Quel temps fait-il ?", "Il fait beau"],
+        "gramatica": ["Questions sur la météo"],
+        "contextos": ["météo", "conversations"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment décrire le temps avec du soleil ?",
+              "opciones": ["Il fait soleil", "Il pleut", "Il neige"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Loisirs": {
+        "vocabulario": ["loisir", "sport", "musique", "lecture"],
+        "verbos": ["jouer", "écouter", "lire"],
+        "adjectivos": ["intéressant", "ennuyeux"],
+        "frases_clave": ["Quels sont tes loisirs ?", "J'aime jouer au football"],
+        "gramatica": ["Aimer + infinitif"],
+        "contextos": ["loisirs", "conversations"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que sont les activités de loisir ?",
+              "opciones": ["loisirs", "travail", "devoirs"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Chez le Médecin": {
+        "vocabulario": ["médecin", "malade", "douleur", "fièvre", "médicament"],
+        "verbos": ["avoir mal", "se sentir", "examiner"],
+        "adjectivos": ["malade", "sain"],
+        "frases_clave": ["Je ne me sens pas bien", "J'ai mal à la tête"],
+        "gramatica": ["Avoir mal à"],
+        "contextos": ["santé", "médecin"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que dire quand on a mal à la tête ?",
+              "opciones": ["J'ai mal à la tête", "J'ai mal au ventre", "J'ai de la fièvre"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Directions": {
+        "vocabulario": ["rue", "gauche", "droite", "tout droit"],
+        "verbos": ["tourner", "aller", "continuer"],
+        "adjectivos": ["proche", "loin"],
+        "frases_clave": ["Tournez à gauche", "C'est tout droit"],
+        "gramatica": ["Impératif"],
+        "contextos": ["directions", "ville"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment demander son chemin ?",
+              "opciones": ["Comment aller à la gare ?", "Quelle heure est-il ?", "Combien ça coûte ?"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Routine Quotidienne": {
+        "vocabulario": ["réveiller", "petit-déjeuner", "travailler", "dîner", "dormir"],
+        "verbos": ["se réveiller", "manger", "travailler"],
+        "adjectivos": ["quotidien", "habituel"],
+        "frases_clave": ["Je me réveille à 7h", "Je vais au travail"],
+        "gramatica": ["Présent pour routines"],
+        "contextos": ["routine", "vie quotidienne"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que fait-on le matin ?",
+              "opciones": ["petit-déjeuner", "dîner", "dormir"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Passé Composé": {
+        "vocabulario": ["hier", "la semaine dernière", "fini", "visité"],
+        "verbos": ["a été", "a fait", "a mangé"],
+        "adjectivos": ["passé", "fini"],
+        "frases_clave": ["Je suis allé au cinéma hier", "J'ai fini mon travail"],
+        "gramatica": ["Passé composé"],
+        "contextos": ["passé", "expériences"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quel temps pour actions passées ?",
+              "opciones": ["passé composé", "présent", "futur"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Futur Proche": {
+        "vocabulario": ["demain", "la semaine prochaine", "bientôt"],
+        "verbos": ["aller + infinitif"],
+        "adjectivos": ["futur", "prochain"],
+        "frases_clave": ["Je vais partir demain", "Il va pleuvoir"],
+        "gramatica": ["Futur proche"],
+        "contextos": ["plans", "futur"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment former le futur proche ?",
+              "opciones": ["aller + infinitif", "être + infinitif", "avoir + infinitif"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "B1": {
+      "Exprimer des Opinions": {
+        "vocabulario": ["opinion", "penser", "croire", "d'accord"],
+        "verbos": ["penser", "croire", "être d'accord"],
+        "adjectivos": ["personnel", "général"],
+        "frases_clave": ["À mon avis...", "Je pense que..."],
+        "gramatica": ["Expressions d'opinion"],
+        "contextos": ["discussions", "débats"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment exprimer une opinion ?",
+              "opciones": ["À mon avis...", "Selon les faits...", "Les scientifiques disent..."],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Faire des Suggestions": {
+        "vocabulario": ["suggestion", "proposition", "idée"],
+        "verbos": ["suggérer", "proposer", "conseiller"],
+        "adjectivos": ["bon", "meilleur"],
+        "frases_clave": ["Et si on...?", "Je propose que..."],
+        "gramatica": ["Conditionnel pour suggestions"],
+        "contextos": ["plans", "décisions"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment faire une suggestion ?",
+              "opciones": ["Et si on allait au cinéma ?", "Je dois partir", "Je suis allé hier"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Raconter des Histoires": {
+        "vocabulario": ["histoire", "personnage", "événement"],
+        "verbos": ["arriver", "se passer", "raconter"],
+        "adjectivos": ["intéressant", "ennuyeux"],
+        "frases_clave": ["Il était une fois...", "Soudain..."],
+        "gramatica": ["Passé pour histoires"],
+        "contextos": ["récits", "expériences"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment commencer un conte ?",
+              "opciones": ["Il était une fois", "La fin", "Soudain"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Comparaisons": {
+        "vocabulario": ["comparaison", "similaire", "différent"],
+        "verbos": ["comparer", "ressembler"],
+        "adjectivos": ["plus grand", "meilleur", "pire"],
+        "frases_clave": ["C'est plus grand que", "C'est le meilleur"],
+        "gramatica": ["Comparatifs et superlatifs"],
+        "contextos": ["choix", "description"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment former le comparatif de 'grand' ?",
+              "opciones": ["plus grand", "plus grande", "le plus grand"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Conditionnel": {
+        "vocabulario": ["condition", "si", "résultat"],
+        "verbos": ["serait", "aurait", "ferait"],
+        "adjectivos": ["conditionnel", "hypothétique"],
+        "frases_clave": ["Si j'étais riche...", "S'il pleut..."],
+        "gramatica": ["Conditionnel présent"],
+        "contextos": ["hypothèses", "souhaits"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quel temps pour des situations hypothétiques ?",
+              "opciones": ["conditionnel", "présent", "passé"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Au Travail": {
+        "vocabulario": ["travail", "collègue", "patron", "réunion"],
+        "verbos": ["travailler", "organiser", "assister"],
+        "adjectivos": ["professionnel", "occupé"],
+        "frases_clave": ["Je travaille comme...", "Nous avons une réunion"],
+        "gramatica": ["Vocabulaire professionnel"],
+        "contextos": ["travail", "bureau"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment appeler les personnes avec qui on travaille ?",
+              "opciones": ["collègues", "étudiants", "clients"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Technologie": {
+        "vocabulario": ["ordinateur", "internet", "email", "mot de passe"],
+        "verbos": ["utiliser", "télécharger", "partager"],
+        "adjectivos": ["numérique", "en ligne"],
+        "frases_clave": ["J'utilise mon ordinateur", "Je partage des photos"],
+        "gramatica": ["Vocabulaire technologique"],
+        "contextos": ["technologie", "communication"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que faut-il pour protéger ses comptes ?",
+              "opciones": ["mot de passe", "ordinateur", "internet"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Voyages": {
+        "vocabulario": ["voyage", "destination", "hôtel", "vol"],
+        "verbos": ["voyager", "visiter", "réserver"],
+        "adjectivos": ["international", "touristique"],
+        "frases_clave": ["Je voyage au Japon", "Nous avons visité des musées"],
+        "gramatica": ["Passé pour voyages"],
+        "contextos": ["voyages", "tourisme"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Où loge-t-on en voyage ?",
+              "opciones": ["hôtel", "aéroport", "gare"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Culture": {
+        "vocabulario": ["culture", "tradition", "fête", "célébration"],
+        "verbos": ["célébrer", "observer"],
+        "adjectivos": ["culturel", "traditionnel"],
+        "frases_clave": ["Nous célébrons Noël", "C'est une tradition"],
+        "gramatica": ["Vocabulaire culturel"],
+        "contextos": ["culture", "traditions"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que sont les coutumes anciennes ?",
+              "opciones": ["traditions", "innovations", "découvertes"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Environnement": {
+        "vocabulario": ["environnement", "pollution", "recyclage"],
+        "verbos": ["recycler", "protéger", "polluer"],
+        "adjectivos": ["écologique", "propre"],
+        "frases_clave": ["Protéger l'environnement", "Recycler aide"],
+        "gramatica": ["Verbes modaux pour conseils"],
+        "contextos": ["écologie", "environnement"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que signifie 'recycler' ?",
+              "opciones": ["réutiliser les matériaux", "polluer", "jeter"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Éducation": {
+        "vocabulario": ["éducation", "école", "université", "examen"],
+        "verbos": ["étudier", "apprendre", "enseigner"],
+        "adjectivos": ["éducatif", "académique"],
+        "frases_clave": ["J'étudie le français", "Nous avons un examen"],
+        "gramatica": ["Vocabulaire éducatif"],
+        "contextos": ["éducation", "études"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Où va-t-on pour les études supérieures ?",
+              "opciones": ["université", "école primaire", "jardin d'enfants"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Sports": {
+        "vocabulario": ["sport", "exercice", "équipe", "match"],
+        "verbos": ["jouer", "faire", "gagner"],
+        "adjectivos": ["sportif", "en forme"],
+        "frases_clave": ["Je joue au football", "L'exercice est bon"],
+        "gramatica": ["Jouer/faire avec sports"],
+        "contextos": ["sports", "fitness"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quel verbe avec 'football' ?",
+              "opciones": ["jouer", "faire", "aller"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Médias": {
+        "vocabulario": ["médias", "journal", "télévision", "journaliste"],
+        "verbos": ["rapporter", "diffuser", "interviewer"],
+        "adjectivos": ["médiatique", "actuel"],
+        "frases_clave": ["Je lis le journal", "Le journaliste a rapporté"],
+        "gramatica": ["Vocabulaire médiatique"],
+        "contextos": ["médias", "actualités"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Où lit-on les actualités ?",
+              "opciones": ["journal", "restaurant", "stade"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Réclamations": {
+        "vocabulario": ["réclamation", "problème", "solution", "remboursement"],
+        "verbos": ["se plaindre", "demander", "résoudre"],
+        "adjectivos": ["poli", "raisonnable"],
+        "frases_clave": ["Je voudrais me plaindre", "Pouvez-vous m'aider ?"],
+        "gramatica": ["Demandes polies"],
+        "contextos": ["service client", "problèmes"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment demander poliment de l'aide ?",
+              "opciones": ["Pouvez-vous m'aider ?", "Aide-moi !", "Je veux de l'aide"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Voix Passive": {
+        "vocabulario": ["passif", "actif", "sujet", "objet"],
+        "verbos": ["est fait", "a été construit"],
+        "adjectivos": ["passif", "actif"],
+        "frases_clave": ["Le livre a été écrit", "Le français est parlé"],
+        "gramatica": ["Formation du passif"],
+        "contextos": ["écrit formel", "rapports"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment former le passif ?",
+              "opciones": ["être + participe passé", "avoir + participe passé", "faire + infinitif"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "B2": {
+      "Emails Professionnels": {
+        "vocabulario": ["email", "professionnel", "objet", "pièce jointe"],
+        "verbos": ["envoyer", "recevoir", "joindre"],
+        "adjectivos": ["formel", "professionnel"],
+        "frases_clave": ["Cher Monsieur...", "Veuillez trouver ci-joint..."],
+        "gramatica": ["Structure formelle"],
+        "contextos": ["communication professionnelle"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment commencer un email formel ?",
+              "opciones": ["Cher Monsieur", "Salut", "Coucou"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Réunions": {
+        "vocabulario": ["réunion", "ordre du jour", "participant", "décision"],
+        "verbos": ["présider", "participer", "conclure"],
+        "adjectivos": ["productif", "efficace"],
+        "frases_clave": ["Commençons par le premier point", "Quel est le plan d'action ?"],
+        "gramatica": ["Langage des réunions"],
+        "contextos": ["réunions professionnelles"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment s'appelle la liste des sujets de réunion ?",
+              "opciones": ["ordre du jour", "compte-rendu", "rapport"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Négociation": {
+        "vocabulario": ["négociation", "compromis", "accord", "proposition"],
+        "verbos": ["négocier", "proposer", "accepter"],
+        "adjectivos": ["négociable", "raisonnable"],
+        "frases_clave": ["Quelle est votre meilleure offre ?", "Pouvons-nous trouver un terrain d'entente ?"],
+        "gramatica": ["Conditionnel pour négociations"],
+        "contextos": ["négociations", "affaires"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce qu'un compromis ?",
+              "opciones": ["accord mutuel", "impasse", "demande"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Présentations": {
+        "vocabulario": ["présentation", "audience", "diapositive", "conclusion"],
+        "verbos": ["présenter", "démontrer", "résumer"],
+        "adjectivos": ["convaincant", "clair"],
+        "frases_clave": ["Je vais commencer par un aperçu", "Pour résumer..."],
+        "gramatica": ["Langage des présentations"],
+        "contextos": ["présentations", "conférences"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qui regarde une présentation ?",
+              "opciones": ["audience", "présentateurs", "organisateurs"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Argumentation": {
+        "vocabulario": ["argument", "thèse", "preuve", "contre-argument"],
+        "verbos": ["argumenter", "soutenir", "réfuter"],
+        "adjectivos": ["convaincant", "logique"],
+        "frases_clave": ["La preuve suggère que...", "D'un autre côté..."],
+        "gramatica": ["Structures argumentatives"],
+        "contextos": ["débats", "écrit persuasif"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce qui soutient un argument ?",
+              "opciones": ["preuve", "opinions", "sentiments"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Expressions Idiomatiques": {
+        "vocabulario": ["expression", "idiomatique", "figuré", "littéral"],
+        "verbos": ["signifier", "suggérer"],
+        "adjectivos": ["idiomatique", "figuré"],
+        "frases_clave": ["Il pleut des cordes", "Cassez-vous une jambe !"],
+        "gramatica": ["Expressions figées"],
+        "contextos": ["langage courant", "culture"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que signifie 'casser sa pipe' ?",
+              "opciones": ["mourir", "casser quelque chose", "parler fort"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Entretiens d'Embauche": {
+        "vocabulario": ["entretien", "candidat", "employeur", "compétences"],
+        "verbos": ["postuler", "démontrer", "négocier"],
+        "adjectivos": ["qualifié", "expérimenté"],
+        "frases_clave": ["Parlez-moi de vous", "Quelles sont vos forces ?"],
+        "gramatica": ["Questions d'entretien"],
+        "contextos": ["emploi", "carrière"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que discute-t-on en entretien ?",
+              "opciones": ["qualifications", "météo", "vacances"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Économie": {
+        "vocabulario": ["économie", "investissement", "marché", "inflation"],
+        "verbos": ["investir", "économiser", "dépenser"],
+        "adjectivos": ["économique", "financier"],
+        "frases_clave": ["La bourse fluctue", "L'inflation affecte..."],
+        "gramatica": ["Terminologie économique"],
+        "contextos": ["économie", "finances"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que l'inflation ?",
+              "opciones": ["hausse des prix", "récession", "investissement"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Science": {
+        "vocabulario": ["science", "recherche", "découverte", "analyse"],
+        "verbos": ["rechercher", "découvrir", "analyser"],
+        "adjectivos": ["scientifique", "technologique"],
+        "frases_clave": ["La recherche montre...", "La technologie avance"],
+        "gramatica": ["Langage scientifique"],
+        "contextos": ["science", "technologie"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que signifie IA ?",
+              "opciones": ["Intelligence Artificielle", "Idées Amusantes", "Internet Avancé"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Littérature": {
+        "vocabulario": ["littérature", "roman", "poésie", "thème"],
+        "verbos": ["écrire", "lire", "interpréter"],
+        "adjectivos": ["littéraire", "créatif"],
+        "frases_clave": ["Ce roman explore...", "La poésie est émouvante"],
+        "gramatica": ["Analyse littéraire"],
+        "contextos": ["littérature", "art"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment appelle-t-on une catégorie de littérature ?",
+              "opciones": ["genre", "chapitre", "page"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Politique": {
+        "vocabulario": ["politique", "gouvernement", "élection", "démocratie"],
+        "verbos": ["gouverner", "voter", "élire"],
+        "adjectivos": ["politique", "démocratique"],
+        "frases_clave": ["Le gouvernement a annoncé...", "Les citoyens votent"],
+        "gramatica": ["Discours politique"],
+        "contextos": ["politique", "société"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quel système permet de choisir ses dirigeants ?",
+              "opciones": ["démocratie", "dictature", "monarchie"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Santé": {
+        "vocabulario": ["santé", "bien-être", "nutrition", "exercice"],
+        "verbos": ["exercer", "manger", "prévenir"],
+        "adjectivos": ["sain", "en forme"],
+        "frases_clave": ["L'exercice améliore la santé", "La nutrition est importante"],
+        "gramatica": ["Conseils de santé"],
+        "contextos": ["santé", "fitness"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que le bien-être ?",
+              "opciones": ["santé globale", "maladie", "fatigue"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Temps des Verbes Avancés": {
+        "vocabulario": ["plus-que-parfait", "futur antérieur", "conditionnel passé"],
+        "verbos": ["avait fait", "aura fini"],
+        "adjectivos": ["accompli", "futur"],
+        "frases_clave": ["J'avais déjà fini", "J'aurai terminé demain"],
+        "gramatica": ["Temps composés"],
+        "contextos": ["récits", "projections"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quel temps pour une action avant une autre action passée ?",
+              "opciones": ["plus-que-parfait", "passé composé", "présent"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Discours Indirect": {
+        "vocabulario": ["discours indirect", "discours direct", "verbe introducteur"],
+        "verbos": ["a dit", "a demandé", "a expliqué"],
+        "adjectivos": ["direct", "indirect"],
+        "frases_clave": ["Il a dit qu'il était fatigué", "Elle a demandé si..."],
+        "gramatica": ["Transformation du discours"],
+        "contextos": ["rapports", "conversations"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment transformer 'Je suis content' en discours indirect ?",
+              "opciones": ["Il a dit qu'il était content", "Il a dit qu'il est content", "Il a dit je suis content"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Connecteurs Avancés": {
+        "vocabulario": ["connecteur", "transition", "cohésion"],
+        "verbos": ["relier", "lier"],
+        "adjectivos": ["cohérent", "logique"],
+        "frases_clave": ["De plus...", "Cependant...", "Par conséquent..."],
+        "gramatica": ["Connecteurs logiques"],
+        "contextos": ["écrit académique", "argumentation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Quel connecteur montre l'opposition ?",
+              "opciones": ["cependant", "de plus", "par conséquent"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "C1": {
+      "Rédaction d'Essais": {
+        "vocabulario": ["essai", "thèse", "argument", "conclusion"],
+        "verbos": ["argumenter", "prouver", "conclure"],
+        "adjectivos": ["argumentatif", "convaincant"],
+        "frases_clave": ["La thèse principale est...", "En conclusion..."],
+        "gramatica": ["Structure d'essai"],
+        "contextos": ["écrit académique"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que la thèse d'un essai ?",
+              "opciones": ["argument principal", "preuve", "conclusion"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Analyse Critique": {
+        "vocabulario": ["analyse", "critique", "évaluation", "interprétation"],
+        "verbos": ["analyser", "évaluer", "interpréter"],
+        "adjectivos": ["critique", "objectif"],
+        "frases_clave": ["Cette analyse révèle...", "L'évaluation montre..."],
+        "gramatica": ["Langage analytique"],
+        "contextos": ["analyse", "critique"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que l'analyse ?",
+              "opciones": ["examen détaillé", "ignorance", "résumé"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Discours Académique": {
+        "vocabulario": ["académique", "recherche", "citation", "méthodologie"],
+        "verbos": ["citer", "référencer", "théoriser"],
+        "adjectivos": ["académique", "savant"],
+        "frases_clave": ["Selon la recherche...", "La littérature suggère..."],
+        "gramatica": ["Langage académique"],
+        "contextos": ["université", "recherche"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Comment citer une source ?",
+              "opciones": ["avec une citation", "en ignorant", "en copiant"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Présentations Académiques": {
+        "vocabulario": ["présentation", "résultats", "méthodologie", "Q&A"],
+        "verbos": ["présenter", "démontrer", "résumer"],
+        "adjectivos": ["académique", "recherché"],
+        "frases_clave": ["Cette présentation examine...", "Les résultats indiquent..."],
+        "gramatica": ["Présentation académique"],
+        "contextos": ["conférences", "séminaires"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Sur quoi se base une présentation académique ?",
+              "opciones": ["recherche", "opinions", "devinettes"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Rédaction Professionnelle": {
+        "vocabulario": ["professionnel", "rapport", "mémorandum", "clarté"],
+        "verbos": ["rédiger", "réviser", "corriger"],
+        "adjectivos": ["professionnel", "clair"],
+        "frases_clave": ["Ce rapport décrit...", "Veuillez trouver ci-joint..."],
+        "gramatica": ["Style professionnel"],
+        "contextos": ["entreprise", "communication"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce qui est essentiel dans l'écriture professionnelle ?",
+              "opciones": ["clarté", "phrases compliquées", "langage informel"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Nuances du Langage": {
+        "vocabulario": ["nuance", "connotation", "implication", "registre"],
+        "verbos": ["suggérer", "impliquer", "conveyoir"],
+        "adjectivos": ["nuancé", "implicite"],
+        "frases_clave": ["Les implications subtiles...", "Le ton suggère..."],
+        "gramatica": ["Sens implicite"],
+        "contextos": ["communication avancée"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que sont les nuances ?",
+              "opciones": ["subtilités de sens", "définitions", "traductions"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Philosophie": {
+        "vocabulario": ["philosophie", "éthique", "morale", "raison"],
+        "verbos": ["philosopher", "raisonner", "débattre"],
+        "adjectivos": ["philosophique", "moral"],
+        "frases_clave": ["D'un point de vue éthique...", "L'argument philosophique..."],
+        "gramatica": ["Discours philosophique"],
+        "contextos": ["philosophie", "éthique"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que l'éthique ?",
+              "opciones": ["principes moraux", "physique", "biologie"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Recherche": {
+        "vocabulario": ["recherche", "méthodologie", "quantitatif", "qualitatif"],
+        "verbos": ["rechercher", "analyser", "collecter"],
+        "adjectivos": ["méthodologique", "empirique"],
+        "frases_clave": ["La méthodologie employée...", "Les données collectées..."],
+        "gramatica": ["Terminologie de recherche"],
+        "contextos": ["recherche", "science"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que la méthodologie ?",
+              "opciones": ["approche de recherche", "devinette", "supposition"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Critique Littéraire": {
+        "vocabulario": ["critique", "littéraire", "symbole", "thème"],
+        "verbos": ["critiquer", "interpréter", "déconstruire"],
+        "adjectivos": ["littéraire", "symbolique"],
+        "frases_clave": ["Une lecture attentive révèle...", "La structure narrative..."],
+        "gramatica": ["Analyse littéraire"],
+        "contextos": ["littérature", "critique"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que la critique littéraire ?",
+              "opciones": ["analyse des œuvres", "vente de livres", "écriture d'histoires"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Communication Interculturelle": {
+        "vocabulario": ["interculturel", "sensibilité", "normes", "valeurs"],
+        "verbos": ["communiquer", "adapter", "comprendre"],
+        "adjectivos": ["interculturel", "sensible"],
+        "frases_clave": ["La sensibilité culturelle...", "Les malentendus peuvent..."],
+        "gramatica": ["Concepts interculturels"],
+        "contextos": ["communication globale"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que la communication interculturelle ?",
+              "opciones": ["communication entre cultures", "dialogue local", "parler régional"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Structures Complexes": {
+        "vocabulario": ["structure", "complexe", "subordination", "enchâssement"],
+        "verbos": ["structurer", "enchâsser", "coordonner"],
+        "adjectivos": ["complexe", "enchâssé"],
+        "frases_clave": ["La structure de phrase...", "L'enchâssement crée..."],
+        "gramatica": ["Syntaxe complexe"],
+        "contextos": ["langage avancé"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que sont les phrases complexes ?",
+              "opciones": ["phrases multiples", "phrases simples", "mots"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Rhétorique": {
+        "vocabulario": ["rhétorique", "persuasion", "argument", "appel"],
+        "verbos": ["persuader", "argumenter", "influencer"],
+        "adjectivos": ["rhétorique", "persuasif"],
+        "frases_clave": ["L'appel rhétorique...", "La technique persuasive..."],
+        "gramatica": ["Dispositifs rhétoriques"],
+        "contextos": ["persuasion", "argumentation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que la rhétorique ?",
+              "opciones": ["art de la persuasion", "grammaire", "orthographe"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    },
+
+    "C2": {
+      "Maîtrise des Expressions": {
+        "vocabulario": ["expression", "idiomatique", "proverbe", "figuré"],
+        "verbos": ["maîtriser", "comprendre", "utiliser"],
+        "adjectivos": ["idiomatique", "courant"],
+        "frases_clave": ["C'est simple comme bonjour", "Il pleut des cordes"],
+        "gramatica": ["Expressions natives"],
+        "contextos": ["langage natif"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Que signifie 'casser sa pipe' ?",
+              "opciones": ["mourir", "casser quelque chose", "parler fort"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Subtilités Pragmatiques": {
+        "vocabulario": ["pragmatique", "subtilité", "implicite", "contexte"],
+        "verbos": ["suggérer", "impliquer", "interpréter"],
+        "adjectivos": ["pragmatique", "subtile"],
+        "frases_clave": ["Le sens pragmatique...", "Lire entre les lignes..."],
+        "gramatica": ["Interprétation contextuelle"],
+        "contextos": ["compréhension avancée"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que la pragmatique ?",
+              "opciones": ["langage en contexte", "syntaxe", "phonétique"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Variations Dialectales": {
+        "vocabulario": ["dialecte", "variation", "régional", "accent"],
+        "verbos": ["varier", "différer", "parler"],
+        "adjectivos": ["dialectal", "régional"],
+        "frases_clave": ["Cette variation régionale...", "Le dialecte diffère..."],
+        "gramatica": ["Variations linguistiques"],
+        "contextos": ["diversité linguistique"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce qu'un dialecte ?",
+              "opciones": ["variété régionale", "accent", "langue"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Langage Littéraire Avancé": {
+        "vocabulario": ["littéraire", "figure", "symbole", "allégorie"],
+        "verbos": ["symboliser", "représenter", "évoquer"],
+        "adjectivos": ["littéraire", "symbolique"],
+        "frases_clave": ["L'imagerie riche évoque...", "Fonctionne comme une allégorie..."],
+        "gramatica": ["Dispositifs littéraires"],
+        "contextos": ["littérature avancée"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce qu'une allégorie ?",
+              "opciones": ["métaphore étendue", "comparaison", "référence"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Traduction": {
+        "vocabulario": ["traduction", "interprétation", "équivalent", "adaptation"],
+        "verbos": ["traduire", "interpréter", "adapter"],
+        "adjectivos": ["traductionnel", "équivalent"],
+        "frases_clave": ["La traduction capture...", "L'adaptation culturelle..."],
+        "gramatica": ["Concepts de traduction"],
+        "contextos": ["traduction", "médiation"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que la traduction ?",
+              "opciones": ["conversion écrite", "interprétation", "explication"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Langage Spécialisé": {
+        "vocabulario": ["spécialisé", "jargon", "terminologie", "technique"],
+        "verbos": ["spécialiser", "utiliser", "appliquer"],
+        "adjectivos": ["spécialisé", "technique"],
+        "frases_clave": ["La terminologie technique...", "Le jargon professionnel..."],
+        "gramatica": ["Vocabulaire spécialisé"],
+        "contextos": ["domaines spécialisés"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que le jargon ?",
+              "opciones": ["vocabulaire spécialisé", "argot", "langage courant"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Humour": {
+        "vocabulario": ["humour", "jeu de mots", "ironie", "satire"],
+        "verbos": ["plaisanter", "ironiser", "satiriser"],
+        "adjectivos": ["humoristique", "ironique"],
+        "frases_clave": ["Jeu de mots intelligent", "L'ironie de la situation..."],
+        "gramatica": ["Dispositifs humoristiques"],
+        "contextos": ["humour", "divertissement"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce qu'un jeu de mots ?",
+              "opciones": ["plaisanterie linguistique", "histoire", "fait"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Registre et Style": {
+        "vocabulario": ["registre", "style", "formalité", "ton"],
+        "verbos": ["adapter", "ajuster", "varier"],
+        "adjectivos": ["formel", "informel", "approprié"],
+        "frases_clave": ["Le registre formel...", "Le style approprié..."],
+        "gramatica": ["Variation de registre"],
+        "contextos": ["adaptation stylistique"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que le registre ?",
+              "opciones": ["niveau de formalité", "accent", "dialecte"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Histoire de la Langue": {
+        "vocabulario": ["histoire", "évolution", "étymologie", "origine"],
+        "verbos": ["évoluer", "dériver", "influencer"],
+        "adjectivos": ["historique", "étymologique"],
+        "frases_clave": ["L'étymologie du mot...", "L'évolution linguistique..."],
+        "gramatica": ["Concepts historiques"],
+        "contextos": ["histoire linguistique"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que l'étymologie ?",
+              "opciones": ["étude des origines", "grammaire", "orthographe"],
+              "correcta": 0
+            }
+          ]
+        }
+      },
+
+      "Maîtrise Totale": {
+        "vocabulario": ["maîtrise", "perfection", "fluidity", "excellence"],
+        "verbos": ["maîtriser", "perfectionner", "exprimer"],
+        "adjectivos": ["parfait", "maître", "fluide"],
+        "frases_clave": ["Maîtrise linguistique complète", "Expression sophistiquée..."],
+        "gramatica": ["Excellence linguistique"],
+        "contextos": ["maîtrise avancée"],
+        "ejemplos": {
+          "seleccion_multiple": [
+            {
+              "pregunta": "Qu'est-ce que la maîtrise ?",
+              "opciones": ["commande complète", "début", "apprentissage"],
+              "correcta": 0
+            }
+          ]
+        }
+      }
+    }
+  }
+}
