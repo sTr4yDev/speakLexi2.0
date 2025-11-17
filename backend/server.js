@@ -80,22 +80,16 @@ const initializeApp = async () => {
 // Seguridad
 app.use(helmet());
 
-// Rate limiting (excluir rutas de testing en desarrollo)
+// ✅ AGREGAR RATE LIMITING MÁS PERMISIVO
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
-  message: {
-    error: 'Demasiadas peticiones desde esta IP, intenta más tarde.'
-  },
-  skip: (req, res) => {
-    // Excluir rutas de testing del rate limiting en desarrollo
-    if (process.env.NODE_ENV === 'development' && req.path.startsWith('/api/testing')) {
-      return true;
-    }
-    return false;
-  }
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 1000, // ✅ Aumentar a 1000 requests (era muy bajo)
+    message: 'Demasiadas peticiones desde esta IP, por favor intenta más tarde',
+    standardHeaders: true,
+    legacyHeaders: false,
 });
-app.use(limiter);
+
+app.use('/api/', limiter);
 
 // CORS
 const allowedOrigins = [
@@ -153,6 +147,12 @@ app.use('/api/estudiante', estudianteRoutes);
 console.log('✅ Módulo 4 (Desempeño) registrado');
 
 // ==========================================================
+// ✅ AGREGAR ESTAS DOS LÍNEAS:
+// ==========================================================
+app.use('/api/notificaciones', require('./routes/notificacionesRoutes'));
+app.use('/api/mensajes', require('./routes/mensajesRoutes'));
+
+// ==========================================================
 // RUTAS DE TESTING (SOLO EN DESARROLLO)
 // ==========================================================
 
@@ -186,7 +186,10 @@ app.get('/api/health', async (req, res) => {
       planning: 'available',
       // AGREGAR SERVICIOS DEL MÓDULO 4
       professor: 'available',
-      student: 'available'
+      student: 'available',
+      // AGREGAR NUEVOS SERVICIOS
+      notifications: 'available',
+      messages: 'available'
   };
 
   // Agregar servicio de testing solo en desarrollo
@@ -220,7 +223,10 @@ app.get('/api/config', (req, res) => {
       planning: true,
       // AGREGAR FEATURES DEL MÓDULO 4
       professor: true,
-      student: true
+      student: true,
+      // AGREGAR NUEVAS FEATURES
+      notifications: true,
+      messages: true
   };
 
   const endpoints = {
@@ -238,6 +244,9 @@ app.get('/api/config', (req, res) => {
       // AGREGAR ENDPOINTS DEL MÓDULO 4
       profesor: '/api/profesor',
       estudiante: '/api/estudiante',
+      // AGREGAR NUEVOS ENDPOINTS
+      notificaciones: '/api/notificaciones',
+      mensajes: '/api/mensajes',
       health: '/api/health',
       config: '/api/config'
   };
@@ -307,7 +316,13 @@ app.get('/', (req, res) => {
     'GET  /api/profesor/estadisticas - Estadísticas de estudiantes',
     'POST /api/profesor/planes - Crear plan de estudio',
     'GET  /api/estudiante/retroalimentacion - Retroalimentación recibida',
-    'POST /api/estudiante/retroalimentacion/:id/marcar-leido - Marcar como leído'
+    'POST /api/estudiante/retroalimentacion/:id/marcar-leido - Marcar como leído',
+
+    '--- NOTIFICACIONES Y MENSAJES ---',
+    'GET  /api/notificaciones - Listar notificaciones del usuario',
+    'POST /api/notificaciones/marcar-leida - Marcar notificación como leída',
+    'GET  /api/mensajes - Listar mensajes',
+    'POST /api/mensajes/enviar - Enviar mensaje'
   ];
 
   // Agregar endpoints de testing solo en desarrollo
@@ -353,7 +368,10 @@ app.use('*', (req, res) => {
     '/api/planificacion/*',
     // AGREGAR ENDPOINTS DEL MÓDULO 4
     '/api/profesor/*',
-    '/api/estudiante/*'
+    '/api/estudiante/*',
+    // AGREGAR NUEVOS ENDPOINTS
+    '/api/notificaciones/*',
+    '/api/mensajes/*'
   ];
 
   // Agregar testing solo en desarrollo
@@ -435,6 +453,10 @@ initializeApp().then(() => {
     // MOSTRAR MÓDULO 4
     console.log(`👨‍🏫 Profesor: http://${HOST}:${PORT}/api/profesor`);
     console.log(`👨‍🎓 Estudiante: http://${HOST}:${PORT}/api/estudiante`);
+    
+    // MOSTRAR NUEVOS MÓDULOS
+    console.log(`🔔 Notificaciones: http://${HOST}:${PORT}/api/notificaciones`);
+    console.log(`✉️  Mensajes: http://${HOST}:${PORT}/api/mensajes`);
     
     // Mostrar testing solo en desarrollo
     if (process.env.NODE_ENV === 'development') {

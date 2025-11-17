@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensajes - SpeakLexi</title>
+    
+    <!-- Preload -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <meta name="description" content="SpeakLexi - Mensajes">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <style>
+        /* Estilos adicionales para las mejoras */
+        .animate-pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .animate-fade-out {
+            animation: fadeOut 0.3s ease-in-out;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* Estados de mensaje */
+        .mensaje-enviando {
+            opacity: 0.8;
+        }
+        
+        .mensaje-error {
+            background-color: #ef4444 !important;
+        }
+        
+        /* Transiciones suaves */
+        .transition-all-200 {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Mensajes</h2>
+                    <p class="text-gray-600 dark:text-gray-300">Comunicación con tus profesores</p>
+                </div>
+                
+                <!-- Botón Nuevo Mensaje -->
+                <button id="btn-nuevo-mensaje" class="px-6 py-3 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-lg font-medium hover:from-secondary-700 hover:to-primary-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2 self-start sm:self-auto">
+                    <i class="fas fa-pen"></i>
+                    Nuevo Mensaje
+                </button>
+            </div>
+            
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                <a href="/pages/estudiante/estudiante-dashboard.html" class="hover:text-primary-600 transition-colors">Dashboard</a>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span class="text-primary-600 dark:text-primary-400">Mensajes</span>
+            </div>
+        </div>
+
+        <!-- Layout: Lista + Conversación -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Columna Izquierda: Lista de Conversaciones -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden h-full flex flex-col">
+                    <!-- Header con búsqueda -->
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-semibold text-gray-900 dark:text-white">Conversaciones</h3>
+                            <div class="relative" id="contenedor-busqueda">
+                                <button id="btn-buscar" class="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <input 
+                                    type="text" 
+                                    id="input-buscar-conversaciones" 
+                                    placeholder="Buscar conversaciones..."
+                                    class="hidden absolute top-full right-0 mt-2 w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-lg z-10"
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- Filtros -->
+                        <div class="flex gap-1 text-xs" id="filtros-conversaciones">
+                            <button class="px-3 py-1 bg-primary-600 text-white rounded-full transition-colors" data-filtro="todos">
+                                Todos
+                            </button>
+                            <button class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" data-filtro="no-leidos">
+                                No leídos
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de conversaciones -->
+                    <div id="lista-conversaciones" class="divide-y divide-gray-100 dark:divide-gray-700 flex-1 overflow-y-auto scrollbar-thin">
+                        <!-- Loading State (se reemplaza por JavaScript) -->
+                        <div class="p-8 text-center">
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-2"></div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Cargando conversaciones...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado vacío (se muestra dinámicamente) -->
+                    <div id="estado-vacio-conversaciones" class="hidden p-8 text-center">
+                        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-inbox text-2xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500 dark:text-gray-400">No tienes conversaciones</p>
+                        <button onclick="mensajeriaManager.abrirModalNuevoMensaje()" class="mt-3 text-sm text-primary-600 hover:text-primary-700 transition-colors">
+                            Enviar tu primer mensaje
+                        </button>
+                    </div>
+                    
+                    <!-- Estado error (se muestra dinámicamente) -->
+                    <div id="estado-error-conversaciones" class="hidden p-8 text-center">
+                        <i class="fas fa-exclamation-circle text-3xl text-red-500 mb-2"></i>
+                        <p class="text-gray-500 dark:text-gray-400 mb-2">Error cargando conversaciones</p>
+                        <button onclick="mensajeriaManager.cargarConversaciones()" class="text-sm text-primary-600 hover:text-primary-700 transition-colors">
+                            Reintentar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Conversación Activa -->
+            <div class="lg:col-span-2">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden h-full flex flex-col">
+                    <!-- Header de Conversación -->
+                    <div id="header-conversacion" class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-user text-primary-600 dark:text-primary-400"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 dark:text-white" id="nombre-conversacion"></h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400" id="rol-conversacion"></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Indicador de estado (escribiendo, en línea, etc.) -->
+                            <div id="indicador-estado" class="hidden">
+                                <span class="text-xs text-green-500 flex items-center gap-1">
+                                    <i class="fas fa-circle text-[8px]"></i>
+                                    <span id="texto-estado">En línea</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensajes -->
+                    <div id="contenedor-mensajes" class="flex-1 p-6 overflow-y-auto bg-gray-50 dark:bg-gray-900/50 scrollbar-thin relative">
+                        <!-- Botón Scroll to Bottom -->
+                        <button 
+                            id="scroll-to-bottom" 
+                            class="hidden absolute bottom-4 right-4 w-10 h-10 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-all duration-200 z-10 flex items-center justify-center"
+                            title="Ir al último mensaje"
+                        >
+                            <i class="fas fa-arrow-down text-sm"></i>
+                        </button>
+                        
+                        <!-- Estado vacío inicial -->
+                        <div id="empty-state" class="flex flex-col items-center justify-center h-full text-center">
+                            <div class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-comments text-3xl text-gray-400"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No hay mensajes seleccionados</h3>
+                            <p class="text-gray-500 dark:text-gray-400 max-w-xs">Selecciona una conversación o inicia una nueva para comenzar a chatear</p>
+                        </div>
+
+                        <!-- Loading mensajes -->
+                        <div id="loading-mensajes" class="hidden flex flex-col items-center justify-center h-full text-center">
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-2"></div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Cargando mensajes...</p>
+                        </div>
+
+                        <!-- Mensajes de la conversación -->
+                        <div id="mensajes-conversacion" class="space-y-4 hidden"></div>
+                        
+                        <!-- Indicador de escribiendo -->
+                        <div id="indicador-escribiendo" class="hidden mt-4 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                            <div class="flex space-x-1">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                            </div>
+                            <span id="texto-escribiendo">El profesor está escribiendo...</span>
+                        </div>
+                    </div>
+
+                    <!-- Input para responder -->
+                    <div id="form-respuesta" class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hidden">
+                        <form id="form-enviar-respuesta" class="space-y-2">
+                            <div class="flex gap-2 items-end">
+                                <div class="flex-1 relative">
+                                    <textarea 
+                                        type="text" 
+                                        id="input-mensaje" 
+                                        placeholder="Escribe tu mensaje..." 
+                                        rows="1"
+                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none min-h-[44px] max-h-32 transition-all-200"
+                                        required
+                                    ></textarea>
+                                    
+                                    <!-- Contador de caracteres -->
+                                    <div class="flex justify-between items-center mt-1 px-1">
+                                        <span id="char-count" class="text-xs text-gray-500 transition-colors">0/1000</span>
+                                        <span id="send-status" class="text-xs text-gray-500"></span>
+                                    </div>
+                                </div>
+                                
+                                <button 
+                                    type="submit" 
+                                    id="btn-enviar-respuesta"
+                                    class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2 h-[44px] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled
+                                >
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span class="hidden sm:inline">Enviar</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Indicador de conexión -->
+                            <div id="indicador-conexion" class="hidden text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <i class="fas fa-wifi"></i>
+                                <span>Conectado</span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Mensaje -->
+    <div id="modal-nuevo-mensaje" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between mb-4 flex-shrink-0">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Nuevo Mensaje</h3>
+                <button id="btn-cerrar-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="form-nuevo-mensaje" class="flex-1 overflow-hidden flex flex-col">
+                <!-- Destinatario -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Para:
+                    </label>
+                    <select 
+                        id="select-destinatario" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                        required
+                    >
+                        <option value="">Selecciona un profesor...</option>
+                        <!-- Opciones se cargan dinámicamente -->
+                    </select>
+                </div>
+
+                <!-- Mensaje -->
+                <div class="mb-4 flex-1 flex flex-col">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Mensaje:
+                    </label>
+                    <div class="flex-1 relative">
+                        <textarea 
+                            id="textarea-mensaje" 
+                            rows="6"
+                            class="w-full h-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none transition-colors"
+                            placeholder="Escribe tu mensaje aquí..."
+                            required
+                        ></textarea>
+                        
+                        <!-- Contador de caracteres para modal -->
+                        <div class="flex justify-between items-center mt-1 px-1">
+                            <span id="char-count-modal" class="text-xs text-gray-500 transition-colors">0/1000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex gap-3 flex-shrink-0">
+                    <button 
+                        type="button" 
+                        id="btn-cancelar-modal"
+                        class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit"
+                        id="btn-enviar-modal"
+                        class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled
+                    >
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm w-full"></div>
+
+    <!-- Scripts -->
+    <script src="/config/app-config.js"></script>
+    <script src="/assets/js/core/utils.js"></script>
+    <script src="/assets/js/core/api-client.js"></script>
+    <script src="/assets/js/core/theme-manager.js"></script>
+    <script src="/assets/js/core/toast-manager.js"></script>
+    <script src="/assets/js/core/navbar-loader.js"></script>
+    <script src="/assets/js/core/notificaciones-manager.js"></script>
+    
+    <!-- Lógica de la página -->
+    <script src="/assets/js/pages/mensajes.js"></script>
+    
+    <script>
+        // Script adicional para funcionalidades específicas del HTML
+        document.addEventListener('DOMContentLoaded', function() {
+            // Contador de caracteres para el modal
+            const textareaModal = document.getElementById('textarea-mensaje');
+            const contadorModal = document.getElementById('char-count-modal');
+            const botonEnviarModal = document.getElementById('btn-enviar-modal');
+            
+            if (textareaModal && contadorModal && botonEnviarModal) {
+                textareaModal.addEventListener('input', function() {
+                    const longitud = this.value.length;
+                    contadorModal.textContent = `${longitud}/1000`;
+                    
+                    // Cambiar color si se acerca al límite
+                    if (longitud > 900) {
+                        contadorModal.classList.add('text-red-500');
+                        contadorModal.classList.remove('text-gray-500', 'text-yellow-500');
+                    } else if (longitud > 750) {
+                        contadorModal.classList.add('text-yellow-500');
+                        contadorModal.classList.remove('text-gray-500', 'text-red-500');
+                    } else {
+                        contadorModal.classList.add('text-gray-500');
+                        contadorModal.classList.remove('text-red-500', 'text-yellow-500');
+                    }
+                    
+                    // Habilitar/deshabilitar botón
+                    const mensajeValido = longitud > 0 && longitud <= 1000;
+                    botonEnviarModal.disabled = !mensajeValido;
+                });
+            }
+            
+            // Búsqueda de conversaciones
+            const btnBuscar = document.getElementById('btn-buscar');
+            const inputBuscar = document.getElementById('input-buscar-conversaciones');
+            
+            if (btnBuscar && inputBuscar) {
+                btnBuscar.addEventListener('click', function() {
+                    inputBuscar.classList.toggle('hidden');
+                    if (!inputBuscar.classList.contains('hidden')) {
+                        inputBuscar.focus();
+                    }
+                });
+                
+                // Cerrar búsqueda al hacer click fuera
+                document.addEventListener('click', function(e) {
+                    if (!btnBuscar.contains(e.target) && !inputBuscar.contains(e.target)) {
+                        inputBuscar.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Filtros de conversaciones
+            const filtros = document.querySelectorAll('#filtros-conversaciones button');
+            filtros.forEach(filtro => {
+                filtro.addEventListener('click', function() {
+                    const filtroSeleccionado = this.getAttribute('data-filtro');
+                    
+                    // Actualizar estado activo
+                    filtros.forEach(f => {
+                        if (f === this) {
+                            f.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+                            f.classList.add('bg-primary-600', 'text-white');
+                        } else {
+                            f.classList.remove('bg-primary-600', 'text-white');
+                            f.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+                        }
+                    });
+                    
+                    // Aquí se aplicaría el filtro (implementado en el JS principal)
+                    if (window.mensajeriaManager && typeof window.mensajeriaManager.filtrarConversaciones === 'function') {
+                        window.mensajeriaManager.filtrarConversaciones(filtroSeleccionado);
+                    }
+                });
+            });
+            
+            // Auto-resize del textarea
+            const inputMensaje = document.getElementById('input-mensaje');
+            if (inputMensaje) {
+                inputMensaje.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            }
+            
+            // Detectar conexión
+            function actualizarEstadoConexion() {
+                const indicador = document.getElementById('indicador-conexion');
+                if (indicador) {
+                    if (navigator.onLine) {
+                        indicador.classList.remove('hidden');
+                        indicador.innerHTML = '<i class="fas fa-wifi"></i><span>Conectado</span>';
+                        indicador.classList.remove('text-red-500');
+                        indicador.classList.add('text-gray-500');
+                    } else {
+                        indicador.classList.remove('hidden');
+                        indicador.innerHTML = '<i class="fas fa-wifi-slash"></i><span>Sin conexión</span>';
+                        indicador.classList.remove('text-gray-500');
+                        indicador.classList.add('text-red-500');
+                    }
+                }
+            }
+            
+            window.addEventListener('online', actualizarEstadoConexion);
+            window.addEventListener('offline', actualizarEstadoConexion);
+            actualizarEstadoConexion(); // Estado inicial
+        });
+    </script>
+</body>
+</html>

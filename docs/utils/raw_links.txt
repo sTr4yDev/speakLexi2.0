@@ -1,11 +1,18 @@
-# RAW LINKS — Actualizado 2025-11-14 14:19:42
+# RAW LINKS — Actualizado 2025-11-15 19:58:40
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: 1ba1dffb9078937f5b12d45539586aa4aede5fd1
+# Commit: f8a4c1708ddd7a7e708be0358740dc9c6ca9db48
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/email.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/jwt.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/generar-lecciones.py
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/limpiar-duplicados.py
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/reordenar.py
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/sincronizar.py
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/test.py
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/test_2.py
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/validar_nombre.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/models/cursos.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/models/estadisticasModel.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/models/gamificacionModel.js
@@ -56,6 +63,12 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/profesorController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/progresoController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/retroalimentacionController.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/kb/kb_aleman.json
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/kb/kb_frances.json
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/kb/kb_ingles.json
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/kb/kb_italiano.json
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/kb/kb_portuges.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/helpers/logrosHelper.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/middleware/auth.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/middleware/authMiddleware.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/middleware/uploadMiddleware.js
@@ -63,6 +76,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/middleware/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/package.json
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/scripts/debug.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/services/emailService.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/knowledge_base.json
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/components/ejercicioRender.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/components/footer.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/components/navbar.html
@@ -94,6 +108,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/dashboard.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/leaderboard.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/leccion-activa.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/lecciones.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/logros.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/perfil.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/progreso.js
@@ -121,6 +136,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estu
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/estudiante-dashboard.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/leaderboard.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/leccion-activa.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/lecciones.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/logros-recompensas.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/mis-progresos.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/perfil.html
@@ -161,3 +177,6 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/raw_link
 ========================= OTROS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/.gitignore
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/.env
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/backup_ejercicios_20251114_224207.sql
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/renombrar_lecciones.sql
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/data/sync_titulos.sql

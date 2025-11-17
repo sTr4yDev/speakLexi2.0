@@ -1,12 +1,11 @@
 /* ============================================
-   SPEAKLEXI - ESTADÍSTICAS PROFESOR (CON DATOS REALES CORREGIDO)
+   SPEAKLEXI - ESTADÍSTICAS PROFESOR (CON DATOS REALES)
    Archivo: assets/js/pages/profesor/estadisticas-profesor.js
-   UC-13: Consultar estadísticas de progreso - CON DATOS REALES DEL MÓDULO 4
+   UC-13: Consultar estadísticas de progreso - CON DATOS REALES
    ============================================ */
 
 class EstadisticasProfesor {
     constructor() {
-        // ✅ CORREGIDO: BASE_URL → API_URL (Línea 18)
         this.API_URL = window.APP_CONFIG?.API?.API_URL || 'http://localhost:5000/api';
         this.token = localStorage.getItem('token');
         this.estado = {
@@ -115,7 +114,7 @@ class EstadisticasProfesor {
 
             console.log('🔄 Cargando estadísticas del profesor...');
 
-            // ✅ CONSTRUIR PARÁMETROS PARA FILTROS
+            // Construir parámetros para filtros
             const params = new URLSearchParams();
             
             if (this.estado.filtros.nivel !== 'todos') {
@@ -131,7 +130,7 @@ class EstadisticasProfesor {
                 params.append('fecha_hasta', this.estado.filtros.fecha_hasta);
             }
 
-            // ✅ USAR ENDPOINT REAL DE PROFESOR - CORREGIDO
+            // Usar endpoint real de profesor
             const endpoint = `${this.API_URL}/profesor/estadisticas?${params.toString()}`;
             console.log('📊 Endpoint real:', endpoint);
 
@@ -342,7 +341,7 @@ class EstadisticasProfesor {
         const elementos = this.elementos;
         if (!elementos.graficoDistribucionHabilidades || !window.Chart) return;
         
-        // Usar datos de áreas críticas del backend o simular basado en estudiantes
+        // Usar datos de áreas críticas del backend
         const temasDificultad = this.estado.estadisticas.temas_dificultad || [];
         
         if (temasDificultad.length === 0) {
@@ -404,55 +403,17 @@ class EstadisticasProfesor {
         const elementos = this.elementos;
         if (!elementos.graficoTendenciaMensual || !window.Chart) return;
         
-        // Simular datos de tendencia (en una implementación real vendrían del backend)
-        const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
-        const alumnosActivos = [25, 28, 32, 35, 38, 42];
-        const leccionesCompletadas = [120, 145, 168, 192, 210, 235];
-        
-        const ctx = elementos.graficoTendenciaMensual.getContext('2d');
-        
-        if (this.estado.charts.tendenciaMensual) {
-            this.estado.charts.tendenciaMensual.destroy();
-        }
-        
-        this.estado.charts.tendenciaMensual = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: meses,
-                datasets: [
-                    {
-                        label: 'Estudiantes Activos',
-                        data: alumnosActivos,
-                        borderColor: 'rgb(99, 102, 241)',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Lecciones Completadas',
-                        data: leccionesCompletadas,
-                        borderColor: 'rgb(16, 185, 129)',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Evolución Mensual del Grupo'
-                    },
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
-                }
-            }
-        });
+        // En una implementación real, estos datos vendrían del endpoint de tendencias
+        // Por ahora mostramos un mensaje indicando que no hay datos
+        elementos.graficoTendenciaMensual.innerHTML = `
+            <div class="flex items-center justify-center h-full text-gray-500">
+                <div class="text-center">
+                    <i class="fas fa-chart-line text-4xl mb-4 text-gray-300"></i>
+                    <p>Datos de tendencia mensual no disponibles</p>
+                    <p class="text-sm mt-2">Esta funcionalidad estará disponible próximamente</p>
+                </div>
+            </div>
+        `;
     }
 
     renderizarTablaMejoresAlumnos() {

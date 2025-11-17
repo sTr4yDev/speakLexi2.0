@@ -13,10 +13,21 @@ const ProfesorController = require('../controllers/profesorController');
 const { verificarToken, verificarProfesor } = require('../middleware/authMiddleware');
 
 // ============================================
+// RUTAS PÚBLICAS (solo requieren autenticación)
+// ============================================
+
+/**
+ * @route   GET /api/profesor/lista
+ * @desc    Obtener lista de profesores para selector
+ * @access  Private (solo autenticación)
+ */
+router.get('/lista', verificarToken, ProfesorController.obtenerListaProfesores);
+
+// ============================================
 // MIDDLEWARE GLOBAL PARA RUTAS DE PROFESOR
 // ============================================
 
-// Todas las rutas requieren autenticación y rol de profesor
+// El resto de rutas requieren autenticación Y rol de profesor
 router.use(verificarToken);
 router.use(verificarProfesor);
 
@@ -51,6 +62,26 @@ router.get('/estudiantes', ProfesorController.obtenerEstudiantes);
 router.get('/estadisticas', ProfesorController.obtenerEstadisticasDetalladas);
 
 // ============================================
+// NUEVAS RUTAS PARA RF-14 Y RF-15
+// ============================================
+
+/**
+ * @route   GET /api/profesor/ejercicios-pendientes
+ * @desc    Obtener ejercicios de escritura pendientes de retroalimentación
+ * @access  Private (Profesor only)
+ * @response {Array} data - Lista de ejercicios pendientes
+ */
+router.get('/ejercicios-pendientes', ProfesorController.obtenerEjerciciosPendientes);
+
+/**
+ * @route   GET /api/profesor/analisis-rendimiento
+ * @desc    Analizar rendimiento del grupo y detectar áreas críticas
+ * @access  Private (Profesor only)
+ * @response {Object} data - Análisis de rendimiento y sugerencias
+ */
+router.get('/analisis-rendimiento', ProfesorController.analizarRendimiento);
+
+// ============================================
 // GESTIÓN DE RETROALIMENTACIÓN
 // ============================================
 
@@ -63,6 +94,8 @@ router.get('/estadisticas', ProfesorController.obtenerEstadisticasDetalladas);
  * @body    {string} mensaje - Contenido del mensaje
  * @body    {string} [tipo] - Tipo: felicitacion, mejora, alerta, general
  * @body    {number} [leccion_id] - ID de lección relacionada
+ * @body    {number} [ejercicio_respuesta_id] - ID de respuesta de ejercicio
+ * @body    {number} [calificacion] - Calificación 1-10
  * @response {Object} data - ID de la retroalimentación creada
  */
 router.post('/retroalimentacion', ProfesorController.enviarRetroalimentacion);
@@ -92,6 +125,7 @@ router.get('/retroalimentacion', ProfesorController.obtenerRetroalimentaciones);
  * @body    {Array} [temas_dificultad] - Array de temas con dificultad
  * @body    {Array} [lecciones_sugeridas] - Array de IDs de lecciones
  * @body    {Array} [ejercicios_extra] - Array de ejercicios adicionales
+ * @body    {Array} [areas_enfoque] - Array de áreas de enfoque
  * @body    {string} [fecha_inicio] - Fecha de inicio (YYYY-MM-DD)
  * @body    {string} [fecha_fin_estimada] - Fecha fin estimada (YYYY-MM-DD)
  * @response {Object} data - ID del plan creado

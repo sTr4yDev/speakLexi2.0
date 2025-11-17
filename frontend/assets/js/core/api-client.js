@@ -198,7 +198,7 @@ class APIClient {
             window.toastManager.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
             
             setTimeout(() => {
-                window.location.href = '/login.html';
+                window.location.href = '/pages/auth/login.html';
             }, 2000);
         }
     }
