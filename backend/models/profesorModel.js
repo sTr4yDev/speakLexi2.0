@@ -2,7 +2,7 @@
    SPEAKLEXI - MODELO DE PROFESOR
    Módulo 4: Dashboard y Gestión de Estudiantes
    
-   CORREGIDO: pool.execute() → database.query()
+   CORREGIDO: database.pool.execute() → pool.execute()
    AÑADIDAS: Funciones para estadísticas detalladas
    
    Funciones:
@@ -10,10 +10,10 @@
    - Gestión de estudiantes asignados
    - Estadísticas y métricas
    - Alertas y notificaciones
-   - Estadísticas detalladas (temas difícultad, distribución, etc.)
+   - Estadísticas detalladas (temas difíciles, distribución, etc.)
    ============================================ */
 
-const database = require('../config/database'); // ✅ CORREGIDO: importar database completo
+const pool = require('../config/database'); // ✅ CORREGIDO: importar pool directamente
 
 class ProfesorModel {
     
@@ -37,7 +37,7 @@ class ProfesorModel {
             LIMIT 1
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId]); // ✅ CORREGIDO
+        const [rows] = await pool.execute(query, [profesorId]); // ✅ CORREGIDO
         return rows[0] || null;
     }
     
@@ -75,7 +75,7 @@ class ProfesorModel {
             ORDER BY pe.total_xp DESC
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId]); // ✅ CORREGIDO
+        const [rows] = await pool.execute(query, [profesorId]); // ✅ CORREGIDO
         return rows;
     }
     
@@ -103,7 +103,7 @@ class ProfesorModel {
                 AND u.estado_cuenta = 'activo'
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId]); // ✅ CORREGIDO
+        const [rows] = await pool.execute(query, [profesorId]); // ✅ CORREGIDO
         return rows[0];
     }
     
@@ -139,12 +139,12 @@ class ProfesorModel {
             LIMIT ${limitSafe}
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId]); // Solo profesorId
+        const [rows] = await pool.execute(query, [profesorId]); // Solo profesorId
         return rows;
     }
     
     /**
-     * ✅ NUEVA FUNCIÓN: Obtener temas con mayor dificultad
+     * ✅ FUNCIÓN: Obtener temas con mayor dificultad
      * Basado en ejercicios con baja puntuación
      */
     static async obtenerTemasDificultad(profesorId, limit = 10) {
@@ -173,12 +173,45 @@ class ProfesorModel {
             LIMIT ${limitSafe}
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId]);
+        const [rows] = await pool.execute(query, [profesorId]);
         return rows;
     }
     
     /**
-     * ✅ NUEVA FUNCIÓN: Obtener distribución de estudiantes por nivel
+     * ✅ FUNCIÓN: Obtener temas de dificultad comunes para planificación
+     */
+    static async obtenerTemasDificultadComunes(profesorId, limit = 8) {
+        const limitSafe = parseInt(limit) || 8;
+        
+        const query = `
+            SELECT 
+                e.tipo as tema,
+                l.titulo as leccion,
+                COUNT(DISTINCT re.usuario_id) as estudiantes_afectados,
+                AVG(re.puntuacion_obtenida) as dificultad_promedio,
+                ROUND((100 - AVG(re.puntuacion_obtenida)), 1) as porcentaje_dificultad
+            FROM profesor_asignaciones pa
+            INNER JOIN perfil_estudiantes pe 
+                ON pe.nivel_actual = pa.nivel 
+                AND pe.idioma_aprendizaje = pa.idioma
+            INNER JOIN resultados_ejercicios re ON re.usuario_id = pe.usuario_id
+            INNER JOIN ejercicios e ON e.id = re.ejercicio_id
+            INNER JOIN lecciones l ON l.id = e.leccion_id
+            WHERE pa.profesor_id = ?
+                AND pa.activo = TRUE
+                AND re.completado_en >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            GROUP BY e.tipo, l.titulo
+            HAVING COUNT(re.id) >= 2 AND AVG(re.puntuacion_obtenida) < 70
+            ORDER BY estudiantes_afectados DESC, dificultad_promedio ASC
+            LIMIT ${limitSafe}
+        `;
+        
+        const [rows] = await pool.execute(query, [profesorId]);
+        return rows;
+    }
+    
+    /**
+     * ✅ FUNCIÓN: Obtener distribución de estudiantes por nivel
      */
     static async obtenerDistribucionNiveles(profesorId) {
         const query = `
@@ -201,12 +234,12 @@ class ProfesorModel {
             ORDER BY pe.nivel_actual
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId]);
+        const [rows] = await pool.execute(query, [profesorId]);
         return rows;
     }
     
     /**
-     * ✅ NUEVA FUNCIÓN: Obtener actividad reciente (últimos 7 días)
+     * ✅ FUNCIÓN: Obtener actividad reciente (últimos 7 días)
      */
     static async obtenerActividadReciente(profesorId, dias = 7) {
         const diasSafe = parseInt(dias) || 7;
@@ -229,7 +262,7 @@ class ProfesorModel {
             ORDER BY fecha DESC
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId]);
+        const [rows] = await pool.execute(query, [profesorId]);
         return rows;
     }
     
@@ -263,7 +296,7 @@ class ProfesorModel {
         
         query += ' ORDER BY a.creado_en DESC';
         
-        const [rows] = await database.pool.execute(query, [profesorId]); // ✅ CORREGIDO
+        const [rows] = await pool.execute(query, [profesorId]); // ✅ CORREGIDO
         return rows;
     }
     
@@ -306,7 +339,7 @@ class ProfesorModel {
             LIMIT 1
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId, estudianteId]); // ✅ CORREGIDO
+        const [rows] = await pool.execute(query, [profesorId, estudianteId]); // ✅ CORREGIDO
         return rows[0] || null;
     }
     
@@ -336,7 +369,7 @@ class ProfesorModel {
             ORDER BY l.orden ASC
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId]); // ✅ CORREGIDO
+        const [rows] = await pool.execute(query, [profesorId]); // ✅ CORREGIDO
         return rows;
     }
     
@@ -355,7 +388,7 @@ class ProfesorModel {
                 AND pa.activo = TRUE
         `;
         
-        const [rows] = await database.pool.execute(query, [profesorId, estudianteId]); // ✅ CORREGIDO
+        const [rows] = await pool.execute(query, [profesorId, estudianteId]); // ✅ CORREGIDO
         return rows[0].tiene_acceso > 0;
     }
     
@@ -369,7 +402,42 @@ class ProfesorModel {
             WHERE id = ? AND profesor_id = ?
         `;
         
-        await database.pool.execute(query, [alertaId, profesorId]); // ✅ CORREGIDO
+        await pool.execute(query, [alertaId, profesorId]); // ✅ CORREGIDO
+    }
+    
+    /**
+     * ✅ NUEVA FUNCIÓN: Obtener ejercicios pendientes de revisión
+     */
+    static async obtenerEjerciciosPendientes(profesorId) {
+        const query = `
+            SELECT 
+                re.id,
+                re.usuario_id,
+                CONCAT(u.nombre, ' ', u.primer_apellido) as estudiante_nombre,
+                re.ejercicio_id,
+                e.tipo as ejercicio_tipo,
+                l.titulo as leccion_titulo,
+                re.respuestas_usuario,
+                re.completado_en,
+                re.puntuacion_obtenida
+            FROM profesor_asignaciones pa
+            INNER JOIN perfil_estudiantes pe 
+                ON pe.nivel_actual = pa.nivel 
+                AND pe.idioma_aprendizaje = pa.idioma
+            INNER JOIN resultados_ejercicios re ON re.usuario_id = pe.usuario_id
+            INNER JOIN usuarios u ON u.id = pe.usuario_id
+            INNER JOIN ejercicios e ON e.id = re.ejercicio_id
+            INNER JOIN lecciones l ON l.id = e.leccion_id
+            WHERE pa.profesor_id = ?
+                AND pa.activo = TRUE
+                AND e.tipo = 'escritura'
+                AND re.completado_en >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            ORDER BY re.completado_en DESC
+            LIMIT 50
+        `;
+        
+        const [rows] = await pool.execute(query, [profesorId]);
+        return rows;
     }
 }
 

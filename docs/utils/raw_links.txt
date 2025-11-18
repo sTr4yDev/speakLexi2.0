@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-15 19:58:40
+# RAW LINKS — Actualizado 2025-11-17 17:20:53
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: f8a4c1708ddd7a7e708be0358740dc9c6ca9db48
+# Commit: e2f6849dbe89c0e76c798ceaa74b25ac1ca7e1bc
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -30,7 +30,9 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/esta
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/estudianteRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/gamificacionRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/leccionRoutes.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/mensajesRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/multimediaRoutes.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/notificacionesRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/planificacionRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/profesorRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/progresoRoutes.js
@@ -50,6 +52,8 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/config/app
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/api/auth.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/api/usuario.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/config.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/scripts/integrar.py
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/scripts/fix-html-routes.js
 
 ========================= FRONTEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/authController.js
@@ -58,7 +62,9 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/estadisticasController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/gamificacionController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/leccionController.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/mensajesController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/multimediaController.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/notificacionesController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/planificacionController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/profesorController.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/controllers/progresoController.js
@@ -85,6 +91,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/css
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/form-validator.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/module-loader.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/navbar-loader.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/notificaciones-manager.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/theme-manager.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/toast-manager.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/utils.js
@@ -112,6 +119,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/logros.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/perfil.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/progreso.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/mensajes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/onboarding/asignar-nivel.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/profesor/dashboard.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/profesor/estadisticas-profesor.js
@@ -140,6 +148,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estu
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/logros-recompensas.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/mis-progresos.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/estudiante/perfil.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/mensajes.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/onboarding/asignar-nivel.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/profesor/estadisticas-profesor.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/profesor/planificacion.html
@@ -158,6 +167,9 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/
 
 ========================= DOCS LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/CLAUDE.md
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/ANALISIS_LECCIONES.md
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/ARQUITECTURA_LECCIONES.md
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/ENDPOINTS_PENDIENTES.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 1/GUIDELINES.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 1/README.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 3/DEEPSEEK_FRONTEND_GUIDELINES.md
@@ -169,6 +181,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 4/GUIA_
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 4/GUIDELINES-DEEPSEEK.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 4/INSTALACION.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 4/README.md
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/PLAN_PROFESOR.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/README.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/guidelines/como-crear-paginas.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/guidelines/formato-paginas.md

@@ -27,7 +27,7 @@ router.get('/lista', verificarToken, ProfesorController.obtenerListaProfesores);
 // MIDDLEWARE GLOBAL PARA RUTAS DE PROFESOR
 // ============================================
 
-// El resto de rutas requieren autenticación Y rol de profesor
+// ✅ CORREGIDO: Aplicar middleware antes de las rutas protegidas
 router.use(verificarToken);
 router.use(verificarProfesor);
 
@@ -62,7 +62,7 @@ router.get('/estudiantes', ProfesorController.obtenerEstudiantes);
 router.get('/estadisticas', ProfesorController.obtenerEstadisticasDetalladas);
 
 // ============================================
-// NUEVAS RUTAS PARA RF-14 Y RF-15
+// ✅ RUTAS PARA EJERCICIOS PENDIENTES Y ANÁLISIS
 // ============================================
 
 /**

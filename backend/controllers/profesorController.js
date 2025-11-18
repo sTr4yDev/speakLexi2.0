@@ -1,8 +1,9 @@
 const db = require('../config/database');
 const pool = db.pool || db;
+const ProfesorModel = require('../models/profesorModel'); // ✅ AGREGADO: Importar modelo corregido
 
 /**
- * CONTROLADOR COMPLETO DE PROFESOR - SIN COMENTARIOS EN QUERIES SQL
+ * CONTROLADOR COMPLETO DE PROFESOR - VERSIÓN ROBUSTA CON CORRECCIONES
  * Implementa RF-13, RF-14, RF-15
  */
 class ProfesorController {
@@ -46,12 +47,12 @@ class ProfesorController {
     }
 
     // ============================================
-    // DASHBOARD Y ESTADÍSTICAS (RF-13)
+    // DASHBOARD Y ESTADÍSTICAS (RF-13) - MEJORADO
     // ============================================
 
     /**
      * @route   GET /api/profesor/dashboard
-     * @desc    Dashboard principal del profesor
+     * @desc    Dashboard principal del profesor - CON DATOS DE PLANIFICACIÓN
      */
     static async obtenerDashboard(req, res) {
         try {
@@ -101,7 +102,11 @@ class ProfesorController {
                         },
                         top_estudiantes: [],
                         estudiantes_recientes: [],
-                        alertas: []
+                        alertas: [],
+                        planificacion: {  // ✅ AGREGADO: Estructura para planificación
+                            temas_comunes: [],
+                            distribucion_niveles: []
+                        }
                     }
                 });
             }
@@ -113,6 +118,16 @@ class ProfesorController {
             `, [profesorId]);
 
             if (estudiantes.length === 0) {
+                // ✅ AGREGADO: Obtener datos de planificación incluso sin estudiantes
+                let temasComunes = [];
+                let distribucionNiveles = [];
+                try {
+                    temasComunes = await ProfesorModel.obtenerTemasDificultadComunes(profesorId, 5);
+                    distribucionNiveles = await ProfesorModel.obtenerDistribucionNiveles(profesorId);
+                } catch (modelError) {
+                    console.error('Error obteniendo datos de planificación:', modelError);
+                }
+
                 return res.json({
                     success: true,
                     data: {
@@ -132,7 +147,11 @@ class ProfesorController {
                         },
                         top_estudiantes: [],
                         estudiantes_recientes: [],
-                        alertas: []
+                        alertas: [],
+                        planificacion: {  // ✅ AGREGADO: Datos de planificación
+                            temas_comunes: temasComunes,
+                            distribucion_niveles: distribucionNiveles
+                        }
                     }
                 });
             }
@@ -265,6 +284,17 @@ class ProfesorController {
                 todosEstudiantes = [];
             }
 
+            // ✅ AGREGADO: Obtener datos de planificación para el módulo
+            let temasComunes = [];
+            let distribucionNiveles = [];
+            try {
+                temasComunes = await ProfesorModel.obtenerTemasDificultadComunes(profesorId, 5);
+                distribucionNiveles = await ProfesorModel.obtenerDistribucionNiveles(profesorId);
+                console.log(`📊 Datos de planificación: ${temasComunes.length} temas, ${distribucionNiveles.length} niveles`);
+            } catch (planificacionError) {
+                console.error('Error obteniendo datos de planificación:', planificacionError);
+            }
+
             console.log(`✅ Dashboard cargado: ${dashboardStats.total_estudiantes} estudiantes`);
 
             res.json({
@@ -290,7 +320,13 @@ class ProfesorController {
                     
                     estudiantes_recientes: todosEstudiantes,
                     
-                    alertas: alertas
+                    alertas: alertas,
+
+                    // ✅ AGREGADO: Datos para el módulo de planificación
+                    planificacion: {
+                        temas_comunes: temasComunes,
+                        distribucion_niveles: distribucionNiveles
+                    }
                 }
             });
 
@@ -626,7 +662,7 @@ class ProfesorController {
     }
 
     // ============================================
-    // NUEVO: EJERCICIOS PENDIENTES (RF-14)
+    // ✅ CORREGIDO: EJERCICIOS PENDIENTES (RF-14)
     // ============================================
 
     /**
@@ -637,85 +673,14 @@ class ProfesorController {
         try {
             const profesorId = req.user.id;
 
-            const [asignaciones] = await pool.execute(`
-                SELECT nivel, idioma 
-                FROM profesor_asignaciones 
-                WHERE profesor_id = ? AND activo = 1
-                LIMIT 1
-            `, [profesorId]);
-
-            if (asignaciones.length === 0) {
-                return res.status(403).json({
-                    success: false,
-                    error: 'Profesor sin nivel/idioma asignado'
-                });
-            }
-
-            const { nivel, idioma } = asignaciones[0];
-
-            const [estudiantes] = await pool.execute(`
-                SELECT estudiante_id 
-                FROM profesor_estudiantes 
-                WHERE profesor_id = ? AND activo = 1
-            `, [profesorId]);
-
-            if (estudiantes.length === 0) {
-                return res.json({
-                    success: true,
-                    data: {
-                        total_pendientes: 0,
-                        ejercicios: [],
-                        mensaje: 'No hay estudiantes asignados'
-                    }
-                });
-            }
-
-            const estudianteIds = estudiantes.map(e => e.estudiante_id);
-
-            const [ejercicios] = await pool.execute(`
-                SELECT
-                    re.id as respuesta_id,
-                    re.usuario_id as alumno_id,
-                    CONCAT(u.nombre, ' ', COALESCE(u.primer_apellido, '')) as alumno_nombre,
-                    e.id as ejercicio_id,
-                    e.pregunta as ejercicio_titulo,
-                    re.respuesta_texto,
-                    l.nivel,
-                    l.idioma,
-                    re.creado_en as fecha_envio,
-                    EXISTS(
-                        SELECT 1 FROM retroalimentacion r 
-                        WHERE r.ejercicio_respuesta_id = re.id
-                    ) as tiene_retroalimentacion
-                FROM resultados_ejercicios re
-                INNER JOIN usuarios u ON re.usuario_id = u.id
-                INNER JOIN ejercicios e ON re.ejercicio_id = e.id
-                INNER JOIN lecciones l ON e.leccion_id = l.id
-                WHERE e.tipo = 'escritura'
-                  AND l.nivel = ?
-                  AND l.idioma = ?
-                  AND re.usuario_id IN (?)
-                  AND NOT EXISTS (
-                      SELECT 1 FROM retroalimentacion r
-                      WHERE r.ejercicio_respuesta_id = re.id
-                  )
-                ORDER BY re.creado_en DESC
-                LIMIT 50
-            `, [nivel, idioma, estudianteIds]);
+            // ✅ USAR MODELO CORREGIDO en lugar de consulta directa
+            const ejercicios = await ProfesorModel.obtenerEjerciciosPendientes(profesorId);
 
             console.log(`📝 Encontrados ${ejercicios.length} ejercicios pendientes`);
 
             res.json({
                 success: true,
-                data: {
-                    total_pendientes: ejercicios.length,
-                    ejercicios,
-                    filtros: {
-                        nivel,
-                        idioma,
-                        total_estudiantes: estudianteIds.length
-                    }
-                }
+                data: ejercicios
             });
 
         } catch (error) {
@@ -888,7 +853,7 @@ class ProfesorController {
     }
 
     // ============================================
-    // NUEVO: ANÁLISIS DE RENDIMIENTO (RF-15)
+    // ANÁLISIS DE RENDIMIENTO (RF-15)
     // ============================================
 
     /**

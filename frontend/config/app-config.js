@@ -25,6 +25,7 @@ const API_CONFIG = {
         ? 'https://api.speaklexi.com' 
         : 'http://localhost:5000',
     
+    // ✅ CRÍTICO: Alias API_URL para compatibilidad
     API_URL: APP_ENV.MODE === 'production'
         ? 'https://api.speaklexi.com/api'
         : 'http://localhost:5000/api',
@@ -207,41 +208,44 @@ const API_CONFIG = {
         PROFESOR: {
             // Dashboard y gestión general
             DASHBOARD: '/profesor/dashboard',
-            ALUMNOS: '/profesor/alumnos',
-            ALUMNO_DETALLE: '/profesor/alumnos/:id',
+            ESTUDIANTES: '/profesor/estudiantes',
+            ALUMNOS: '/profesor/estudiantes',
+            ALUMNO_DETALLE: '/profesor/estudiantes/:id',
             
             // Estadísticas detalladas
-            ESTADISTICAS: {
-                GENERAL: '/profesor/estadisticas/general',
-                POR_NIVEL: '/profesor/estadisticas/por-nivel',
-                TENDENCIA_MENSUAL: '/profesor/estadisticas/tendencia-mensual',
-                MEJORES_ALUMNOS: '/profesor/estadisticas/mejores-alumnos',
-                AREAS_CRITICAS: '/profesor/estadisticas/areas-criticas',
-                EXPORTAR_REPORTE: '/profesor/estadisticas/exportar',
-                DISTRIBUCION_HABILIDADES: '/profesor/estadisticas/distribucion-habilidades'
-            },
+            ESTADISTICAS: '/profesor/estadisticas',
+            ESTADISTICAS_DETALLADAS: '/profesor/estadisticas',
+            POR_NIVEL: '/profesor/estadisticas/por-nivel',
+            TENDENCIA_MENSUAL: '/profesor/estadisticas/tendencia-mensual',
+            MEJORES_ALUMNOS: '/profesor/estadisticas/mejores-alumnos',
+            AREAS_CRITICAS: '/profesor/estadisticas/areas-criticas',
+            EXPORTAR_REPORTE: '/profesor/estadisticas/exportar',
+            DISTRIBUCION_HABILIDADES: '/profesor/estadisticas/distribucion-habilidades',
             
             // ✅ UC-14: Revisar retroalimentación
             RETROALIMENTACION: {
-                ALUMNOS: '/profesor/alumnos',
-                POR_ALUMNO: '/profesor/retroalimentacion/alumno/:id',
+                LISTA: '/profesor/retroalimentacion',
                 CREAR: '/profesor/retroalimentacion',
-                ACTUALIZAR: '/profesor/retroalimentacion/:id',
-                ELIMINAR: '/profesor/retroalimentacion/:id',
-                LECCIONES_ALUMNO: '/profesor/alumno/:id/lecciones',
-                LISTAR_TODAS: '/profesor/retroalimentaciones'
+                HISTORIAL: '/profesor/retroalimentacion',
+                POR_ALUMNO: '/profesor/retroalimentacion?estudiante_id=:id',
+                EJERCICIOS_PENDIENTES: '/profesor/ejercicios-pendientes'
             },
             
             // ✅ UC-15: Planificar nuevos contenidos
             PLANIFICACION: {
-                ANALIZAR: '/profesor/planificacion/analisis',
-                PLANES: '/profesor/planificacion/planes',
-                CREAR: '/profesor/planificacion/planes',
-                ACTUALIZAR: '/profesor/planificacion/planes/:id',
-                ELIMINAR: '/profesor/planificacion/planes/:id',
-                DETALLE: '/profesor/planificacion/planes/:id',
+                ANALIZAR: '/profesor/analisis-rendimiento',
+                PLANES: '/profesor/planes',
+                CREAR: '/profesor/planes',
+                ACTUALIZAR: '/profesor/planes/:id',
+                ELIMINAR: '/profesor/planes/:id',
+                DETALLE: '/profesor/planes/:id',
                 SUGERENCIAS: '/profesor/planificacion/sugerencias'
-            }
+            },
+            
+            // Alertas y notificaciones
+            ALERTAS: '/profesor/alertas',
+            MARCAR_ALERTA_REVISADA: '/profesor/alertas/:id/revisar',
+            LECCIONES: '/profesor/lecciones'
         },
         
         // Endpoints genéricos (para compatibilidad)
@@ -391,7 +395,7 @@ const UI_CONFIG = {
             PROGRESO: '/pages/cursos/progreso-curso.html'
         },
         
-        // ✅ NUEVAS RUTAS PARA PROFESOR
+        // ✅ RUTAS PARA PROFESOR - ACTUALIZADAS
         PROFESOR: {
             DASHBOARD: '/pages/profesor/profesor-dashboard.html',
             ESTADISTICAS: '/pages/profesor/estadisticas-profesor.html',
@@ -865,9 +869,10 @@ const APP_CONFIG = {
 };
 
 // ==========================================================
-// EXPORTAR AL WINDOW GLOBAL
+// ✅ EXPORTAR AL WINDOW GLOBAL - COMPATIBILIDAD COMPLETA
 // ==========================================================
 if (typeof window !== 'undefined') {
+    // Exportar configuraciones individuales
     window.APP_ENV = APP_ENV;
     window.API_CONFIG = API_CONFIG;
     window.STORAGE_CONFIG = STORAGE_CONFIG;
@@ -880,15 +885,25 @@ if (typeof window !== 'undefined') {
     window.ERROR_CONFIG = ERROR_CONFIG;
     window.FORMAT_CONFIG = FORMAT_CONFIG;
     window.TEST_USERS = TEST_USERS;
+    
+    // ✅ CONFIGURACIÓN PRINCIPAL
     window.APP_CONFIG = APP_CONFIG;
     window.SpeakLexiConfig = APP_CONFIG;
+    
+    // ✅ ALIAS CRÍTICOS PARA COMPATIBILIDAD
+    window.API_URL = API_CONFIG.API_URL;
+    window.BASE_URL = API_CONFIG.BASE_URL;
+    
+    // ✅ FUNCIONES GLOBALES
     window.navegarAlDashboard = navegarAlDashboard;
     
     console.log('✅ SpeakLexi Config - Configuración completa cargada');
+    console.log('   - API_URL:', window.API_URL);
+    console.log('   - BASE_URL:', window.BASE_URL);
     console.log('   - Modo:', window.APP_ENV?.MODE);
     console.log('   - Versión:', window.APP_ENV?.VERSION);
     console.log('   - Endpoints PROFESOR configurados: ✅');
-    console.log('   - Módulo 5 (Mantenimiento) eliminado: ✅');
+    console.log('   - Compatibilidad completa: ✅');
 }
 
 // Export para módulos ES6
@@ -901,4 +916,7 @@ if (APP_ENV.DEBUG && typeof console !== 'undefined') {
     console.log(`🚀 ${APP_ENV.APP_NAME} v${APP_ENV.VERSION} - Configuración cargada`);
     console.log('📁 Módulos activos: Usuarios, Lecciones, Aprendizaje, Desempeño');
     console.log('🎯 Endpoints de PROFESOR configurados para UC-13, UC-14, UC-15');
+    console.log('🔗 URLs disponibles:');
+    console.log('   - API_URL:', API_CONFIG.API_URL);
+    console.log('   - BASE_URL:', API_CONFIG.BASE_URL);
 }

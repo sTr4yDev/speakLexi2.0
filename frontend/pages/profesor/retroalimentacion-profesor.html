@@ -58,6 +58,38 @@
     <!-- ✅ META OPTIMIZACIÓN -->
     <meta name="description" content="SpeakLexi - Gestión de Retroalimentación">
     <meta name="theme-color" content="#4F46E5">
+
+    <style>
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
     <!-- ✅ NAVBAR DINÁMICO -->
@@ -77,6 +109,15 @@
                     <i class="fas fa-chevron-right text-xs"></i>
                     <span class="text-primary-600 dark:text-primary-400">Retroalimentación</span>
                 </div>
+            </div>
+
+            <!-- Botón Nuevo Mensaje -->
+            <div class="flex justify-end mb-6">
+                <button id="btn-nuevo-mensaje" 
+                        class="px-6 py-3 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-lg font-medium hover:from-secondary-700 hover:to-primary-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2">
+                    <i class="fas fa-paper-plane"></i>
+                    Nuevo Mensaje
+                </button>
             </div>
 
             <!-- Layout Principal -->
@@ -105,58 +146,144 @@
                     </div>
 
                     <!-- Lista de Alumnos -->
-                    <div id="lista-alumnos" class="max-h-[calc(100vh-300px)] overflow-y-auto">
+                    <div id="lista-alumnos" class="max-h-[calc(100vh-300px)] overflow-y-auto scrollbar-thin">
                         <!-- Se llenará dinámicamente -->
+                        <div class="p-8 text-center">
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-2"></div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Cargando alumnos...</p>
+                        </div>
+                    </div>
+
+                    <!-- Estado vacío -->
+                    <div id="estado-vacio-alumnos" class="hidden p-8 text-center">
+                        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-users text-2xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500 dark:text-gray-400">No hay alumnos asignados</p>
                     </div>
                 </div>
 
-                <!-- Panel Principal - Retroalimentación -->
+                <!-- Panel Principal - Retroalimentación y Mensajería -->
                 <div class="lg:col-span-3">
-                    <!-- Header del Panel Principal -->
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 mb-6">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <h3 id="alumno-seleccionado-nombre" class="text-xl font-bold text-gray-900 dark:text-white">
-                                    Selecciona un alumno
-                                </h3>
-                                <p id="alumno-seleccionado-nivel" class="text-gray-600 dark:text-gray-400">
-                                    Para ver su historial de retroalimentación
-                                </p>
+                    <!-- Panel de Mensajería -->
+                    <div id="panel-mensajeria" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden h-[600px] flex flex-col hidden">
+                        <!-- Header de Conversación -->
+                        <div id="header-conversacion" class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-user text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900 dark:text-white" id="nombre-conversacion">Selecciona un alumno</h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400" id="rol-conversacion">Para comenzar una conversación</p>
+                                    </div>
+                                </div>
                             </div>
-                            <button id="btn-nuevo-comentario" 
-                                    class="mt-4 sm:mt-0 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
-                                <i class="fas fa-plus"></i>
-                                Nuevo Comentario
+                        </div>
+
+                        <!-- Mensajes -->
+                        <div id="contenedor-mensajes" class="flex-1 p-6 overflow-y-auto bg-gray-50 dark:bg-gray-900/50 scrollbar-thin">
+                            <!-- Estado vacío inicial -->
+                            <div id="empty-state" class="flex flex-col items-center justify-center h-full text-center">
+                                <div class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                                    <i class="fas fa-comments text-3xl text-gray-400"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Selecciona un alumno</h3>
+                                <p class="text-gray-500 dark:text-gray-400 max-w-xs">Elige un alumno de la lista para comenzar una conversación</p>
+                            </div>
+
+                            <!-- Loading mensajes -->
+                            <div id="loading-mensajes" class="hidden flex flex-col items-center justify-center h-full text-center">
+                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-2"></div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Cargando mensajes...</p>
+                            </div>
+
+                            <!-- Mensajes de la conversación -->
+                            <div id="mensajes-conversacion" class="space-y-4 hidden"></div>
+                        </div>
+
+                        <!-- Input para responder -->
+                        <div id="form-respuesta" class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hidden">
+                            <form id="form-enviar-respuesta" class="space-y-2">
+                                <div class="flex gap-2 items-end">
+                                    <div class="flex-1 relative">
+                                        <textarea 
+                                            type="text" 
+                                            id="input-mensaje" 
+                                            placeholder="Escribe tu mensaje..." 
+                                            rows="1"
+                                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none min-h-[44px] max-h-32"
+                                            required
+                                        ></textarea>
+                                        
+                                        <!-- Contador de caracteres -->
+                                        <div class="flex justify-between items-center mt-1 px-1">
+                                            <span id="char-count" class="text-xs text-gray-500">0/1000</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button 
+                                        type="submit" 
+                                        id="btn-enviar-respuesta"
+                                        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2 h-[44px] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled
+                                    >
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Panel de Retroalimentación (oculto por defecto) -->
+                    <div id="panel-retroalimentacion">
+                        <!-- Header del Panel Principal -->
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 mb-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h3 id="alumno-seleccionado-nombre" class="text-xl font-bold text-gray-900 dark:text-white">
+                                        Selecciona un alumno
+                                    </h3>
+                                    <p id="alumno-seleccionado-nivel" class="text-gray-600 dark:text-gray-400">
+                                        Para ver su historial de retroalimentación
+                                    </p>
+                                </div>
+                                <button id="btn-nuevo-comentario" 
+                                        class="mt-4 sm:mt-0 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+                                    <i class="fas fa-plus"></i>
+                                    Nuevo Comentario
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Loading Indicator -->
+                        <div id="loading-retroalimentacion" class="hidden flex items-center justify-center py-12">
+                            <div class="text-center">
+                                <div class="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+                                <p class="text-gray-600 dark:text-gray-400">Cargando retroalimentación...</p>
+                            </div>
+                        </div>
+
+                        <!-- Estado Vacío -->
+                        <div id="estado-vacio-alumno" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center border border-gray-100 dark:border-gray-700">
+                            <div class="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-comments text-gray-400 text-2xl"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Sin retroalimentación</h4>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                                Este alumno aún no tiene comentarios de retroalimentación.
+                            </p>
+                            <button id="btn-nuevo-primer-comentario" 
+                                    class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
+                                Agregar Primer Comentario
                             </button>
                         </div>
-                    </div>
 
-                    <!-- Loading Indicator -->
-                    <div id="loading-retroalimentacion" class="hidden flex items-center justify-center py-12">
-                        <div class="text-center">
-                            <div class="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
-                            <p class="text-gray-600 dark:text-gray-400">Cargando retroalimentación...</p>
+                        <!-- Lista de Retroalimentación -->
+                        <div id="lista-retroalimentacion-alumno" class="space-y-4">
+                            <!-- Se llenará dinámicamente -->
                         </div>
-                    </div>
-
-                    <!-- Estado Vacío -->
-                    <div id="estado-vacio-alumno" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center border border-gray-100 dark:border-gray-700">
-                        <div class="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-comments text-gray-400 text-2xl"></i>
-                        </div>
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Sin retroalimentación</h4>
-                        <p class="text-gray-600 dark:text-gray-400 mb-6">
-                            Este alumno aún no tiene comentarios de retroalimentación.
-                        </p>
-                        <button id="btn-nuevo-primer-comentario" 
-                                class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
-                            Agregar Primer Comentario
-                        </button>
-                    </div>
-
-                    <!-- Lista de Retroalimentación -->
-                    <div id="lista-retroalimentacion-alumno" class="space-y-4">
-                        <!-- Se llenará dinámicamente -->
                     </div>
                 </div>
             </div>
@@ -277,6 +404,90 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Modal Nuevo Mensaje -->
+    <div id="modal-nuevo-mensaje" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Nuevo Mensaje</h3>
+                <button id="btn-cerrar-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="form-nuevo-mensaje">
+                <!-- Destinatario -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Para:
+                    </label>
+                    <select 
+                        id="select-destinatario" 
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        required
+                    >
+                        <option value="">Selecciona un alumno...</option>
+                    </select>
+                </div>
+
+                <!-- Mensaje -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Mensaje:
+                    </label>
+                    <textarea 
+                        id="textarea-mensaje" 
+                        rows="4"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                        placeholder="Escribe tu mensaje aquí..."
+                        required
+                    ></textarea>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex gap-3">
+                    <button 
+                        type="button" 
+                        id="btn-cancelar-modal"
+                        class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit"
+                        id="btn-enviar-modal"
+                        class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Estados Globales -->
+    <div id="loading-global" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+            <p class="text-gray-900 dark:text-white font-medium">Cargando datos...</p>
+        </div>
+    </div>
+
+    <div id="error-global" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl text-center max-w-md">
+            <i class="fas fa-exclamation-triangle text-3xl text-red-500 mb-4"></i>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Error</h3>
+            <p id="error-message" class="text-gray-600 dark:text-gray-300 mb-4"></p>
+            <button onclick="retroalimentacionProfesor.cargarDatosCompletos()" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                Reintentar
+            </button>
+        </div>
+    </div>
+
+    <div id="contenido-principal" class="hidden">
+        <!-- El contenido principal se muestra aquí -->
     </div>
 
     <!-- ============================================
