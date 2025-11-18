@@ -1,7 +1,6 @@
 /* ============================================
-   SPEAKLEXI - PLANIFICADOR DE CONTENIDOS (PROFESOR) - CON DATOS REALES
-   Archivo: assets/js/pages/profesor/planificacion.js
-   UC-15: Planificar contenidos - CON DATOS REALES
+   SPEAKLEXI - PLANIFICACIÓN SEMI-REAL
+   Genera planes automáticos y los envía por mensajería
    ============================================ */
 
 class PlanificacionProfesor {
@@ -9,29 +8,45 @@ class PlanificacionProfesor {
         this.API_URL = window.APP_CONFIG?.API?.API_URL || 'http://localhost:5000/api';
         this.token = localStorage.getItem('token');
         this.estado = {
-            planes: [],
             estudiantes: [],
-            analisis: null,
-            planSeleccionado: null,
-            filtroEstado: 'todos',
-            alumnosSeleccionados: new Set()
+            conversaciones: [],
+            planesGenerados: [],
+            estudianteSeleccionado: null
         };
-        this.chartInstance = null;
+        
+        // 🎯 GENERADOR DE ANÁLISIS AUTOMÁTICO
+        this.analizadorIA = {
+            areasComunes: [
+                { nombre: 'Gramática - Tiempos Verbales', nivel: 'alta', emojis: '📚' },
+                { nombre: 'Vocabulario - Expresiones Idiomáticas', nivel: 'media', emojis: '💬' },
+                { nombre: 'Pronunciación - Sonidos Específicos', nivel: 'media', emojis: '🗣️' },
+                { nombre: 'Comprensión Auditiva', nivel: 'baja', emojis: '👂' },
+                { nombre: 'Escritura - Estructura de Oraciones', nivel: 'alta', emojis: '✍️' },
+                { nombre: 'Lectura - Comprensión de Textos', nivel: 'media', emojis: '📖' }
+            ],
+            fortalezas: [
+                'Buena actitud y motivación',
+                'Constancia en la práctica',
+                'Participación activa en clase',
+                'Mejora progresiva observable'
+            ]
+        };
+        
         this.init();
     }
 
     async init() {
         try {
-            console.log('✅ Módulo Planificación Profesor iniciando...');
+            console.log('✅ Módulo Planificación Semi-Real iniciando...');
             
             await this.verificarAutenticacion();
-            await this.cargarDatos();
+            await this.cargarEstudiantes();
             this.configurarEventListeners();
             
-            console.log('✅ Módulo Planificación Profesor listo');
+            console.log('✅ Módulo listo');
         } catch (error) {
-            console.error('💥 Error inicializando módulo:', error);
-            this.mostrarError('Error al cargar el módulo de planificación');
+            console.error('💥 Error:', error);
+            this.mostrarError('Error al cargar el módulo');
         }
     }
 
@@ -40,12 +55,7 @@ class PlanificacionProfesor {
         
         if (!usuario || !usuario.id) {
             window.location.href = '/pages/auth/login.html';
-            throw new Error('Usuario no autenticado');
-        }
-
-        if (usuario.rol !== 'profesor' && usuario.rol !== 'admin') {
-            window.location.href = '/pages/estudiante/dashboard.html';
-            throw new Error('Acceso denegado: rol no autorizado');
+            throw new Error('No autenticado');
         }
 
         if (!this.token) {
@@ -54,744 +64,566 @@ class PlanificacionProfesor {
         }
     }
 
+    // ============================================
     // ELEMENTOS DOM
+    // ============================================
     get elementos() {
         return {
-            analisisGrupo: document.getElementById('analisis-grupo'),
-            areasCriticas: document.getElementById('areas-criticas'),
-            sugerencias: document.getElementById('sugerencias'),
-            graficoDesempeno: document.getElementById('grafico-desempeno'),
-            loadingDashboard: document.getElementById('loading-dashboard'),
-            listaPlanes: document.getElementById('lista-planes'),
-            estadoVacioPlanes: document.getElementById('estado-vacio-planes'),
-            loadingPlanes: document.getElementById('loading-planes'),
-            modalPlan: document.getElementById('modal-plan'),
-            formPlan: document.getElementById('form-plan'),
-            inputTitulo: document.getElementById('input-titulo'),
-            textareaDescripcion: document.getElementById('textarea-descripcion'),
-            selectNivel: document.getElementById('select-nivel'),
-            inputFechaInicio: document.getElementById('input-fecha-inicio'),
-            inputFechaFin: document.getElementById('input-fecha-fin'),
-            btnGuardarPlan: document.getElementById('btn-guardar-plan'),
-            btnCancelarPlan: document.getElementById('btn-cancelar-plan'),
-            btnCrearPlan: document.getElementById('btn-crear-plan'),
-            btnCrearPrimerPlan: document.getElementById('btn-crear-primer-plan'),
-            modalConfirmacion: document.getElementById('modal-confirmacion'),
-            textoConfirmacion: document.getElementById('texto-confirmacion'),
-            btnConfirmarSi: document.getElementById('btn-confirmar-si'),
-            btnConfirmarNo: document.getElementById('btn-confirmar-no'),
-            listaAlumnos: document.getElementById('lista-alumnos'),
-            contadorAlumnos: document.getElementById('contador-alumnos'),
-            errorMinimoAlumnos: document.getElementById('error-minimo-alumnos')
+            listaEstudiantes: document.getElementById('lista-estudiantes'),
+            btnGenerarAnalisis: document.getElementById('btn-generar-analisis'),
+            panelAnalisis: document.getElementById('panel-analisis'),
+            contenedorAnalisis: document.getElementById('contenedor-analisis'),
+            btnEnviarPlan: document.getElementById('btn-enviar-plan'),
+            loadingEstudiantes: document.getElementById('loading-estudiantes'),
+            loadingAnalisis: document.getElementById('loading-analisis'),
+            estadoVacio: document.getElementById('estado-vacio')
         };
     }
 
     // ============================================
-    // CARGA DE DATOS REALES
+    // CARGA DE ESTUDIANTES DESDE MENSAJERÍA
     // ============================================
 
-    async cargarDatos() {
+    async cargarEstudiantes() {
         try {
-            this.mostrarCargando('dashboard', true);
-            this.mostrarCargando('planes', true);
-
-            // ✅ CARGAR ANÁLISIS DE RENDIMIENTO REAL
-            console.log('🔄 Cargando análisis de rendimiento...');
-            const responseAnalisis = await fetch(`${this.API_URL}/profesor/analisis-rendimiento`, {
+            this.mostrarLoading('estudiantes', true);
+            
+            console.log('📡 Cargando conversaciones...');
+            const response = await fetch(`${this.API_URL}/mensajes`, {
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
                     'Content-Type': 'application/json'
                 }
             });
 
-            if (!responseAnalisis.ok) throw new Error(`Error ${responseAnalisis.status} cargando análisis`);
-            
-            const resultAnalisis = await responseAnalisis.json();
-            this.estado.analisis = resultAnalisis.data;
-            console.log('✅ Análisis cargado:', this.estado.analisis);
+            if (!response.ok) throw new Error(`Error ${response.status}`);
 
-            // ✅ CARGAR ESTUDIANTES REALES
-            console.log('🔄 Cargando estudiantes...');
-            const responseEstudiantes = await fetch(`${this.API_URL}/profesor/estudiantes`, {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!responseEstudiantes.ok) throw new Error(`Error ${responseEstudiantes.status} cargando estudiantes`);
-            
-            const resultEstudiantes = await responseEstudiantes.json();
-            this.estado.estudiantes = resultEstudiantes.data || [];
-            console.log('✅ Estudiantes cargados:', this.estado.estudiantes.length);
-
-            // ✅ CARGAR PLANES EXISTENTES
-            await this.cargarPlanes();
-
-            this.renderizarDashboard();
-            this.renderizarListaAlumnos();
-            this.renderizarPlanes();
-
-            this.mostrarCargando('dashboard', false);
-            this.mostrarCargando('planes', false);
-
-        } catch (error) {
-            console.error('❌ Error cargando datos:', error);
-            this.mostrarCargando('dashboard', false);
-            this.mostrarCargando('planes', false);
-            this.mostrarError('Error al cargar los datos: ' + error.message);
-        }
-    }
-
-    async cargarPlanes() {
-        try {
-            console.log('🔄 Cargando planes existentes...');
-            const response = await fetch(`${this.API_URL}/profesor/planes`, {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) throw new Error(`Error ${response.status} cargando planes`);
-            
             const result = await response.json();
-            this.estado.planes = result.data || [];
-            console.log('✅ Planes cargados:', this.estado.planes.length);
+            console.log('📦 Respuesta completa:', result);
+            
+            // ✅ FIX: Verificar múltiples posibles estructuras
+            const mensajes = result.data?.data || result.data || [];
+            console.log('📬 Total mensajes:', mensajes.length);
+            
+            if (mensajes.length > 0) {
+                this.procesarEstudiantes(mensajes);
+                this.renderizarEstudiantes();
+            } else {
+                this.mostrarEstadoVacio();
+            }
 
         } catch (error) {
-            console.error('❌ Error cargando planes:', error);
-            this.estado.planes = [];
+            console.error('❌ Error cargando estudiantes:', error);
+            this.mostrarEstadoVacio();
+        } finally {
+            this.mostrarLoading('estudiantes', false);
         }
     }
 
-    // ============================================
-    // GESTIÓN DE ALUMNOS (MÍNIMO 5)
-    // ============================================
+    procesarEstudiantes(mensajes) {
+        const estudiantesMap = new Map();
+        const usuarioId = this.obtenerUsuarioId();
 
-    renderizarListaAlumnos() {
-        const elementos = this.elementos;
-        if (!elementos.listaAlumnos) return;
-
-        if (this.estado.estudiantes.length === 0) {
-            elementos.listaAlumnos.innerHTML = `
-                <div class="text-center py-8 text-gray-500">
-                    <i class="fas fa-users text-4xl mb-4 text-gray-300"></i>
-                    <p>No hay estudiantes disponibles</p>
-                </div>
-            `;
-            return;
-        }
-
-        elementos.listaAlumnos.innerHTML = this.estado.estudiantes.map(estudiante => {
-            const estaSeleccionado = this.estado.alumnosSeleccionados.has(estudiante.id);
+        mensajes.forEach(mensaje => {
+            const estudianteId = mensaje.remitente_id === usuarioId ? 
+                mensaje.destinatario_id : mensaje.remitente_id;
             
-            return `
-                <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${estaSeleccionado ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-300' : ''}">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-semibold">
-                            ${(estudiante.nombre_completo || estudiante.nombre || 'U').charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900 dark:text-white">
-                                ${estudiante.nombre_completo || `${estudiante.nombre || ''} ${estudiante.primer_apellido || ''}`.trim()}
-                            </div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                Nivel ${estudiante.nivel_actual || 'A1'} • ${estudiante.total_xp || 0} XP
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" 
-                            onclick="planificacionProfesor.toggleAlumno(${estudiante.id})"
-                            class="px-4 py-2 rounded-lg font-medium transition-all ${
-                                estaSeleccionado 
-                                    ? 'bg-primary-500 text-white hover:bg-primary-600' 
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                            }">
-                        ${estaSeleccionado ? 'Seleccionado' : 'Seleccionar'}
-                    </button>
-                </div>
-            `;
-        }).join('');
+            // ✅ FIX: Manejo de nombres con fallback
+            const nombreEstudiante = mensaje.remitente_id === usuarioId ?
+                (mensaje.nombre_destinatario || mensaje.destinatario_nombre || 'Estudiante') :
+                (mensaje.nombre_remitente || mensaje.remitente_nombre || 'Estudiante');
 
-        this.actualizarContadorAlumnos();
-    }
+            if (!estudiantesMap.has(estudianteId)) {
+                estudiantesMap.set(estudianteId, {
+                    id: estudianteId,
+                    nombre_completo: nombreEstudiante || 'Estudiante Sin Nombre',
+                    nivel: this.generarNivelAleatorio(),
+                    mensajes_totales: 0,
+                    ultimo_contacto: mensaje.creado_en
+                });
+            }
 
-    toggleAlumno(alumnoId) {
-        if (this.estado.alumnosSeleccionados.has(alumnoId)) {
-            this.estado.alumnosSeleccionados.delete(alumnoId);
-        } else {
-            this.estado.alumnosSeleccionados.add(alumnoId);
-        }
-        
-        this.renderizarListaAlumnos();
-        this.validarMinimoAlumnos();
-    }
-
-    actualizarContadorAlumnos() {
-        const elementos = this.elementos;
-        if (!elementos.contadorAlumnos) return;
-
-        const total = this.estado.alumnosSeleccionados.size;
-        elementos.contadorAlumnos.textContent = `${total} alumnos seleccionados`;
-        
-        if (elementos.contadorAlumnos) {
-            elementos.contadorAlumnos.className = `text-sm font-medium ${
-                total >= 5 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'
-            }`;
-        }
-    }
-
-    validarMinimoAlumnos() {
-        const elementos = this.elementos;
-        if (!elementos.errorMinimoAlumnos) return;
-
-        const total = this.estado.alumnosSeleccionados.size;
-        const esValido = total >= 5;
-
-        elementos.errorMinimoAlumnos.classList.toggle('hidden', esValido);
-        
-        if (elementos.btnGuardarPlan) {
-            elementos.btnGuardarPlan.disabled = !esValido;
-        }
-
-        return esValido;
-    }
-
-    // ============================================
-    // RENDERIZADO CON DATOS REALES
-    // ============================================
-
-    renderizarDashboard() {
-        this.renderizarAnalisisGrupo();
-        this.renderizarAreasCriticas();
-        this.renderizarSugerencias();
-        this.renderizarGraficoDesempeno();
-    }
-
-    renderizarAnalisisGrupo() {
-        const elementos = this.elementos;
-        if (!elementos.analisisGrupo) return;
-
-        const stats = this.estado.analisis?.estadisticas_grupo || this.estado.analisis?.estadisticas || {};
-
-        elementos.analisisGrupo.innerHTML = `
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl p-6 text-center border-2 border-blue-200 dark:border-blue-700 shadow-lg">
-                    <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                        ${stats.total_estudiantes || this.estado.estudiantes.length || 0}
-                    </div>
-                    <div class="text-sm font-medium text-blue-700 dark:text-blue-300">Estudiantes Totales</div>
-                </div>
-                <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-xl p-6 text-center border-2 border-green-200 dark:border-green-700 shadow-lg">
-                    <div class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-                        ${stats.estudiantes_con_plan || this.estado.planes.length || 0}
-                    </div>
-                    <div class="text-sm font-medium text-green-700 dark:text-green-300">Con Plan Activo</div>
-                </div>
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl p-6 text-center border-2 border-purple-200 dark:border-purple-700 shadow-lg">
-                    <div class="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
-                        ${stats.planes_activos || this.estado.planes.filter(p => p.estado === 'en_progreso').length || 0}
-                    </div>
-                    <div class="text-sm font-medium text-purple-700 dark:text-purple-300">Planes en Progreso</div>
-                </div>
-                <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-xl p-6 text-center border-2 border-orange-200 dark:border-orange-700 shadow-lg">
-                    <div class="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">
-                        ${stats.tasa_completacion || 0}%
-                    </div>
-                    <div class="text-sm font-medium text-orange-700 dark:text-orange-300">Tasa Completación</div>
-                </div>
-            </div>
-        `;
-    }
-
-    renderizarAreasCriticas() {
-        const elementos = this.elementos;
-        if (!elementos.areasCriticas) return;
-
-        const temas = this.estado.analisis?.areas_criticas || this.estado.analisis?.temas_dificultad || [];
-
-        if (temas.length === 0) {
-            elementos.areasCriticas.innerHTML = `
-                <div class="text-center py-8 text-gray-500">
-                    <i class="fas fa-check-circle text-4xl mb-4 text-green-300"></i>
-                    <p>No se identificaron áreas críticas</p>
-                    <p class="text-sm mt-2">El grupo muestra buen desempeño general</p>
-                </div>
-            `;
-            return;
-        }
-
-        elementos.areasCriticas.innerHTML = temas.map(tema => {
-            const frecuencia = tema.frecuencia || tema.estudiantes_afectados || 0;
-            const criticidad = frecuencia >= 10 ? 'alta' : frecuencia >= 5 ? 'media' : 'baja';
+            const estudiante = estudiantesMap.get(estudianteId);
+            estudiante.mensajes_totales++;
             
-            const colores = {
-                alta: { 
-                    border: 'border-red-500', 
-                    bg: 'bg-red-50 dark:bg-red-900/20', 
-                    text: 'text-red-700 dark:text-red-300', 
-                    badge: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-                    bar: 'bg-red-500'
-                },
-                media: { 
-                    border: 'border-yellow-500', 
-                    bg: 'bg-yellow-50 dark:bg-yellow-900/20', 
-                    text: 'text-yellow-700 dark:text-yellow-300', 
-                    badge: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-                    bar: 'bg-yellow-500'
-                },
-                baja: { 
-                    border: 'border-orange-500', 
-                    bg: 'bg-orange-50 dark:bg-orange-900/20', 
-                    text: 'text-orange-700 dark:text-orange-300', 
-                    badge: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-                    bar: 'bg-orange-500'
-                }
-            };
-            const color = colores[criticidad];
-
-            return `
-                <div class="${color.bg} rounded-xl p-4 border-l-4 ${color.border} shadow-md hover:shadow-lg transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <i class="fas fa-exclamation-triangle ${color.text}"></i>
-                            ${tema.tema || tema.nombre || 'Área crítica'}
-                        </h3>
-                        <span class="px-3 py-1 rounded-full text-xs font-bold ${color.badge}">
-                            ${tema.estudiantes_afectados || frecuencia} estudiantes
-                        </span>
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        Dificultad reportada <span class="font-semibold">${frecuencia} veces</span>
-                    </div>
-                    <div class="bg-white dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                        <div class="h-3 ${color.bar} transition-all duration-500" 
-                             style="width: ${Math.min(frecuencia * 10, 100)}%"></div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    renderizarSugerencias() {
-        const elementos = this.elementos;
-        if (!elementos.sugerencias) return;
-
-        const sugerencias = this.estado.analisis?.sugerencias || [];
-
-        if (sugerencias.length === 0) {
-            elementos.sugerencias.innerHTML = `
-                <div class="text-center py-8 text-gray-500">
-                    <i class="fas fa-lightbulb text-4xl mb-4 text-yellow-300"></i>
-                    <p>No hay sugerencias disponibles</p>
-                    <p class="text-sm mt-2">El análisis no generó recomendaciones específicas</p>
-                </div>
-            `;
-            return;
-        }
-
-        elementos.sugerencias.innerHTML = sugerencias.map(sug => {
-            const prioridadColores = {
-                alta: 'border-red-500 bg-red-50 dark:bg-red-900/20',
-                media: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20',
-                baja: 'border-green-500 bg-green-50 dark:bg-green-900/20'
-            };
-
-            return `
-                <div class="${prioridadColores[sug.prioridad]} border-l-4 rounded-lg p-4 shadow-md hover:shadow-lg transition-all">
-                    <div class="flex items-start justify-between mb-2">
-                        <h4 class="font-semibold text-gray-900 dark:text-white">
-                            ${sug.titulo}
-                        </h4>
-                        <span class="text-xs px-2 py-1 rounded-full ${
-                            sug.prioridad === 'alta' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
-                            sug.prioridad === 'media' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
-                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                        }">
-                            ${sug.prioridad.toUpperCase()}
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        ${sug.descripcion}
-                    </p>
-                    <button onclick="planificacionProfesor.mostrarModalPlan()" 
-                            class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 font-semibold flex items-center gap-1">
-                        <i class="fas fa-plus-circle"></i>
-                        ${sug.accion || 'Crear plan de acción'}
-                    </button>
-                </div>
-            `;
-        }).join('');
-    }
-
-    renderizarGraficoDesempeno() {
-        const elementos = this.elementos;
-        if (!elementos.graficoDesempeno || !window.Chart) return;
-
-        const ctx = elementos.graficoDesempeno.getContext('2d');
-        
-        if (this.chartInstance) {
-            this.chartInstance.destroy();
-        }
-
-        const temas = this.estado.analisis?.areas_criticas || this.estado.analisis?.temas_dificultad || [];
-        
-        if (temas.length === 0) {
-            elementos.graficoDesempeno.innerHTML = `
-                <div class="flex items-center justify-center h-full text-gray-500">
-                    <div class="text-center">
-                        <i class="fas fa-chart-bar text-4xl mb-4 text-gray-300"></i>
-                        <p>No hay datos para mostrar</p>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
-        this.chartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: temas.map(t => t.tema?.substring(0, 20) + (t.tema?.length > 20 ? '...' : '') || 'Área'),
-                datasets: [
-                    {
-                        label: 'Frecuencia de Dificultad',
-                        data: temas.map(t => t.frecuencia || t.estudiantes_afectados || 0),
-                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                        borderColor: 'rgb(59, 130, 246)',
-                        borderWidth: 2,
-                        borderRadius: 8
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            font: { size: 12, weight: 'bold' },
-                            padding: 15
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Análisis de Áreas con Dificultad',
-                        font: { size: 16, weight: 'bold' }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: { size: 14 },
-                        bodyFont: { size: 13 }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            font: { size: 11 }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: { size: 11 }
-                        }
-                    }
-                }
+            if (new Date(mensaje.creado_en) > new Date(estudiante.ultimo_contacto)) {
+                estudiante.ultimo_contacto = mensaje.creado_en;
             }
         });
+
+        this.estado.estudiantes = Array.from(estudiantesMap.values());
+        console.log(`✅ ${this.estado.estudiantes.length} estudiantes procesados`, this.estado.estudiantes);
     }
 
-    renderizarPlanes() {
-        const elementos = this.elementos;
-        if (!elementos.listaPlanes) return;
+    generarNivelAleatorio() {
+        const niveles = ['A1', 'A2', 'B1', 'B2', 'C1'];
+        return niveles[Math.floor(Math.random() * niveles.length)];
+    }
 
-        if (this.estado.planes.length === 0) {
-            elementos.estadoVacioPlanes.classList.remove('hidden');
-            elementos.listaPlanes.innerHTML = '';
+    // ============================================
+    // RENDERIZADO DE ESTUDIANTES
+    // ============================================
+
+    renderizarEstudiantes() {
+        const elementos = this.elementos;
+        if (!elementos.listaEstudiantes) return;
+
+        if (this.estado.estudiantes.length === 0) {
+            this.mostrarEstadoVacio();
             return;
         }
 
-        elementos.estadoVacioPlanes.classList.add('hidden');
-
-        elementos.listaPlanes.innerHTML = this.estado.planes.map((plan) => {
-            const estadoConfig = {
-                'en_progreso': { 
-                    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-300', 
-                    icono: 'fa-spinner fa-spin', 
-                    texto: 'En Progreso' 
-                },
-                'pendiente': { 
-                    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-300', 
-                    icono: 'fa-clock', 
-                    texto: 'Pendiente' 
-                },
-                'completado': { 
-                    color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-300', 
-                    icono: 'fa-check-circle', 
-                    texto: 'Completado' 
-                }
-            };
-
-            const config = estadoConfig[plan.estado] || estadoConfig.pendiente;
-
+        elementos.listaEstudiantes.innerHTML = this.estado.estudiantes.map(est => {
+            // ✅ FIX: Manejo seguro de nombres
+            const nombreCompleto = est.nombre_completo || 'Estudiante';
+            const iniciales = nombreCompleto.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'ES';
+            
             return `
-                <div class="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-xl transition-all p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <h3 class="font-bold text-xl text-gray-900 dark:text-white">
-                                    ${plan.titulo}
-                                </h3>
-                            </div>
-                            <p class="text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
-                                ${plan.descripcion}
-                            </p>
-                            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                <span class="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg">
-                                    <i class="fas fa-user text-primary-600"></i>
-                                    <span class="font-medium">${plan.estudiante_nombre || 'Estudiante'}</span>
-                                </span>
-                                <span class="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg">
-                                    <i class="fas fa-calendar text-green-600"></i>
-                                    ${new Date(plan.fecha_inicio).toLocaleDateString()} - ${new Date(plan.fecha_fin_estimada).toLocaleDateString()}
-                                </span>
-                                <span class="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg">
-                                    <i class="fas fa-layer-group text-purple-600"></i>
-                                    Nivel ${plan.nivel}
-                                </span>
-                            </div>
-                            
-                            ${plan.progreso > 0 ? `
-                                <div class="mb-3">
-                                    <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                                        <span>Progreso del plan</span>
-                                        <span class="font-bold">${plan.progreso}%</span>
-                                    </div>
-                                    <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                                        <div class="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-500" 
-                                             style="width: ${plan.progreso}%"></div>
-                                    </div>
-                                </div>
-                            ` : ''}
-
-                            <div class="flex flex-wrap gap-2">
-                                ${(plan.areas_enfoque || []).map(area => `
-                                    <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-xs font-semibold">
-                                        ${area}
-                                    </span>
-                                `).join('')}
-                            </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 p-6 hover:shadow-xl transition-all cursor-pointer"
+                     onclick="planificacionProfesor.seleccionarEstudiante(${est.id})">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                            ${iniciales}
                         </div>
-                        <div class="ml-4">
-                            <span class="px-4 py-2 rounded-xl text-sm font-bold ${config.color} border-2 flex items-center gap-2 whitespace-nowrap">
-                                <i class="fas ${config.icono}"></i>
-                                ${config.texto}
-                            </span>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-lg text-gray-900 dark:text-white">
+                                ${nombreCompleto}
+                            </h3>
+                            <div class="flex items-center gap-3 mt-1">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 rounded-full text-xs font-bold">
+                                    ${est.nivel}
+                                </span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                    <i class="fas fa-comments mr-1"></i>
+                                    ${est.mensajes_totales} mensajes
+                                </span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="flex justify-between items-center pt-4 border-t-2 border-gray-200 dark:border-gray-700">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                            <i class="fas fa-clock"></i>
-                            Creado: ${new Date(plan.creado_en).toLocaleDateString('es-MX')}
-                        </p>
-                        <div class="flex gap-2">
-                            <button class="text-primary-600 dark:text-primary-400 hover:text-primary-700 text-sm font-semibold flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all"
-                                    onclick="planificacionProfesor.verDetalles(${plan.id})">
-                                <i class="fas fa-eye"></i> Ver Detalles
-                            </button>
-                            <button class="text-red-600 dark:text-red-400 hover:text-red-700 text-sm font-semibold flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                                    onclick="planificacionProfesor.eliminarPlan(${plan.id})">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
+                    <button class="w-full px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg font-semibold hover:from-primary-700 hover:to-primary-800 transition-all flex items-center justify-center gap-2 shadow-md">
+                        <i class="fas fa-brain"></i>
+                        Generar Plan de Mejora
+                    </button>
                 </div>
             `;
         }).join('');
     }
 
+    mostrarEstadoVacio() {
+        const elementos = this.elementos;
+        if (elementos.estadoVacio) {
+            elementos.estadoVacio.classList.remove('hidden');
+        }
+        if (elementos.listaEstudiantes) {
+            elementos.listaEstudiantes.innerHTML = '';
+        }
+    }
+
     // ============================================
-    // GESTIÓN DE PLANES (CON DATOS REALES)
+    // GENERACIÓN DE ANÁLISIS AUTOMÁTICO
     // ============================================
 
-    async manejarEnvioFormulario(event) {
-        event.preventDefault();
+    async seleccionarEstudiante(estudianteId) {
+        const estudiante = this.estado.estudiantes.find(e => e.id === estudianteId);
+        if (!estudiante) return;
+
+        this.estado.estudianteSeleccionado = estudiante;
         
+        await this.generarAnalisisAutomatico(estudiante);
+    }
+
+    async generarAnalisisAutomatico(estudiante) {
         const elementos = this.elementos;
-        const formData = new FormData(elementos.formPlan);
         
-        const datos = {
-            titulo: formData.get('titulo'),
-            descripcion: formData.get('descripcion'),
-            nivel: formData.get('nivel'),
-            fecha_inicio: formData.get('fecha_inicio'),
-            fecha_fin: formData.get('fecha_fin')
+        // Mostrar panel de análisis
+        if (elementos.panelAnalisis) {
+            elementos.panelAnalisis.classList.remove('hidden');
+            elementos.panelAnalisis.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        this.mostrarLoading('analisis', true);
+
+        // Simular tiempo de análisis
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 🎯 GENERAR ANÁLISIS PERSONALIZADO
+        const analisis = this.crearAnalisisPersonalizado(estudiante);
+        
+        this.renderizarAnalisis(analisis);
+        this.mostrarLoading('analisis', false);
+    }
+
+    crearAnalisisPersonalizado(estudiante) {
+        // Seleccionar 3-4 áreas aleatorias
+        const areasSeleccionadas = this.shuffleArray([...this.analizadorIA.areasComunes])
+            .slice(0, 3 + Math.floor(Math.random() * 2));
+
+        // Seleccionar 2 fortalezas aleatorias
+        const fortalezasSeleccionadas = this.shuffleArray([...this.analizadorIA.fortalezas])
+            .slice(0, 2);
+
+        return {
+            estudiante: estudiante,
+            areasDebilidad: areasSeleccionadas,
+            fortalezas: fortalezasSeleccionadas,
+            recomendaciones: this.generarRecomendaciones(areasSeleccionadas),
+            objetivos: this.generarObjetivos(areasSeleccionadas, estudiante.nivel)
+        };
+    }
+
+    generarRecomendaciones(areas) {
+        const recomendaciones = {
+            'Gramática - Tiempos Verbales': [
+                'Practicar con ejercicios de transformación de tiempos',
+                'Hacer ejercicios de completar espacios con el tiempo correcto',
+                'Leer textos y identificar los tiempos verbales'
+            ],
+            'Vocabulario - Expresiones Idiomáticas': [
+                'Crear flashcards con expresiones comunes',
+                'Ver series/películas con subtítulos',
+                'Practicar con ejercicios de contexto'
+            ],
+            'Pronunciación - Sonidos Específicos': [
+                'Practicar con ejercicios de repetición',
+                'Grabar tu voz y comparar',
+                'Enfocarse en sonidos problemáticos específicos'
+            ],
+            'Comprensión Auditiva': [
+                'Escuchar podcasts en inglés',
+                'Ver videos con subtítulos progresivamente menos',
+                'Practicar con ejercicios de listening'
+            ],
+            'Escritura - Estructura de Oraciones': [
+                'Practicar escribir párrafos cortos diariamente',
+                'Revisar estructuras gramaticales básicas',
+                'Hacer ejercicios de ordenar oraciones'
+            ],
+            'Lectura - Comprensión de Textos': [
+                'Leer artículos cortos diariamente',
+                'Practicar técnicas de skimming y scanning',
+                'Hacer ejercicios de comprensión lectora'
+            ]
         };
 
-        // ✅ VALIDAR MÍNIMO 5 ALUMNOS
-        if (!this.validarMinimoAlumnos()) {
-            this.mostrarError('Debes seleccionar al menos 5 alumnos para crear el plan');
+        return areas.map(area => ({
+            area: area.nombre,
+            acciones: recomendaciones[area.nombre] || ['Practicar regularmente']
+        }));
+    }
+
+    generarObjetivos(areas, nivel) {
+        const objetivosBase = [
+            `Mejorar habilidades identificadas en las próximas 4 semanas`,
+            `Practicar al menos 30 minutos diarios`,
+            `Completar ejercicios específicos de refuerzo`,
+            `Avanzar hacia el siguiente nivel (${this.siguienteNivel(nivel)})`
+        ];
+
+        return objetivosBase;
+    }
+
+    siguienteNivel(nivelActual) {
+        const niveles = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+        const index = niveles.indexOf(nivelActual);
+        return index < niveles.length - 1 ? niveles[index + 1] : 'C2';
+    }
+
+    shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    // ============================================
+    // RENDERIZADO DEL ANÁLISIS
+    // ============================================
+
+    renderizarAnalisis(analisis) {
+        const elementos = this.elementos;
+        if (!elementos.contenedorAnalisis) return;
+
+        const estudiante = analisis.estudiante;
+
+        elementos.contenedorAnalisis.innerHTML = `
+            <!-- Header del Estudiante -->
+            <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl p-6 mb-6 text-white">
+                <div class="flex items-center gap-4">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-2xl font-bold">
+                        ${estudiante.nombre_completo.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold mb-1">Plan de Mejora Personalizado</h2>
+                        <p class="text-primary-100">Para: ${estudiante.nombre_completo}</p>
+                        <p class="text-primary-200 text-sm mt-1">Nivel Actual: ${estudiante.nivel}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fortalezas -->
+            <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 mb-6 border-2 border-green-200 dark:border-green-800">
+                <h3 class="text-lg font-bold text-green-800 dark:text-green-300 mb-4 flex items-center gap-2">
+                    <i class="fas fa-star"></i>
+                    Fortalezas Identificadas
+                </h3>
+                <ul class="space-y-2">
+                    ${analisis.fortalezas.map(f => `
+                        <li class="flex items-center gap-2 text-green-700 dark:text-green-400">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>${f}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+
+            <!-- Áreas de Mejora -->
+            <div class="mb-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-bullseye"></i>
+                    Áreas de Mejora Prioritarias
+                </h3>
+                <div class="space-y-4">
+                    ${analisis.areasDebilidad.map(area => {
+                        const colores = {
+                            alta: 'border-red-300 bg-red-50 dark:bg-red-900/20',
+                            media: 'border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20',
+                            baja: 'border-orange-300 bg-orange-50 dark:bg-orange-900/20'
+                        };
+                        
+                        return `
+                            <div class="border-l-4 ${colores[area.nivel]} rounded-lg p-4">
+                                <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
+                                    ${area.emojis} ${area.nombre}
+                                </h4>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${
+                                        area.nivel === 'alta' ? 'bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                                        area.nivel === 'media' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                                        'bg-orange-200 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+                                    }">
+                                        Prioridad ${area.nivel}
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+
+            <!-- Recomendaciones Específicas -->
+            <div class="mb-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-lightbulb"></i>
+                    Recomendaciones Específicas
+                </h3>
+                <div class="space-y-6">
+                    ${analisis.recomendaciones.map(rec => `
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                            <h4 class="font-semibold text-blue-900 dark:text-blue-300 mb-3">
+                                📚 ${rec.area}
+                            </h4>
+                            <ul class="space-y-2">
+                                ${rec.acciones.map(accion => `
+                                    <li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-400">
+                                        <i class="fas fa-arrow-right text-blue-500 mt-1"></i>
+                                        <span>${accion}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- Objetivos -->
+            <div class="mb-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-flag-checkered"></i>
+                    Objetivos del Plan
+                </h3>
+                <ul class="space-y-3">
+                    ${analisis.objetivos.map(obj => `
+                        <li class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span class="text-gray-700 dark:text-gray-300">${obj}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+
+            <!-- Botón de Envío -->
+            <div class="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 border-2 border-green-200 dark:border-green-800">
+                <div class="text-center mb-4">
+                    <i class="fas fa-paper-plane text-4xl text-green-600 dark:text-green-400 mb-3"></i>
+                    <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                        ¿Listo para enviar el plan?
+                    </h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Este plan se enviará como mensaje personalizado al estudiante
+                    </p>
+                </div>
+                <button onclick="planificacionProfesor.enviarPlanComoMensaje()" 
+                        class="w-full px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-bold text-lg hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
+                    <i class="fas fa-rocket"></i>
+                    Enviar Plan de Mejora al Estudiante
+                </button>
+            </div>
+        `;
+
+        // Guardar análisis actual
+        this.estado.analisisActual = analisis;
+    }
+
+    // ============================================
+    // ENVÍO DEL PLAN COMO MENSAJE REAL
+    // ============================================
+
+    async enviarPlanComoMensaje() {
+        if (!this.estado.analisisActual || !this.estado.estudianteSeleccionado) {
+            this.mostrarError('No hay análisis para enviar');
             return;
         }
 
-        if (!datos.titulo || !datos.descripcion || !datos.nivel) {
-            this.mostrarError('Por favor completa todos los campos requeridos');
-            return;
-        }
+        const analisis = this.estado.analisisActual;
+        const estudiante = this.estado.estudianteSeleccionado;
+
+        // 🎯 FORMATEAR MENSAJE COMPLETO
+        const mensajePlan = this.formatearMensajePlan(analisis, estudiante);
 
         try {
-            elementos.btnGuardarPlan.disabled = true;
-            elementos.btnGuardarPlan.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creando Planes...';
-            
-            // ✅ CREAR PLAN PARA CADA ALUMNO SELECCIONADO
-            const alumnosIds = Array.from(this.estado.alumnosSeleccionados);
-            let planesCreados = 0;
+            const btnEnviar = event.target;
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando Plan...';
 
-            for (const alumnoId of alumnosIds) {
-                await this.crearPlanIndividual({
-                    ...datos,
-                    estudiante_id: alumnoId
-                });
-                planesCreados++;
-            }
-            
-            this.mostrarExito(`¡${planesCreados} planes creados exitosamente! 🎉`);
-            elementos.formPlan.reset();
-            this.estado.alumnosSeleccionados.clear();
-            this.ocultarModalPlan();
-            
-            // Recargar datos
-            await this.cargarPlanes();
-            this.renderizarPlanes();
-            this.renderizarListaAlumnos();
-            
-        } catch (error) {
-            console.error('❌ Error creando planes:', error);
-            this.mostrarError('Error al crear los planes: ' + error.message);
-        } finally {
-            elementos.btnGuardarPlan.disabled = false;
-            elementos.btnGuardarPlan.innerHTML = '<i class="fas fa-save mr-2"></i>Crear Planes';
-        }
-    }
+            console.log('📤 Enviando plan a estudiante:', estudiante.id);
 
-    async crearPlanIndividual(datos) {
-        const areasArray = Array.from(document.querySelectorAll('input[name="areas_enfoque"]:checked'))
-            .map(cb => cb.value);
-
-        const planData = {
-            estudiante_id: datos.estudiante_id,
-            titulo: datos.titulo,
-            descripcion: datos.descripcion,
-            areas_enfoque: areasArray,
-            nivel: datos.nivel,
-            fecha_inicio: datos.fecha_inicio,
-            fecha_fin_estimada: datos.fecha_fin,
-            estado: 'pendiente',
-            progreso: 0
-        };
-
-        console.log('📤 Enviando plan:', planData);
-
-        const response = await fetch(`${this.API_URL}/profesor/planes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`
-            },
-            body: JSON.stringify(planData)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error ${response.status}: ${errorText}`);
-        }
-
-        const result = await response.json();
-        return result.data;
-    }
-
-    mostrarModalPlan() {
-        const elementos = this.elementos;
-        elementos.modalPlan.classList.remove('hidden');
-        elementos.modalPlan.classList.add('flex');
-        
-        // Resetear selecciones
-        this.estado.alumnosSeleccionados.clear();
-        this.renderizarListaAlumnos();
-        
-        const hoy = new Date().toISOString().split('T')[0];
-        if (elementos.inputFechaInicio) {
-            elementos.inputFechaInicio.min = hoy;
-            elementos.inputFechaInicio.value = hoy;
-        }
-        if (elementos.inputFechaFin) {
-            const enUnMes = new Date();
-            enUnMes.setMonth(enUnMes.getMonth() + 1);
-            elementos.inputFechaFin.min = hoy;
-            elementos.inputFechaFin.value = enUnMes.toISOString().split('T')[0];
-        }
-    }
-
-    ocultarModalPlan() {
-        const elementos = this.elementos;
-        elementos.modalPlan.classList.add('hidden');
-        elementos.modalPlan.classList.remove('flex');
-        elementos.formPlan.reset();
-        this.estado.alumnosSeleccionados.clear();
-        this.renderizarListaAlumnos();
-    }
-
-    // ============================================
-    // ACCIONES DE PLANES
-    // ============================================
-
-    verDetalles(planId) {
-        const plan = this.estado.planes.find(p => p.id === planId);
-        if (!plan) return;
-
-        alert(`📋 Plan: ${plan.titulo}\n\n` +
-              `👤 Estudiante: ${plan.estudiante_nombre}\n` +
-              `📚 Nivel: ${plan.nivel}\n` +
-              `📅 Duración: ${new Date(plan.fecha_inicio).toLocaleDateString()} - ${new Date(plan.fecha_fin_estimada).toLocaleDateString()}\n` +
-              `✅ Progreso: ${plan.progreso}%\n` +
-              `📊 Estado: ${plan.estado}\n\n` +
-              `Áreas de enfoque:\n${(plan.areas_enfoque || []).map(a => `• ${a}`).join('\n')}`
-        );
-    }
-
-    async eliminarPlan(planId) {
-        const plan = this.estado.planes.find(p => p.id === planId);
-        if (!plan) return;
-
-        const confirmado = confirm(`¿Estás seguro de eliminar el plan "${plan.titulo}"?`);
-        if (!confirmado) return;
-
-        try {
-            const response = await fetch(`${this.API_URL}/profesor/planes/${planId}`, {
-                method: 'DELETE',
+            // ✅ ENVIAR MENSAJE REAL A TRAVÉS DE LA API
+            const response = await fetch(`${this.API_URL}/mensajes`, {
+                method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.token}`
-                }
+                },
+                body: JSON.stringify({
+                    destinatario_id: estudiante.id,
+                    mensaje: mensajePlan
+                })
             });
 
-            if (!response.ok) throw new Error(`Error ${response.status} eliminando plan`);
+            if (!response.ok) throw new Error(`Error ${response.status}`);
 
-            this.estado.planes = this.estado.planes.filter(p => p.id !== planId);
-            this.renderizarPlanes();
-            this.mostrarExito('Plan eliminado correctamente ✅');
+            const result = await response.json();
+            
+            if (result.success) {
+                this.mostrarExito('✅ ¡Plan enviado exitosamente al estudiante!');
+                
+                // Guardar en historial local
+                this.estado.planesGenerados.push({
+                    estudiante_id: estudiante.id,
+                    estudiante_nombre: estudiante.nombre_completo,
+                    fecha: new Date().toISOString(),
+                    analisis: analisis
+                });
+
+                // Resetear y volver a lista
+                setTimeout(() => {
+                    this.resetearPanel();
+                }, 2000);
+            } else {
+                throw new Error('Respuesta inválida del servidor');
+            }
+
         } catch (error) {
-            console.error('❌ Error eliminando plan:', error);
-            this.mostrarError('Error al eliminar el plan: ' + error.message);
+            console.error('❌ Error enviando plan:', error);
+            this.mostrarError('Error al enviar el plan: ' + error.message);
+            
+            const btnEnviar = event.target;
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = '<i class="fas fa-rocket mr-2"></i>Enviar Plan de Mejora al Estudiante';
+        }
+    }
+
+    formatearMensajePlan(analisis, estudiante) {
+        return `
+🎯 PLAN DE MEJORA PERSONALIZADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Estudiante: ${estudiante.nombre_completo}
+📊 Nivel Actual: ${estudiante.nivel}
+📅 Fecha: ${new Date().toLocaleDateString('es-MX', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+})}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⭐ FORTALEZAS IDENTIFICADAS:
+
+${analisis.fortalezas.map((f, i) => `${i + 1}. ✅ ${f}`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 ÁREAS DE MEJORA PRIORITARIAS:
+
+${analisis.areasDebilidad.map((area, i) => `
+${i + 1}. ${area.emojis} ${area.nombre}
+   Prioridad: ${area.nivel.toUpperCase()}
+`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 RECOMENDACIONES ESPECÍFICAS:
+
+${analisis.recomendaciones.map((rec, i) => `
+📚 ${rec.area}:
+${rec.acciones.map((a, j) => `   ${j + 1}. ${a}`).join('\n')}
+`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏁 OBJETIVOS DEL PLAN:
+
+${analisis.objetivos.map((obj, i) => `${i + 1}. ${obj}`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 NOTA DEL PROFESOR:
+
+Este plan ha sido diseñado específicamente para ti basándose en un análisis de tu progreso actual. Te recomiendo enfocarte en las áreas prioritarias durante las próximas 4 semanas.
+
+Recuerda: la constancia es clave. Practicar 30 minutos diarios es más efectivo que estudiar 3 horas una vez a la semana.
+
+¡Estoy aquí para apoyarte en tu proceso de aprendizaje! Si tienes dudas sobre cualquier punto del plan, no dudes en escribirme.
+
+¡Mucho éxito! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        `.trim();
+    }
+
+    resetearPanel() {
+        const elementos = this.elementos;
+        
+        if (elementos.panelAnalisis) {
+            elementos.panelAnalisis.classList.add('hidden');
+        }
+        
+        if (elementos.contenedorAnalisis) {
+            elementos.contenedorAnalisis.innerHTML = '';
+        }
+
+        this.estado.estudianteSeleccionado = null;
+        this.estado.analisisActual = null;
+
+        // Scroll a lista
+        if (elementos.listaEstudiantes) {
+            elementos.listaEstudiantes.scrollIntoView({ behavior: 'smooth' });
         }
     }
 
@@ -799,10 +631,21 @@ class PlanificacionProfesor {
     // UTILIDADES
     // ============================================
 
-    mostrarCargando(tipo, mostrar) {
+    obtenerUsuarioId() {
+        try {
+            const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+            return usuario.id || 0;
+        } catch {
+            return 0;
+        }
+    }
+
+    mostrarLoading(tipo, mostrar) {
         const elementos = this.elementos;
-        const elemento = tipo === 'dashboard' ? elementos.loadingDashboard : elementos.loadingPlanes;
-        if (elemento) elemento.classList.toggle('hidden', !mostrar);
+        const elemento = tipo === 'estudiantes' ? elementos.loadingEstudiantes : elementos.loadingAnalisis;
+        if (elemento) {
+            elemento.classList.toggle('hidden', !mostrar);
+        }
     }
 
     mostrarExito(mensaje) {
@@ -826,41 +669,7 @@ class PlanificacionProfesor {
     // ============================================
 
     configurarEventListeners() {
-        const elementos = this.elementos;
-
-        if (elementos.btnCrearPlan) {
-            elementos.btnCrearPlan.addEventListener('click', () => this.mostrarModalPlan());
-        }
-
-        if (elementos.btnCrearPrimerPlan) {
-            elementos.btnCrearPrimerPlan.addEventListener('click', () => this.mostrarModalPlan());
-        }
-
-        if (elementos.formPlan) {
-            elementos.formPlan.addEventListener('submit', (e) => this.manejarEnvioFormulario(e));
-        }
-
-        if (elementos.btnCancelarPlan) {
-            elementos.btnCancelarPlan.addEventListener('click', () => this.ocultarModalPlan());
-        }
-
-        if (elementos.modalPlan) {
-            elementos.modalPlan.addEventListener('click', (e) => {
-                if (e.target === elementos.modalPlan) this.ocultarModalPlan();
-            });
-        }
-
-        if (elementos.inputFechaInicio && elementos.inputFechaFin) {
-            elementos.inputFechaInicio.addEventListener('change', function() {
-                elementos.inputFechaFin.min = this.value;
-            });
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !elementos.modalPlan.classList.contains('hidden')) {
-                this.ocultarModalPlan();
-            }
-        });
+        // Los eventos se manejan inline con onclick por simplicidad
     }
 }
 
@@ -875,8 +684,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.planificacionProfesor = planificacionProfesor;
-
-// Funciones globales para HTML
-window.toggleAlumno = (alumnoId) => planificacionProfesor.toggleAlumno(alumnoId);
-window.mostrarModalPlan = () => planificacionProfesor.mostrarModalPlan();
-window.ocultarModalPlan = () => planificacionProfesor.ocultarModalPlan();

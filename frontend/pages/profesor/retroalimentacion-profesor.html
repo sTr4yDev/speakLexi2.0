@@ -5,17 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retroalimentación - SpeakLexi</title>
     
-    <!-- ✅ PRELOAD CRÍTICO -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
-    <link rel="preload" href="/assets/css/custom-styles.css" as="style">
-    
-    <!-- ✅ CSS EXTERNO -->
+    <!-- CSS EXTERNO -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- ✅ TAILWIND CDN -->
+    <!-- TAILWIND CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Configuración inline de Tailwind
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -32,125 +27,137 @@
                             700: '#0369a1',
                             800: '#075985',
                             900: '#0c4a6e',
-                        },
-                        secondary: {
-                            50: '#faf5ff',
-                            100: '#f3e8ff',
-                            200: '#e9d5ff',
-                            300: '#d8b4fe',
-                            400: '#c084fc',
-                            500: '#a855f7',
-                            600: '#9333ea',
-                            700: '#7e22ce',
-                            800: '#6b21a8',
-                            900: '#581c87',
                         }
                     }
                 }
             }
         }
     </script>
-    
-    <!-- ✅ CSS INTERNO -->
-    <link rel="stylesheet" href="/assets/css/custom-styles.css">
-    <link rel="stylesheet" href="/assets/css/animations.css">
-    
-    <!-- ✅ META OPTIMIZACIÓN -->
-    <meta name="description" content="SpeakLexi - Gestión de Retroalimentación">
-    <meta name="theme-color" content="#4F46E5">
 
     <style>
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-in-out;
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
-        .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-        
-        .dark .scrollbar-thin::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-        
-        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #475569;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
-<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-    <!-- ✅ NAVBAR DINÁMICO -->
-    <div id="navbar-container"></div>
+<body class="h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
     
-    <!-- ✅ CONTENIDO PRINCIPAL -->
-    <main class="min-h-screen pt-16">
+    <!-- NAVBAR SIMPLIFICADO -->
+    <nav class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 fixed w-full top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            <i class="fas fa-comments mr-2"></i>
+                            SpeakLexi
+                        </h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-full px-4 py-2 shadow-sm">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                            P
+                        </div>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Profesor</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="min-h-screen pt-16 pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Header -->
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Gestión de Retroalimentación</h2>
-                <p class="text-gray-600 dark:text-gray-300">Revisa y proporciona comentarios personalizados a tus estudiantes</p>
+            <!-- Header Mejorado -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    Sistema de Retroalimentación
+                </h1>
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    Proporciona comentarios personalizados a tus estudiantes
+                </p>
                 
-                <!-- Breadcrumb -->
-                <div class="flex items-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
-                    <a href="/pages/profesor/dashboard.html" class="hover:text-primary-600">Profesor</a>
-                    <i class="fas fa-chevron-right text-xs"></i>
-                    <span class="text-primary-600 dark:text-primary-400">Retroalimentación</span>
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Estudiantes</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">6</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                                <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Retroalimentaciones</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">12</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                                <i class="fas fa-star text-green-600 dark:text-green-400 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Mensajes Hoy</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">3</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                                <i class="fas fa-comment-dots text-purple-600 dark:text-purple-400 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Botón Nuevo Mensaje -->
-            <div class="flex justify-end mb-6">
+            <!-- Botón Nuevo Mensaje Mejorado -->
+            <div class="flex justify-center mb-8">
                 <button id="btn-nuevo-mensaje" 
-                        class="px-6 py-3 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-lg font-medium hover:from-secondary-700 hover:to-primary-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2">
+                        class="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:-translate-y-1 transition-all duration-300 shadow-2xl hover:shadow-3xl flex items-center gap-3">
                     <i class="fas fa-paper-plane"></i>
-                    Nuevo Mensaje
+                    Nueva Retroalimentación
                 </button>
             </div>
 
             <!-- Layout Principal -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <!-- Panel Lateral - Lista de Alumnos -->
-                <div class="lg:col-span-1 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Panel Lateral - Lista de Alumnos Mejorado -->
+                <div class="lg:col-span-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20">
                     <!-- Header del Panel Lateral -->
-                    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Mis Alumnos</h3>
+                    <div class="p-6 border-b border-gray-200/50 dark:border-gray-700/50">
+                        <h3 class="font-bold text-gray-900 dark:text-white text-lg mb-4 flex items-center gap-2">
+                            <i class="fas fa-user-graduate text-blue-600"></i>
+                            Mis Alumnos
+                        </h3>
                         
                         <!-- Buscador -->
                         <div class="relative">
                             <input type="text" id="buscador-alumnos" 
-                                   class="w-full pl-9 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                   class="w-full pl-10 pr-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl bg-white/50 dark:bg-gray-700/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 backdrop-blur-sm"
                                    placeholder="Buscar alumno...">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                        </div>
-                    </div>
-
-                    <!-- Loading Indicator -->
-                    <div id="loading-alumnos" class="hidden flex items-center justify-center py-8">
-                        <div class="text-center">
-                            <div class="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-2"></div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Cargando alumnos...</p>
+                            <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
                         </div>
                     </div>
 
                     <!-- Lista de Alumnos -->
-                    <div id="lista-alumnos" class="max-h-[calc(100vh-300px)] overflow-y-auto scrollbar-thin">
+                    <div id="lista-alumnos" class="max-h-[calc(100vh-400px)] overflow-y-auto scrollbar-thin p-4">
                         <!-- Se llenará dinámicamente -->
-                        <div class="p-8 text-center">
-                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-2"></div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Cargando alumnos...</p>
+                        <div class="text-center py-8">
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Cargando estudiantes...</p>
                         </div>
                     </div>
 
@@ -163,62 +170,57 @@
                     </div>
                 </div>
 
-                <!-- Panel Principal - Retroalimentación y Mensajería -->
+                <!-- Panel Principal - Mensajería Mejorada -->
                 <div class="lg:col-span-3">
-                    <!-- Panel de Mensajería -->
-                    <div id="panel-mensajeria" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden h-[600px] flex flex-col hidden">
+                    <div id="panel-mensajeria" class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden h-[600px] flex flex-col hidden">
                         <!-- Header de Conversación -->
-                        <div id="header-conversacion" class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                        <div id="header-conversacion" class="p-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700">
                             <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-user text-primary-600 dark:text-primary-400"></i>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                        <i class="fas fa-user"></i>
                                     </div>
                                     <div>
-                                        <h3 class="font-semibold text-gray-900 dark:text-white" id="nombre-conversacion">Selecciona un alumno</h3>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400" id="rol-conversacion">Para comenzar una conversación</p>
+                                        <h3 class="font-bold text-gray-900 dark:text-white text-lg" id="nombre-conversacion">Selecciona un alumno</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400" id="rol-conversacion">Para comenzar una conversación</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Mensajes -->
-                        <div id="contenedor-mensajes" class="flex-1 p-6 overflow-y-auto bg-gray-50 dark:bg-gray-900/50 scrollbar-thin">
+                        <div id="contenedor-mensajes" class="flex-1 p-6 overflow-y-auto bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 scrollbar-thin">
                             <!-- Estado vacío inicial -->
                             <div id="empty-state" class="flex flex-col items-center justify-center h-full text-center">
-                                <div class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                                    <i class="fas fa-comments text-3xl text-gray-400"></i>
+                                <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-3xl flex items-center justify-center mb-6 shadow-lg">
+                                    <i class="fas fa-comments text-4xl text-blue-600 dark:text-blue-400"></i>
                                 </div>
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Selecciona un alumno</h3>
-                                <p class="text-gray-500 dark:text-gray-400 max-w-xs">Elige un alumno de la lista para comenzar una conversación</p>
-                            </div>
-
-                            <!-- Loading mensajes -->
-                            <div id="loading-mensajes" class="hidden flex flex-col items-center justify-center h-full text-center">
-                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-2"></div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Cargando mensajes...</p>
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Comienza una conversación</h3>
+                                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md">
+                                    Selecciona un alumno de la lista para enviar retroalimentación personalizada
+                                </p>
                             </div>
 
                             <!-- Mensajes de la conversación -->
-                            <div id="mensajes-conversacion" class="space-y-4 hidden"></div>
+                            <div id="mensajes-conversacion" class="space-y-6 hidden"></div>
                         </div>
 
                         <!-- Input para responder -->
-                        <div id="form-respuesta" class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hidden">
-                            <form id="form-enviar-respuesta" class="space-y-2">
-                                <div class="flex gap-2 items-end">
+                        <div id="form-respuesta" class="p-6 border-t border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hidden">
+                            <form id="form-enviar-respuesta" class="space-y-3">
+                                <div class="flex gap-3 items-end">
                                     <div class="flex-1 relative">
                                         <textarea 
                                             type="text" 
                                             id="input-mensaje" 
-                                            placeholder="Escribe tu mensaje..." 
+                                            placeholder="Escribe tu mensaje de retroalimentación..." 
                                             rows="1"
-                                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none min-h-[44px] max-h-32"
+                                            class="w-full px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70 dark:bg-gray-900/70 text-gray-900 dark:text-white resize-none min-h-[50px] max-h-32 shadow-inner backdrop-blur-sm"
                                             required
                                         ></textarea>
                                         
                                         <!-- Contador de caracteres -->
-                                        <div class="flex justify-between items-center mt-1 px-1">
+                                        <div class="flex justify-between items-center mt-2 px-1">
                                             <span id="char-count" class="text-xs text-gray-500">0/1000</span>
                                         </div>
                                     </div>
@@ -226,63 +228,14 @@
                                     <button 
                                         type="submit" 
                                         id="btn-enviar-respuesta"
-                                        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2 h-[44px] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center gap-2 h-[50px] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                                         disabled
                                     >
                                         <i class="fas fa-paper-plane"></i>
+                                        <span class="font-medium">Enviar</span>
                                     </button>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-
-                    <!-- Panel de Retroalimentación (oculto por defecto) -->
-                    <div id="panel-retroalimentacion">
-                        <!-- Header del Panel Principal -->
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 mb-6">
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <h3 id="alumno-seleccionado-nombre" class="text-xl font-bold text-gray-900 dark:text-white">
-                                        Selecciona un alumno
-                                    </h3>
-                                    <p id="alumno-seleccionado-nivel" class="text-gray-600 dark:text-gray-400">
-                                        Para ver su historial de retroalimentación
-                                    </p>
-                                </div>
-                                <button id="btn-nuevo-comentario" 
-                                        class="mt-4 sm:mt-0 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
-                                    <i class="fas fa-plus"></i>
-                                    Nuevo Comentario
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Loading Indicator -->
-                        <div id="loading-retroalimentacion" class="hidden flex items-center justify-center py-12">
-                            <div class="text-center">
-                                <div class="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
-                                <p class="text-gray-600 dark:text-gray-400">Cargando retroalimentación...</p>
-                            </div>
-                        </div>
-
-                        <!-- Estado Vacío -->
-                        <div id="estado-vacio-alumno" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center border border-gray-100 dark:border-gray-700">
-                            <div class="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-comments text-gray-400 text-2xl"></i>
-                            </div>
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Sin retroalimentación</h4>
-                            <p class="text-gray-600 dark:text-gray-400 mb-6">
-                                Este alumno aún no tiene comentarios de retroalimentación.
-                            </p>
-                            <button id="btn-nuevo-primer-comentario" 
-                                    class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
-                                Agregar Primer Comentario
-                            </button>
-                        </div>
-
-                        <!-- Lista de Retroalimentación -->
-                        <div id="lista-retroalimentacion-alumno" class="space-y-4">
-                            <!-- Se llenará dinámicamente -->
                         </div>
                     </div>
                 </div>
@@ -290,174 +243,77 @@
         </div>
     </main>
 
-    <!-- Modal para Crear Comentario -->
-    <div id="modal-crear" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Nuevo Comentario de Retroalimentación</h3>
-            </div>
-            
-            <form id="form-crear-comentario" class="p-6 space-y-6">
-                <!-- Selección de Alumno -->
-                <div>
-                    <label for="select-alumno-modal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Alumno *
-                    </label>
-                    <select id="select-alumno-modal" name="alumno_id" required
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                        <option value="">Seleccionar alumno...</option>
-                        <!-- Se llenará dinámicamente -->
-                    </select>
-                </div>
-
-                <!-- Selección de Lección -->
-                <div>
-                    <label for="select-leccion-modal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Lección *
-                    </label>
-                    <select id="select-leccion-modal" name="leccion_id" required
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                        <option value="">Seleccionar lección...</option>
-                        <option value="1">Present Simple Tense</option>
-                        <option value="2">Vocabulary: Daily Routine</option>
-                        <option value="3">Listening: Basic Conversations</option>
-                        <option value="4">Speaking: Introductions</option>
-                        <option value="5">Present Perfect Tense</option>
-                        <option value="6">Conversación Avanzada</option>
-                    </select>
-                </div>
-
-                <!-- Tipo de Retroalimentación -->
-                <div>
-                    <label for="select-tipo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Tipo de Comentario *
-                    </label>
-                    <select id="select-tipo" name="tipo" required
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                        <option value="">Seleccionar tipo...</option>
-                        <option value="positiva">Positiva</option>
-                        <option value="neutra">Neutra</option>
-                        <option value="negativa">Constructiva</option>
-                    </select>
-                </div>
-
-                <!-- Calificación -->
-                <div>
-                    <label for="input-calificacion" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Calificación (opcional)
-                    </label>
-                    <input type="number" id="input-calificacion" name="calificacion" min="1" max="10"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                           placeholder="Ej: 8 (1-10)">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Calificación opcional del 1 al 10</p>
-                </div>
-
-                <!-- Comentario -->
-                <div>
-                    <label for="textarea-comentario" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Comentario *
-                    </label>
-                    <textarea id="textarea-comentario" name="comentario" rows="6" required
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                              placeholder="Escribe tu comentario de retroalimentación aquí..."></textarea>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Sé específico y constructivo en tus comentarios para ayudar al alumno a mejorar.
-                    </p>
-                </div>
-
-                <!-- Consejos -->
-                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                    <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
-                        <i class="fas fa-lightbulb"></i>
-                        Consejos para una buena retroalimentación
-                    </h4>
-                    <ul class="text-sm text-blue-700 dark:text-blue-400 space-y-1">
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check text-xs"></i>
-                            Destaca lo que el alumno hizo bien
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check text-xs"></i>
-                            Sé específico sobre áreas de mejora
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check text-xs"></i>
-                            Ofrece sugerencias concretas
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check text-xs"></i>
-                            Mantén un tono positivo y alentador
-                        </li>
-                    </ul>
-                </div>
-            </form>
-
-            <div class="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
-                <button id="btn-cancelar-crear" type="button"
-                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    Cancelar
-                </button>
-                <button id="btn-enviar-comentario" type="submit" form="form-crear-comentario"
-                        class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
-                    <i class="fas fa-paper-plane mr-2"></i>
-                    Enviar Comentario
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Nuevo Mensaje -->
-    <div id="modal-nuevo-mensaje" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Nuevo Mensaje</h3>
+    <!-- Modal Nuevo Mensaje Mejorado -->
+    <div id="modal-nuevo-mensaje" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Nueva Retroalimentación</h3>
                 <button id="btn-cerrar-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
 
-            <form id="form-nuevo-mensaje">
+            <form id="form-nuevo-mensaje" class="space-y-6">
                 <!-- Destinatario -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <i class="fas fa-user mr-2 text-blue-600"></i>
                         Para:
                     </label>
                     <select 
                         id="select-destinatario" 
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        class="w-full px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl bg-white/50 dark:bg-gray-700/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 backdrop-blur-sm shadow-inner"
                         required
                     >
                         <option value="">Selecciona un alumno...</option>
                     </select>
                 </div>
 
+                <!-- Selector de Tipo de Retroalimentación -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <i class="fas fa-tag mr-2 text-purple-600"></i>
+                        Tipo de Retroalimentación
+                    </label>
+                    <select 
+                        id="select-tipo-retro" 
+                        class="w-full px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl bg-white/50 dark:bg-gray-700/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 backdrop-blur-sm shadow-inner"
+                    >
+                        <option value="general">💬 Retroalimentación General</option>
+                        <option value="felicitacion">🎉 Felicitación</option>
+                        <option value="mejora">📚 Área de Mejora</option>
+                        <option value="alerta">⚠️ Alerta</option>
+                    </select>
+                </div>
+
                 <!-- Mensaje -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <i class="fas fa-comment-dots mr-2 text-green-600"></i>
                         Mensaje:
                     </label>
                     <textarea 
                         id="textarea-mensaje" 
                         rows="4"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
-                        placeholder="Escribe tu mensaje aquí..."
+                        class="w-full px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl bg-white/50 dark:bg-gray-700/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none backdrop-blur-sm shadow-inner"
+                        placeholder="Escribe tu mensaje de retroalimentación aquí..."
                         required
                     ></textarea>
                 </div>
 
                 <!-- Botones -->
-                <div class="flex gap-3">
+                <div class="flex gap-4 pt-4">
                     <button 
                         type="button" 
                         id="btn-cancelar-modal"
-                        class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="flex-1 px-6 py-3 border border-gray-300/50 dark:border-gray-600/50 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-300 backdrop-blur-sm font-medium"
                     >
                         Cancelar
                     </button>
                     <button 
                         type="submit"
                         id="btn-enviar-modal"
-                        class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2"
                     >
                         <i class="fas fa-paper-plane"></i>
                         Enviar
@@ -467,51 +323,8 @@
         </div>
     </div>
 
-    <!-- Estados Globales -->
-    <div id="loading-global" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl text-center">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
-            <p class="text-gray-900 dark:text-white font-medium">Cargando datos...</p>
-        </div>
-    </div>
-
-    <div id="error-global" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl text-center max-w-md">
-            <i class="fas fa-exclamation-triangle text-3xl text-red-500 mb-4"></i>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Error</h3>
-            <p id="error-message" class="text-gray-600 dark:text-gray-300 mb-4"></p>
-            <button onclick="retroalimentacionProfesor.cargarDatosCompletos()" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-                Reintentar
-            </button>
-        </div>
-    </div>
-
-    <div id="contenido-principal" class="hidden">
-        <!-- El contenido principal se muestra aquí -->
-    </div>
-
-    <!-- ============================================
-         ORDEN DE CARGA CORREGIDO
-    ============================================ -->
-    
-    <!-- 1️⃣ CONFIGURACIÓN GLOBAL -->
-    <script src="/config/app-config.js"></script>
-    
-    <!-- 2️⃣ CORE MODULES -->
-    <script src="/assets/js/core/utils.js"></script>
-    <script src="/assets/js/core/api-client.js"></script>
-    <script src="/assets/js/core/form-validator.js"></script>
-    <script src="/assets/js/core/toast-manager.js"></script>
-    <script src="/assets/js/core/theme-manager.js"></script>
-    <script src="/assets/js/core/module-loader.js"></script>
-    
-    <!-- 3️⃣ MÓDULOS ADICIONALES -->
-    <script src="/assets/js/core/navbar-loader.js"></script>
-    
-    <!-- 4️⃣ LÓGICA DE PÁGINA (al final) -->
+    <!-- ✅ MANTENIENDO TU ESTRUCTURA ORIGINAL DE CARGA -->
     <script src="/assets/js/pages/profesor/retroalimentacion-profesor.js"></script>
-    <!-- Sistema de notificaciones y mensajes -->
-    <script src="/assets/js/core/notificaciones-manager.js"></script>
 
 </body>
 </html>
