@@ -11,6 +11,14 @@ const authMiddleware = require('../middleware/authMiddleware');
 // RUTAS PARA DASHBOARD ESTUDIANTE
 // ===================================
 
+// Obtener logros del estudiante
+router.get(
+    '/logros', 
+    authMiddleware.verificarToken,
+    authMiddleware.verificarRol(['alumno']),
+    progresoController.obtenerLogrosEstudiante
+);
+
 // Obtener resumen completo del dashboard - CORREGIDO
 router.get(
     '/resumen', 

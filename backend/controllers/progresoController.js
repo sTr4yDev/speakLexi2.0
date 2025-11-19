@@ -313,6 +313,354 @@ exports.actualizarProgresoCurso = async (req, res) => {
 };
 
 /**
+ * Obtener logros del estudiante con detalles
+ */
+exports.obtenerLogrosEstudiante = async (req, res) => {
+    try {
+        const usuarioId = req.user.id;
+        
+        const logros = await GamificacionModel.obtenerLogrosUsuario(usuarioId);
+        
+        // Obtener estadísticas para calcular logros potenciales
+        const [stats] = await db.pool.execute(`
+            SELECT 
+                COUNT(CASE WHEN completada = 1 THEN 1 END) as lecciones_completadas,
+                pe.total_xp,
+                pe.racha_dias
+            FROM progreso_lecciones pl
+            JOIN perfil_estudiantes pe ON pl.usuario_id = pe.usuario_id
+            WHERE pl.usuario_id = ?
+            GROUP BY pe.usuario_id, pe.total_xp, pe.racha_dias
+        `, [usuarioId]);
+        
+        const estadisticas = stats[0] || { lecciones_completadas: 0, total_xp: 0, racha_dias: 0 };
+        
+        // Definir todos los logros posibles con progreso
+        const todosLosLogros = [
+            // LOGROS ORIGINALES (8)
+            {
+                id: 'primera_leccion',
+                titulo: 'Primera Lección',
+                descripcion: 'Completa tu primera lección',
+                icono: '🎯',
+                tipo: 'leccion',
+                progreso: Math.min(100, (estadisticas.lecciones_completadas / 1) * 100),
+                desbloqueado: estadisticas.lecciones_completadas >= 1
+            },
+            {
+                id: 'aprendiz',
+                titulo: 'Aprendiz',
+                descripcion: 'Completa 10 lecciones',
+                icono: '📚',
+                tipo: 'leccion',
+                progreso: Math.min(100, (estadisticas.lecciones_completadas / 10) * 100),
+                desbloqueado: estadisticas.lecciones_completadas >= 10
+            },
+            {
+                id: 'estudioso',
+                titulo: 'Estudioso',
+                descripcion: 'Completa 50 lecciones',
+                icono: '🎓',
+                tipo: 'leccion',
+                progreso: Math.min(100, (estadisticas.lecciones_completadas / 50) * 100),
+                desbloqueado: estadisticas.lecciones_completadas >= 50
+            },
+            {
+                id: 'maestro',
+                titulo: 'Maestro del Idioma',
+                descripcion: 'Completa 100 lecciones',
+                icono: '👑',
+                tipo: 'leccion',
+                progreso: Math.min(100, (estadisticas.lecciones_completadas / 100) * 100),
+                desbloqueado: estadisticas.lecciones_completadas >= 100
+            },
+            {
+                id: 'racha_7',
+                titulo: 'Racha Semanal',
+                descripcion: 'Mantén una racha de 7 días',
+                icono: '🔥',
+                tipo: 'racha',
+                progreso: Math.min(100, (estadisticas.racha_dias / 7) * 100),
+                desbloqueado: estadisticas.racha_dias >= 7
+            },
+            {
+                id: 'racha_30',
+                titulo: 'Racha Mensual',
+                descripcion: 'Mantén una racha de 30 días',
+                icono: '⚡',
+                tipo: 'racha',
+                progreso: Math.min(100, (estadisticas.racha_dias / 30) * 100),
+                desbloqueado: estadisticas.racha_dias >= 30
+            },
+            {
+                id: 'xp_1000',
+                titulo: 'Coleccionista de XP',
+                descripcion: 'Alcanza 1000 puntos XP',
+                icono: '💎',
+                tipo: 'xp',
+                progreso: Math.min(100, (estadisticas.total_xp / 1000) * 100),
+                desbloqueado: estadisticas.total_xp >= 1000
+            },
+            {
+                id: 'xp_5000',
+                titulo: 'Leyenda',
+                descripcion: 'Alcanza 5000 puntos XP',
+                icono: '🌟',
+                tipo: 'xp',
+                progreso: Math.min(100, (estadisticas.total_xp / 5000) * 100),
+                desbloqueado: estadisticas.total_xp >= 5000
+            },
+
+            // NUEVOS LOGROS - VELOCIDAD (3)
+            {
+                id: 'velocista',
+                titulo: 'Velocista',
+                descripcion: 'Completa 5 lecciones en un día',
+                icono: '⚡',
+                tipo: 'velocidad',
+                progreso: 0, // Necesita métrica específica de lecciones por día
+                desbloqueado: false
+            },
+            {
+                id: 'maratonista',
+                titulo: 'Maratonista',
+                descripcion: 'Completa 10 lecciones en una semana',
+                icono: '🏃‍♂️',
+                tipo: 'velocidad',
+                progreso: 0, // Necesita métrica semanal
+                desbloqueado: false
+            },
+            {
+                id: 'rapido_y_curioso',
+                titulo: 'Rápido y Curioso',
+                descripcion: 'Completa una lección en menos de 5 minutos',
+                icono: '⏱️',
+                tipo: 'velocidad',
+                progreso: 0, // Necesita tiempo por lección
+                desbloqueado: false
+            },
+
+            // NUEVOS LOGROS - PERFECCIÓN (3)
+            {
+                id: 'perfeccionista',
+                titulo: 'Perfeccionista',
+                descripcion: 'Obtén 100% en 10 ejercicios consecutivos',
+                icono: '💯',
+                tipo: 'perfeccion',
+                progreso: 0, // Necesita registro de puntajes perfectos consecutivos
+                desbloqueado: false
+            },
+            {
+                id: 'sin_errores',
+                titulo: 'Sin Errores',
+                descripcion: 'Completa 5 lecciones sin ningún error',
+                icono: '✅',
+                tipo: 'perfeccion',
+                progreso: 0, // Necesita registro de lecciones sin errores
+                desbloqueado: false
+            },
+            {
+                id: 'ojo_de_aguila',
+                titulo: 'Ojo de Águila',
+                descripcion: 'Responde correctamente 20 preguntas de gramática seguidas',
+                icono: '👁️',
+                tipo: 'perfeccion',
+                progreso: 0, // Necesita registro de respuestas correctas consecutivas
+                desbloqueado: false
+            },
+
+            // NUEVOS LOGROS - PERSISTENCIA (3)
+            {
+                id: 'persistente',
+                titulo: 'Persistente',
+                descripcion: 'Reintenta un ejercicio 5 veces hasta aprobar',
+                icono: '🔄',
+                tipo: 'persistencia',
+                progreso: 0, // Necesita contador de reintentos por ejercicio
+                desbloqueado: false
+            },
+            {
+                id: 'no_me_rindo',
+                titulo: 'No Me Rindo',
+                descripcion: 'Completa una lección después de 3 intentos fallidos',
+                icono: '💪',
+                tipo: 'persistencia',
+                progreso: 0, // Necesita registro de intentos fallidos
+                desbloqueado: false
+            },
+            {
+                id: 'segunda_oportunidad',
+                titulo: 'Segunda Oportunidad',
+                descripcion: 'Mejora tu puntuación en una lección reprobada',
+                icono: '📈',
+                tipo: 'persistencia',
+                progreso: 0, // Necesita comparación de puntajes
+                desbloqueado: false
+            },
+
+            // NUEVOS LOGROS - EXPLORACIÓN (3)
+            {
+                id: 'explorador',
+                titulo: 'Explorador',
+                descripcion: 'Prueba lecciones en 3 idiomas diferentes',
+                icono: '🌎',
+                tipo: 'exploracion',
+                progreso: 0, // Necesita registro de idiomas utilizados
+                desbloqueado: false
+            },
+            {
+                id: 'aventurero',
+                titulo: 'Aventurero',
+                descripcion: 'Completa lecciones en 3 niveles diferentes',
+                icono: '🗺️',
+                tipo: 'exploracion',
+                progreso: 0, // Necesita registro de niveles completados
+                desbloqueado: false
+            },
+            {
+                id: 'poliglota',
+                titulo: 'Políglota',
+                descripcion: 'Aprende 100 palabras en un idioma diferente',
+                icono: '🗣️',
+                tipo: 'exploracion',
+                progreso: 0, // Necesita contador de palabras aprendidas por idioma
+                desbloqueado: false
+            },
+
+            // NUEVOS LOGROS - TIEMPO DE ESTUDIO (3)
+            {
+                id: 'estudiante_dedicado',
+                titulo: 'Estudiante Dedicado',
+                descripcion: 'Acumula 10 horas de estudio',
+                icono: '⏰',
+                tipo: 'tiempo',
+                progreso: Math.min(100, ((estadisticas.lecciones_completadas * 15) / 600) * 100), // Estimación: 15 min por lección
+                desbloqueado: (estadisticas.lecciones_completadas * 15) >= 600 // 10 horas = 600 minutos
+            },
+            {
+                id: 'nocturno',
+                titulo: 'Nocturno',
+                descripcion: 'Estudia después de las 10 PM',
+                icono: '🌙',
+                tipo: 'tiempo',
+                progreso: 0, // Necesita registro de horarios de estudio
+                desbloqueado: false
+            },
+            {
+                id: 'madrugador',
+                titulo: 'Madrugador',
+                descripcion: 'Estudia antes de las 6 AM',
+                icono: '🌅',
+                tipo: 'tiempo',
+                progreso: 0, // Necesita registro de horarios de estudio
+                desbloqueado: false
+            },
+
+            // NUEVOS LOGROS - CURSOS (3)
+            {
+                id: 'primer_curso',
+                titulo: 'Primer Curso',
+                descripcion: 'Completa tu primer curso',
+                icono: '🎓',
+                tipo: 'curso',
+                progreso: 0, // Necesita registro de cursos completados
+                desbloqueado: false
+            },
+            {
+                id: 'coleccionista_cursos',
+                titulo: 'Coleccionista de Cursos',
+                descripcion: 'Completa 5 cursos diferentes',
+                icono: '📂',
+                tipo: 'curso',
+                progreso: 0, // Necesita contador de cursos completados
+                desbloqueado: false
+            },
+            {
+                id: 'maestro_curso',
+                titulo: 'Maestro de Curso',
+                descripcion: 'Obtén 100% en todos los módulos de un curso',
+                icono: '🏆',
+                tipo: 'curso',
+                progreso: 0, // Necesita registro de progreso por módulo
+                desbloqueado: false
+            },
+
+            // NUEVOS LOGROS - EJERCICIOS ESPECÍFICOS (3)
+            {
+                id: 'escucha_perfecta',
+                titulo: 'Escucha Perfecta',
+                descripcion: 'Completa 10 ejercicios de listening sin errores',
+                icono: '👂',
+                tipo: 'ejercicio',
+                progreso: 0, // Necesita contador por tipo de ejercicio
+                desbloqueado: false
+            },
+            {
+                id: 'pronunciacion_experta',
+                titulo: 'Pronunciación Experta',
+                descripcion: 'Obtén más del 90% en 20 ejercicios de speaking',
+                icono: '🎤',
+                tipo: 'ejercicio',
+                progreso: 0, // Necesita métricas de speaking
+                desbloqueado: false
+            },
+            {
+                id: 'gramatica_avanzada',
+                titulo: 'Gramática Avanzada',
+                descripcion: 'Resuelve 50 ejercicios de gramática correctamente',
+                icono: '📝',
+                tipo: 'ejercicio',
+                progreso: 0, // Necesita contador por tipo de ejercicio
+                desbloqueado: false
+            },
+
+            // NUEVOS LOGROS - VARIOS (3)
+            {
+                id: 'estrella_emergente',
+                titulo: 'Estrella Emergente',
+                descripcion: 'Alcanza el nivel B1 en cualquier idioma',
+                icono: '⭐',
+                tipo: 'progreso',
+                progreso: 0, // Necesita registro de niveles alcanzados
+                desbloqueado: false
+            },
+            {
+                id: 'social',
+                titulo: 'Social',
+                descripcion: 'Comparte 5 logros en redes sociales',
+                icono: '📱',
+                tipo: 'social',
+                progreso: 0, // Necesita contador de compartidos
+                desbloqueado: false
+            },
+            {
+                id: 'todos_logros',
+                titulo: 'Coleccionista Completo',
+                descripcion: 'Desbloquea todos los logros básicos',
+                icono: '🏅',
+                tipo: 'especial',
+                progreso: Math.min(100, (estadisticas.lecciones_completadas / 100) * 100), // Estimación basada en lecciones
+                desbloqueado: estadisticas.lecciones_completadas >= 100
+            }
+        ];
+        
+        res.json({
+            success: true,
+            logros: todosLosLogros,
+            total_desbloqueados: todosLosLogros.filter(l => l.desbloqueado).length,
+            total_logros: todosLosLogros.length
+        });
+        
+    } catch (error) {
+        console.error('Error en obtenerLogrosEstudiante:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al obtener logros'
+        });
+    }
+};
+
+/**
  * ============================================
  * NUEVAS FUNCIONES PARA DASHBOARD ESTUDIANTE - CORREGIDAS
  * ============================================

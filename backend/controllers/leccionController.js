@@ -353,7 +353,8 @@ exports.crearLeccion = async (req, res) => {
             nivel,
             idioma,
             duracion_minutos,
-            orden
+            orden,
+            estado  // 🎯 AGREGAR este parámetro
         } = req.body;
 
         // Validar datos requeridos
@@ -372,7 +373,7 @@ exports.crearLeccion = async (req, res) => {
             idioma,
             duracion_minutos: duracion_minutos || 30,
             orden: orden || 0,
-            estado: 'borrador',
+            estado: estado || 'activa',  // 🎯 CAMBIAR de 'borrador' a 'activa' por defecto
             creado_por: req.user.id
         };
 

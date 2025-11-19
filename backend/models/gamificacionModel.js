@@ -32,7 +32,7 @@ function calcularNivelPorXP(xpTotal) {
 }
 
 /**
- * Otorgar XP a un estudiante
+ * Otorgar XP a un estudiante y verificar cambio de nivel
  * @param {number} usuarioId - ID del usuario
  * @param {number} cantidad - Cantidad de XP a otorgar
  * @param {object} metadata - Información adicional (tipo, leccion_id, etc.)
@@ -61,32 +61,62 @@ exports.otorgarXP = async (usuarioId, cantidad, metadata = {}) => {
                 JSON.stringify(metadata)
             ]);
         } catch (err) {
-            // Si la tabla no existe, continuar (no es crítico)
             console.warn('Tabla historial_xp no existe, saltando registro');
         }
 
-        // 3. Verificar si cambió de nivel CEFR
+        // 3. Obtener perfil actual del estudiante
         const [perfil] = await pool.execute(
-            'SELECT total_xp, nivel_actual FROM perfil_estudiantes WHERE usuario_id = ?',
+            'SELECT total_xp, nivel_actual, idioma_aprendizaje FROM perfil_estudiantes WHERE usuario_id = ?',
             [usuarioId]
         );
 
-        if (perfil.length > 0) {
-            const nuevoNivel = calcularNivelPorXP(perfil[0].total_xp);
+        if (perfil.length === 0) {
+            throw new Error('Perfil de estudiante no encontrado');
+        }
+
+        const { nivel_actual, idioma_aprendizaje } = perfil[0];
+
+        // 4. NUEVA LÓGICA: Verificar si completó todas las lecciones del nivel actual
+        const [estadisticas] = await pool.execute(`
+            SELECT 
+                COUNT(*) as total_lecciones_nivel,
+                SUM(CASE WHEN pl.completada = 1 THEN 1 ELSE 0 END) as lecciones_completadas_nivel
+            FROM lecciones l
+            LEFT JOIN progreso_lecciones pl ON l.id = pl.leccion_id AND pl.usuario_id = ?
+            WHERE l.nivel = ? AND l.idioma = ? AND l.estado = 'activa'
+        `, [usuarioId, nivel_actual, idioma_aprendizaje]);
+
+        const { total_lecciones_nivel, lecciones_completadas_nivel } = estadisticas[0];
+
+        // 5. Si completó todas las lecciones del nivel, pasar al siguiente
+        let nuevoNivel = nivel_actual;
+        if (lecciones_completadas_nivel >= total_lecciones_nivel && total_lecciones_nivel > 0) {
+            const niveles = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+            const indiceActual = niveles.indexOf(nivel_actual);
             
-            // Si cambió de nivel, actualizar
-            if (nuevoNivel !== perfil[0].nivel_actual) {
+            if (indiceActual < niveles.length - 1) {
+                nuevoNivel = niveles[indiceActual + 1];
+                
+                // Actualizar nivel
                 await pool.execute(
                     'UPDATE perfil_estudiantes SET nivel_actual = ? WHERE usuario_id = ?',
                     [nuevoNivel, usuarioId]
                 );
+                
+                console.log(`🎉 Usuario ${usuarioId} subió de nivel: ${nivel_actual} → ${nuevoNivel}`);
             }
         }
 
         return {
             xp_otorgado: cantidad,
             xp_total: perfil[0].total_xp + cantidad,
-            nivel_actual: calcularNivelPorXP(perfil[0].total_xp + cantidad)
+            nivel_anterior: nivel_actual,
+            nivel_actual: nuevoNivel,
+            subio_nivel: nuevoNivel !== nivel_actual,
+            progreso_nivel: {
+                completadas: lecciones_completadas_nivel,
+                total: total_lecciones_nivel
+            }
         };
 
     } catch (error) {

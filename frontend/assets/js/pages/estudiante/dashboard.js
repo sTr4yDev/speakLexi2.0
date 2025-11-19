@@ -1,10 +1,15 @@
 /* ============================================
    SPEAKLEXI - Dashboard Estudiante COMPLETO
-   Con integración de lecciones
+   Con integración de lecciones y logros
    ============================================ */
 
 (async () => {
     'use strict';
+
+    // ============================================
+    // VARIABLES GLOBALES DEL DASHBOARD
+    // ============================================
+    let logros = []; // Variable para almacenar los logros
 
     // ============================================
     // ESPERAR DEPENDENCIAS
@@ -95,6 +100,9 @@
                 // Actualizar stats superiores
                 actualizarStatsSuperiores(datosReales);
 
+                // Cargar logros
+                await cargarLogros();
+
                 // Renderizar contenido dinámico
                 renderizarContenidoDinamico(datosReales);
 
@@ -111,6 +119,28 @@
                 } else {
                     mostrarEstadoSinDatos('No se pudo conectar con el servidor. Intenta más tarde.');
                 }
+            }
+        }
+
+        // ===================================
+        // CARGAR LOGROS DEL ESTUDIANTE
+        // ===================================
+        async function cargarLogros() {
+            try {
+                console.log('🏆 Cargando logros del estudiante...');
+                
+                const response = await window.apiClient.get('/progreso/logros');
+                
+                if (response && response.success) {
+                    logros = response.data.logros || [];
+                    console.log('✅ Logros cargados:', logros.length);
+                } else {
+                    console.warn('⚠️ No se pudieron cargar logros:', response?.error);
+                    logros = [];
+                }
+            } catch (error) {
+                console.error('❌ Error cargando logros:', error);
+                logros = [];
             }
         }
 
@@ -327,7 +357,6 @@
             const progreso = data.progreso || data.estadisticas || {};
             const leccionesEnProgreso = data.leccionesEnProgreso || data.lecciones_en_progreso || [];
             const leccionesCompletadas = data.leccionesCompletadas || data.lecciones_completadas || data.actividadReciente || [];
-            const logros = data.logros || data.logros_recientes || [];
             const cursos = data.cursos || [];
             const leccionesRecomendadas = data.leccionesRecomendadas || [];
 
@@ -359,7 +388,7 @@
                         <!-- Columna Derecha - 1/3 width -->
                         <div class="space-y-8">
                             ${generarLeaderboard(usuario)}
-                            ${generarLogros(logros)}
+                            ${generarLogros()}
                             ${generarAccionesRapidas()}
                         </div>
                     </div>
@@ -655,45 +684,100 @@
             `;
         }
 
-        function generarLogros(logros) {
-            if (logros.length === 0) {
-                return `
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Logros</h3>
-                        </div>
-                        <div class="text-center py-4">
-                            <i class="fas fa-trophy text-gray-300 dark:text-gray-600 text-3xl mb-3"></i>
-                            <p class="text-gray-500 dark:text-gray-400">Aún no tienes logros</p>
-                            <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">¡Completa lecciones para desbloquearlos!</p>
-                        </div>
-                    </div>
-                `;
-            }
-
+        function generarLogros() {
+            const logrosDesbloqueados = logros.filter(l => l.desbloqueado);
+            const logrosProximos = logros
+                .filter(l => !l.desbloqueado && l.progreso > 0)
+                .sort((a, b) => b.progreso - a.progreso)
+                .slice(0, 3);
+            
             return `
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Logros Recientes</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <i class="fas fa-trophy text-yellow-500"></i>
+                            Logros
+                        </h3>
+                        <a href="/pages/estudiante/logros-recompensas.html" 
+                           class="text-sm text-blue-500 hover:text-blue-600">
+                            Ver todos →
+                        </a>
                     </div>
                     
-                    <div class="space-y-4">
-                        ${logros.slice(0, 3).map(logro => `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800">
-                                <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center">
-                                    <span class="text-2xl">🎯</span>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-900 dark:text-white">${logro.titulo || 'Logro desbloqueado'}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">${logro.descripcion || '¡Felicidades!'}</p>
-                                    <div class="mt-1 flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
-                                        <i class="fas fa-gem"></i>
-                                        <span>+${logro.xp_otorgado || 50} XP</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
+                    <div class="text-center mb-4">
+                        <div class="text-2xl font-bold text-gray-900 dark:text-white">
+                            ${logrosDesbloqueados.length} / ${logros.length}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            Logros desbloqueados
+                        </div>
                     </div>
+                    
+                    <!-- Logros recientes desbloqueados -->
+                    ${logrosDesbloqueados.length > 0 ? `
+                        <div class="mb-4">
+                            <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                                DESBLOQUEADOS
+                            </div>
+                            <div class="space-y-2">
+                                ${logrosDesbloqueados.slice(0, 3).map(logro => `
+                                    <div class="flex items-center gap-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                                        <div class="text-2xl">${logro.icono}</div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                                                ${logro.titulo}
+                                            </div>
+                                            <div class="text-xs text-gray-600 dark:text-gray-400 truncate">
+                                                ${logro.descripcion}
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-check-circle text-green-500"></i>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Próximos logros por desbloquear -->
+                    ${logrosProximos.length > 0 ? `
+                        <div>
+                            <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                                PRÓXIMOS
+                            </div>
+                            <div class="space-y-3">
+                                ${logrosProximos.map(logro => `
+                                    <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <div class="text-xl opacity-50">${logro.icono}</div>
+                                            <div class="flex-1">
+                                                <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                                    ${logro.titulo}
+                                                </div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                    ${logro.descripcion}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                                <div class="bg-blue-500 h-2 rounded-full transition-all" 
+                                                     style="width: ${logro.progreso}%">
+                                                </div>
+                                            </div>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">
+                                                ${Math.round(logro.progreso)}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="text-center py-4">
+                            <i class="fas fa-trophy text-gray-300 dark:text-gray-600 text-3xl mb-3"></i>
+                            <p class="text-gray-500 dark:text-gray-400">Completa lecciones para desbloquear logros</p>
+                        </div>
+                    `}
                 </div>
             `;
         }

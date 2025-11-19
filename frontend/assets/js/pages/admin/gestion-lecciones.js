@@ -8,6 +8,10 @@
     let leccionesData = [];
     let paginaActual = 1;
     const leccionesPorPagina = 10;
+    
+    // 🎯 NUEVAS VARIABLES: Modo edición
+    let modoEdicion = false;
+    let leccionEditando = null;
 
     async function init() {
         console.log('🚀 Iniciando Gestión de Lecciones...');
@@ -28,11 +32,16 @@
         document.getElementById('btn-crear-leccion')?.addEventListener('click', mostrarModalCrear);
         document.getElementById('btn-refrescar')?.addEventListener('click', cargarLecciones);
         document.getElementById('btn-cancelar-crear')?.addEventListener('click', ocultarModalCrear);
-        document.getElementById('btn-guardar-leccion')?.addEventListener('click', crearLeccion);
+        document.getElementById('btn-guardar-leccion')?.addEventListener('click', () => crearLeccion());
         document.getElementById('buscar-leccion')?.addEventListener('input', filtrarLecciones);
         document.getElementById('filtro-nivel')?.addEventListener('change', filtrarLecciones);
         document.getElementById('btn-prev')?.addEventListener('click', () => cambiarPagina(-1));
         document.getElementById('btn-next')?.addEventListener('click', () => cambiarPagina(1));
+        
+        // 🎯 NUEVO: Botón guardar borrador desde modal
+        document.getElementById('btn-guardar-borrador-modal')?.addEventListener('click', () => {
+            crearLeccion('borrador');
+        });
         
         document.getElementById('buscar-leccion')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -51,8 +60,6 @@
             console.log('📦 Respuesta completa:', response);
             
             if (response.success) {
-                // 🔧 CORRECCIÓN: response.data contiene {success, data, paginacion}
-                // El array de lecciones está en response.data.data
                 const serverData = response.data;
                 
                 // Verificar estructura de la respuesta
@@ -75,56 +82,16 @@
                 throw new Error(response.error || 'Error al cargar lecciones');
             }
         } catch (error) {
-            console.warn('⚠️ Error cargando lecciones:', error);
-            window.toastManager.warning('Usando datos de demostración. Servidor no disponible.');
+            console.error('❌ Error cargando lecciones:', error);
+            window.toastManager.error('Error al cargar las lecciones: ' + (error.message || 'Error del servidor'));
             
-            leccionesData = obtenerLeccionesDemo();
+            // 🔥 ELIMINADO: No usar datos demo, dejar array vacío
+            leccionesData = [];
             actualizarEstadisticas();
             mostrarLecciones();
         } finally {
             mostrarLoading(false);
         }
-    }
-
-    function obtenerLeccionesDemo() {
-        return [
-            {
-                id: 1,
-                titulo: "Saludos y Presentaciones Básicas",
-                descripcion: "Aprende a saludar y presentarte en situaciones cotidianas",
-                nivel: "A1",
-                idioma: "Inglés",
-                estado: "activa",
-                duracion_minutos: 45,
-                orden: 1,
-                creado_en: new Date().toISOString(),
-                creado_por: "Admin Demo"
-            },
-            {
-                id: 2,
-                titulo: "Números y Fechas",
-                descripcion: "Domina los números cardinales, ordinales y cómo expresar fechas",
-                nivel: "A1",
-                idioma: "Inglés", 
-                estado: "borrador",
-                duracion_minutos: 60,
-                orden: 2,
-                creado_en: new Date(Date.now() - 86400000).toISOString(),
-                creado_por: "Admin Demo"
-            },
-            {
-                id: 3,
-                titulo: "Conversaciones en Restaurante",
-                descripcion: "Frases útiles para pedir comida en un restaurante",
-                nivel: "A2",
-                idioma: "Inglés",
-                estado: "inactiva",
-                duracion_minutos: 50,
-                orden: 3,
-                creado_en: new Date(Date.now() - 172800000).toISOString(),
-                creado_por: "Admin Demo"
-            }
-        ];
     }
 
     function actualizarEstadisticas() {
@@ -166,7 +133,7 @@
                     <td colspan="7" class="py-12 text-center text-gray-500 dark:text-gray-400">
                         <i class="fas fa-search text-3xl mb-3 opacity-50"></i>
                         <p class="text-lg">No se encontraron lecciones</p>
-                        <p class="text-sm mt-1">Intenta ajustar los filtros de búsqueda</p>
+                        <p class="text-sm mt-1">${leccionesData.length === 0 ? 'No hay lecciones registradas' : 'Intenta ajustar los filtros de búsqueda'}</p>
                     </td>
                 </tr>
             `;
@@ -273,8 +240,95 @@
         }
     }
 
+    // 🎯 ACTUALIZADO: Mostrar modal para crear
     function mostrarModalCrear() {
+        modoEdicion = false;
+        leccionEditando = null;
+        
         const modal = document.getElementById('modal-crear-leccion');
+        const titulo = document.getElementById('modal-titulo');
+        const form = document.getElementById('form-crear-leccion');
+        
+        if (titulo) {
+            titulo.textContent = 'Crear Nueva Lección';
+        }
+        
+        if (form) {
+            form.reset();
+            // Establecer valores por defecto
+            form.querySelector('[name="estado"]').value = 'activa';
+            form.querySelector('[name="duracion_minutos"]').value = 30;
+            form.querySelector('[name="orden"]').value = 0;
+        }
+        
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    // 🎯 NUEVA FUNCIÓN: Mostrar modal para editar
+    function mostrarModalEditar(leccionId) {
+        const leccion = leccionesData.find(l => l.id === leccionId);
+        if (!leccion) {
+            window.toastManager.error('Lección no encontrada');
+            return;
+        }
+        
+        modoEdicion = true;
+        leccionEditando = leccion;
+        
+        const modal = document.getElementById('modal-crear-leccion');
+        const titulo = document.getElementById('modal-titulo');
+        const form = document.getElementById('form-crear-leccion');
+        
+        if (titulo) {
+            titulo.textContent = 'Editar Lección';
+        }
+        
+        if (form) {
+            // Cargar datos básicos
+            form.querySelector('[name="titulo"]').value = leccion.titulo || '';
+            form.querySelector('[name="descripcion"]').value = leccion.descripcion || '';
+            form.querySelector('[name="nivel"]').value = leccion.nivel || '';
+            form.querySelector('[name="idioma"]').value = leccion.idioma || '';
+            form.querySelector('[name="estado"]').value = leccion.estado || 'activa';
+            form.querySelector('[name="duracion_minutos"]').value = leccion.duracion_minutos || 30;
+            form.querySelector('[name="orden"]').value = leccion.orden || 0;
+            
+            // 🎯 Cargar contenido estructurado (JSON)
+            try {
+                const contenido = typeof leccion.contenido === 'string' 
+                    ? JSON.parse(leccion.contenido) 
+                    : leccion.contenido || {};
+                
+                const teoria = contenido.teoria || {};
+                
+                // Temas
+                if (contenido.temas && Array.isArray(contenido.temas)) {
+                    form.querySelector('[name="temas"]').value = contenido.temas.join(', ');
+                }
+                
+                // Objetivos
+                if (teoria.objetivos && Array.isArray(teoria.objetivos)) {
+                    form.querySelector('[name="objetivos"]').value = teoria.objetivos.join('\n');
+                }
+                
+                // Vocabulario clave
+                if (teoria.vocabulario_clave && Array.isArray(teoria.vocabulario_clave)) {
+                    form.querySelector('[name="vocabulario_clave"]').value = teoria.vocabulario_clave.join(', ');
+                }
+                
+                // Gramática
+                if (teoria.gramatica && Array.isArray(teoria.gramatica)) {
+                    form.querySelector('[name="gramatica"]').value = teoria.gramatica.join(', ');
+                }
+                
+            } catch (error) {
+                console.warn('⚠️ Error cargando contenido estructurado:', error);
+            }
+        }
+        
         if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -294,7 +348,8 @@
         }
     }
 
-    async function crearLeccion() {
+    // 🎯 ACTUALIZADO: Función crear/editar lección
+    async function crearLeccion(estadoOverride = null) {
         const form = document.getElementById('form-crear-leccion');
         if (!form) return;
         
@@ -305,9 +360,38 @@
         const idioma = formData.get('idioma');
         
         if (!titulo || !nivel || !idioma) {
-            window.toastManager.error('Por favor completa todos los campos requeridos');
+            window.toastManager.error('Título, nivel e idioma son requeridos');
             return;
         }
+        
+        // 🎯 CONSTRUIR ESTRUCTURA JSON (igual que el script Python)
+        const temas = formData.get('temas')
+            ? formData.get('temas').split(',').map(t => t.trim()).filter(t => t)
+            : [];
+        
+        const objetivos = formData.get('objetivos')
+            ? formData.get('objetivos').split('\n').map(o => o.trim()).filter(o => o)
+            : [];
+        
+        const vocabulario_clave = formData.get('vocabulario_clave')
+            ? formData.get('vocabulario_clave').split(',').map(v => v.trim()).filter(v => v)
+            : [];
+        
+        const gramatica = formData.get('gramatica')
+            ? formData.get('gramatica').split(',').map(g => g.trim()).filter(g => g)
+            : [];
+        
+        // Estructura de contenido JSON
+        const contenido = {
+            temas: temas,
+            teoria: {
+                objetivos: objetivos,
+                vocabulario_clave: vocabulario_clave,
+                gramatica: gramatica.length > 0 ? gramatica : undefined
+            }
+        };
+        
+        const estado = estadoOverride || formData.get('estado') || 'activa';
         
         const datosLeccion = {
             titulo: titulo,
@@ -316,49 +400,61 @@
             idioma: idioma,
             duracion_minutos: parseInt(formData.get('duracion_minutos') || 30),
             orden: parseInt(formData.get('orden') || 0),
-            contenido: formData.get('contenido') || '',
-            estado: 'borrador'
+            contenido: JSON.stringify(contenido), // 🎯 Guardar como JSON string
+            estado: estado
         };
 
         try {
             mostrarLoading(true);
             
-            const endpoint = window.APP_CONFIG?.API?.ENDPOINTS?.LECCIONES?.CREAR || '/lecciones';
-            const response = await window.apiClient.post(endpoint, datosLeccion);
+            let response;
+            let endpoint;
             
-            console.log('📦 Respuesta crear lección:', response);
+            if (modoEdicion && leccionEditando) {
+                // Modo edición: PUT
+                endpoint = `/lecciones/${leccionEditando.id}`;
+                response = await window.apiClient.put(endpoint, datosLeccion);
+            } else {
+                // Modo creación: POST
+                endpoint = '/lecciones';
+                response = await window.apiClient.post(endpoint, datosLeccion);
+            }
+            
+            console.log('📦 Respuesta:', response);
             
             if (response.success) {
-                window.toastManager.success('Lección creada exitosamente');
+                const accion = modoEdicion ? 'actualizada' : 'creada';
+                window.toastManager.success(`Lección ${accion} exitosamente`);
                 ocultarModalCrear();
                 await cargarLecciones();
                 
-                // Redirigir al editor
-                setTimeout(() => {
-                    // 🔧 CORRECCIÓN: response.data contiene {success, data, mensaje}
+                // Si es nueva y estado activa, redirigir al editor
+                if (!modoEdicion && estado === 'activa') {
                     const serverData = response.data;
                     const leccionId = serverData.data?.id || serverData.data?.leccion_id;
                     
                     if (leccionId) {
-                        window.location.href = `/pages/admin/editor-leccion.html?id=${leccionId}`;
+                        setTimeout(() => {
+                            window.location.href = `/pages/admin/editor-leccion.html?id=${leccionId}`;
+                        }, 1000);
                     }
-                }, 1000);
+                }
                 
             } else {
-                throw new Error(response.error || 'Error al crear lección');
+                throw new Error(response.error || 'Error al guardar lección');
             }
         } catch (error) {
-            console.error('Error creando lección:', error);
-            window.toastManager.error('Error al crear la lección: ' + (error.message || 'Error desconocido'));
+            console.error('Error guardando lección:', error);
+            window.toastManager.error('Error al guardar la lección: ' + (error.message || 'Error desconocido'));
         } finally {
             mostrarLoading(false);
         }
     }
 
-    // Exportar funciones globalmente
+    // Exportar funciones globalmente (actualizadas)
     window.gestionLecciones = {
         editarLeccion: (id) => {
-            window.location.href = `/pages/admin/editor-leccion.html?id=${id}`;
+            mostrarModalEditar(id); // 🎯 Abrir modal en lugar de redirigir directamente
         },
         
         verLeccion: (id) => {

@@ -6,17 +6,17 @@ class LeccionActiva {
         this.leccionData = null;
         this.ejercicios = [];
         this.ejercicioActualIndex = 0;
-        this.respuestasUsuario = {};
-        this.ejerciciosCompletados = new Set();
         
-        // 🎯 TRACKING DE XP Y PROGRESO
+        // 🎯 NUEVO: Guardar respuestas y estados de validación
+        this.respuestasGuardadas = {}; // { ejercicioId: { respuestas, resultado, validado } }
+        this.ejerciciosValidados = new Set(); // IDs de ejercicios ya validados
+        
+        // XP y progreso
         this.xpAcumulado = 0;
         this.ejerciciosCorrectos = 0;
-        this.ejerciciosValidados = [];
         
         console.log('🎯 Inicializando LeccionActiva...');
         
-        // Verificar que apiClient esté disponible
         if (!window.apiClient) {
             console.error('❌ apiClient no disponible');
             this.mostrarError('Error de configuración del sistema. apiClient no cargado.');
@@ -157,7 +157,7 @@ class LeccionActiva {
                             Ejercicio ${this.ejercicioActualIndex + 1} de ${this.ejercicios.length}
                         </div>
                         <div class="text-xs text-gray-500 dark:text-gray-400">
-                            ${this.ejerciciosCompletados.size} completados
+                            ${this.ejerciciosValidados.size} completados
                         </div>
                     </div>
                 </div>
@@ -214,8 +214,18 @@ class LeccionActiva {
         const renderer = new EjercicioRenderer(ejercicio, ejercicioContainer);
         ejercicioContainer.innerHTML = renderer.renderizar();
 
+        // 🎯 NUEVO: Si ya está validado, deshabilitar inputs
+        if (this.ejerciciosValidados.has(ejercicio.id)) {
+            this.deshabilitarInputs(ejercicioContainer);
+        }
+
         // Agregar controles de navegación
         ejercicioContainer.innerHTML += this.renderizarControles();
+
+        // 🎯 NUEVO: Si el ejercicio ya fue validado, mostrar resultados guardados
+        if (this.respuestasGuardadas[ejercicio.id]) {
+            this.mostrarResultadosGuardados(ejercicio.id);
+        }
 
         // Actualizar barra de progreso
         this.actualizarBarraProgreso();
@@ -224,7 +234,34 @@ class LeccionActiva {
     renderizarControles() {
         const esPrimero = this.ejercicioActualIndex === 0;
         const esUltimo = this.ejercicioActualIndex === this.ejercicios.length - 1;
-        const estaCompletado = this.ejerciciosCompletados.has(this.ejercicioActualIndex);
+        const ejercicioActual = this.ejercicios[this.ejercicioActualIndex];
+        const estaValidado = this.ejerciciosValidados.has(ejercicioActual.id);
+        
+        // 🎯 LÓGICA DEL BOTÓN PRINCIPAL
+        let btnPrincipalTexto = '';
+        let btnPrincipalIcono = '';
+        let btnPrincipalColor = '';
+        let btnPrincipalId = '';
+        
+        if (!estaValidado) {
+            // No validado → Botón "Validar"
+            btnPrincipalTexto = 'Validar Respuesta';
+            btnPrincipalIcono = 'fa-check-circle';
+            btnPrincipalColor = 'bg-green-500 hover:bg-green-600';
+            btnPrincipalId = 'btn-validar';
+        } else if (esUltimo) {
+            // Validado y es el último → Botón "Finalizar"
+            btnPrincipalTexto = 'Finalizar Lección';
+            btnPrincipalIcono = 'fa-flag-checkered';
+            btnPrincipalColor = 'bg-purple-500 hover:bg-purple-600';
+            btnPrincipalId = 'btn-finalizar';
+        } else {
+            // Validado y NO es el último → Botón "Siguiente"
+            btnPrincipalTexto = 'Siguiente Ejercicio';
+            btnPrincipalIcono = 'fa-arrow-right';
+            btnPrincipalColor = 'bg-blue-500 hover:bg-blue-600';
+            btnPrincipalId = 'btn-siguiente';
+        }
 
         return `
             <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -237,31 +274,12 @@ class LeccionActiva {
                     Anterior
                 </button>
                 
-                <div class="flex gap-3">
-                    <button 
-                        id="btn-validar"
-                        class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
-                    >
-                        <i class="fas fa-check-circle"></i>
-                        Validar Respuesta
-                    </button>
-                    
-                    <button 
-                        id="btn-saltar"
-                        class="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex items-center gap-2"
-                    >
-                        <i class="fas fa-forward"></i>
-                        Saltar
-                    </button>
-                </div>
-                
                 <button 
-                    id="btn-siguiente"
-                    class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    ${esUltimo ? 'disabled' : ''}
+                    id="${btnPrincipalId}"
+                    class="px-8 py-3 ${btnPrincipalColor} text-white rounded-lg transition-colors flex items-center gap-2 font-semibold text-lg shadow-lg"
                 >
-                    Siguiente
-                    <i class="fas fa-arrow-right"></i>
+                    <i class="fas ${btnPrincipalIcono}"></i>
+                    ${btnPrincipalTexto}
                 </button>
             </div>
         `;
@@ -271,21 +289,23 @@ class LeccionActiva {
         // Navegación
         setTimeout(() => {
             const btnAnterior = document.getElementById('btn-anterior');
-            const btnSiguiente = document.getElementById('btn-siguiente');
             const btnValidar = document.getElementById('btn-validar');
-            const btnSaltar = document.getElementById('btn-saltar');
+            const btnSiguiente = document.getElementById('btn-siguiente');
+            const btnFinalizar = document.getElementById('btn-finalizar');
             
             if (btnAnterior) {
                 btnAnterior.onclick = () => this.navegarEjercicio(-1);
             }
-            if (btnSiguiente) {
-                btnSiguiente.onclick = () => this.navegarEjercicio(1);
-            }
+            
+            // 🎯 NUEVO: Manejar el botón dinámico
             if (btnValidar) {
                 btnValidar.onclick = () => this.validarEjercicio();
             }
-            if (btnSaltar) {
-                btnSaltar.onclick = () => this.saltarEjercicio();
+            if (btnSiguiente) {
+                btnSiguiente.onclick = () => this.navegarEjercicio(1);
+            }
+            if (btnFinalizar) {
+                btnFinalizar.onclick = () => this.finalizarLeccion();
             }
         }, 100);
     }
@@ -302,8 +322,49 @@ class LeccionActiva {
                 contenidoLeccion.innerHTML = this.renderizarHeader();
                 this.renderizarEjercicioActual();
                 this.agregarEventListeners();
+                
+                // 🎯 NUEVO: Si el ejercicio ya fue validado, mostrar resultados guardados
+                const ejercicioActual = this.ejercicios[this.ejercicioActualIndex];
+                if (this.respuestasGuardadas[ejercicioActual.id]) {
+                    this.mostrarResultadosGuardados(ejercicioActual.id);
+                }
             }
         }
+    }
+
+    // 🎯 NUEVO: Deshabilitar todos los inputs de un ejercicio
+    deshabilitarInputs(container) {
+        const inputs = container.querySelectorAll('input, select, textarea, button[type="button"]');
+        inputs.forEach(input => {
+            input.disabled = true;
+            input.classList.add('opacity-60', 'cursor-not-allowed');
+        });
+        
+        // Agregar badge de "Completado"
+        const ejercicioCard = container.querySelector('.bg-white, .dark\\:bg-gray-800');
+        if (ejercicioCard && !ejercicioCard.querySelector('.badge-completado')) {
+            const badge = document.createElement('div');
+            badge.className = 'badge-completado absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2';
+            badge.innerHTML = '<i class="fas fa-check"></i> Completado';
+            ejercicioCard.style.position = 'relative';
+            ejercicioCard.appendChild(badge);
+        }
+    }
+
+    // 🎯 NUEVO: Mostrar resultados guardados al volver atrás
+    mostrarResultadosGuardados(ejercicioId) {
+        const datosGuardados = this.respuestasGuardadas[ejercicioId];
+        if (!datosGuardados) return;
+
+        const ejercicioContainer = document.getElementById('ejercicio-actual');
+        const ejercicio = this.ejercicios.find(e => e.id === ejercicioId);
+        
+        // Recrear renderer y mostrar resultados
+        const renderer = new EjercicioRenderer(ejercicio, ejercicioContainer);
+        renderer.mostrarResultados(datosGuardados.resultado);
+        
+        // Mostrar panel de resultados
+        this.mostrarPanelResultados(datosGuardados.resultado, ejercicio);
     }
 
     async validarEjercicio() {
@@ -340,25 +401,25 @@ class LeccionActiva {
                 
                 console.log('📦 Resultado extraído:', resultadoReal);
                 
+                // 🎯 GUARDAR RESPUESTAS Y RESULTADOS
+                this.respuestasGuardadas[ejercicio.id] = {
+                    respuestas: respuestasUsuario,
+                    resultado: resultadoReal,
+                    timestamp: new Date().toISOString()
+                };
+                
+                this.ejerciciosValidados.add(ejercicio.id);
+                
                 // Mostrar resultados en los ejercicios
                 renderer.mostrarResultados(resultadoReal);
                 
                 // Mostrar panel de resultados
                 this.mostrarPanelResultados(resultadoReal, ejercicio);
                 
-                // Marcar como completado
-                this.ejerciciosCompletados.add(this.ejercicioActualIndex);
-
                 // 🎯 TRACKING: Guardar resultado y XP
                 const esCorrecta = resultadoReal.esCorrecta || resultadoReal.data?.correcto;
                 const puntuacion = resultadoReal.puntuacion || resultadoReal.data?.puntuacion_obtenida || 0;
                 const puntosMaximos = resultadoReal.puntuacionMaxima || resultadoReal.data?.puntuacion_maxima || ejercicio.puntos_maximos || 10;
-
-                this.ejerciciosValidados.push({
-                    ejercicio_id: ejercicio.id,
-                    correcto: esCorrecta,
-                    puntuacion: puntuacion
-                });
 
                 if (esCorrecta) {
                     this.ejerciciosCorrectos++;
@@ -366,11 +427,15 @@ class LeccionActiva {
                     console.log(`🎉 XP acumulado: ${this.xpAcumulado} (+${puntuacion})`);
                 }
 
-                // 🎯 DETECTAR ÚLTIMO EJERCICIO
-                const esUltimo = this.ejercicioActualIndex === this.ejercicios.length - 1;
-                if (esUltimo && this.ejerciciosValidados.length === this.ejercicios.length) {
-                    console.log('🏁 Último ejercicio completado - preparando finalización...');
-                    setTimeout(() => this.finalizarLeccion(), 2000);
+                // 🎯 Deshabilitar inputs
+                const ejercicioContainer = document.getElementById('ejercicio-actual');
+                this.deshabilitarInputs(ejercicioContainer);
+
+                // 🎯 ACTUALIZAR CONTROLES (cambia de "Validar" a "Siguiente"/"Finalizar")
+                const controlesContainer = ejercicioContainer.querySelector('.flex.justify-between.items-center.mt-8');
+                if (controlesContainer) {
+                    controlesContainer.outerHTML = this.renderizarControles();
+                    this.agregarEventListeners();
                 }
 
                 console.log('📊 Datos para toast:', {esCorrecta, puntuacion, puntosMaximos});
@@ -390,7 +455,7 @@ class LeccionActiva {
             console.error('❌ Error validando ejercicio:', error);
             this.mostrarToast('Error al validar el ejercicio: ' + error.message, 'error');
         } finally {
-            // Restaurar botón
+            // Restaurar botón (solo si aún existe y no fue reemplazado)
             const btnValidar = document.getElementById('btn-validar');
             if (btnValidar) {
                 btnValidar.innerHTML = '<i class="fas fa-check-circle"></i> Validar Respuesta';
@@ -480,12 +545,6 @@ class LeccionActiva {
         }
     }
 
-    saltarEjercicio() {
-        if (confirm('¿Estás seguro de que quieres saltar este ejercicio? Podrás volver a intentarlo más tarde.')) {
-            this.navegarEjercicio(1);
-        }
-    }
-
     async finalizarLeccion() {
         try {
             console.log('🏁 Finalizando lección...');
@@ -535,6 +594,15 @@ class LeccionActiva {
                 };
                 
                 console.log('🎯 Datos para modal:', datosModal);
+                
+                // 🎯 NUEVO: Mostrar notificaciones de logros desbloqueados
+                if (datos.logros_desbloqueados && datos.logros_desbloqueados.length > 0) {
+                    datos.logros_desbloqueados.forEach((logro, index) => {
+                        setTimeout(() => {
+                            this.mostrarNotificacionLogro(logro);
+                        }, index * 1000); // Mostrar uno cada segundo
+                    });
+                }
                 
                 if (aprobado) {
                     this.mostrarModalAprobado(datosModal);
@@ -594,6 +662,32 @@ class LeccionActiva {
             
             this.mostrarToast('Error al finalizar la lección: ' + error.message, 'error');
         }
+    }
+
+    // 🎯 NUEVO: Función para mostrar notificación de logro desbloqueado
+    mostrarNotificacionLogro(logro) {
+        const notificacion = document.createElement('div');
+        notificacion.className = 'fixed top-20 right-4 z-50 animate-slide-in';
+        notificacion.innerHTML = `
+            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl shadow-2xl p-6 max-w-sm">
+                <div class="flex items-center gap-4">
+                    <div class="text-6xl animate-bounce">${logro.icono}</div>
+                    <div>
+                        <div class="text-xs font-semibold opacity-90 mb-1">¡LOGRO DESBLOQUEADO!</div>
+                        <div class="text-xl font-bold mb-1">${logro.titulo}</div>
+                        <div class="text-sm opacity-90">${logro.descripcion}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(notificacion);
+        
+        // Remover después de 5 segundos
+        setTimeout(() => {
+            notificacion.classList.add('animate-fade-out');
+            setTimeout(() => notificacion.remove(), 300);
+        }, 5000);
     }
 
     mostrarModalAprobado(datos) {

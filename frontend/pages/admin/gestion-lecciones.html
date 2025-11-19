@@ -165,89 +165,209 @@ Página de gestión de lecciones para administradores en SpeakLexi.
         </div>
     </main>
 
-    <!-- Modal Crear Lección -->
+    <!-- Modal Crear/Editar Lección -->
     <div id="modal-crear-leccion" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Crear Nueva Lección</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+                <h3 id="modal-titulo" class="text-xl font-bold text-gray-900 dark:text-white">
+                    Crear Nueva Lección
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Completa la información básica de la lección
+                </p>
             </div>
             
-            <form id="form-crear-leccion" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Título *</label>
-                    <input type="text" name="titulo" required 
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                           placeholder="Ej: Saludos y Presentaciones Básicas">
+            <form id="form-crear-leccion" class="p-6 space-y-6">
+                <!-- ========== SECCIÓN 1: INFORMACIÓN BÁSICA ========== -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-blue-500"></i>
+                        Información Básica
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Título <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="titulo" required 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="Ej: Saludos y Presentaciones Básicas">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Descripción
+                            </label>
+                            <textarea name="descripcion" rows="2"
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                      placeholder="Breve descripción del contenido..."></textarea>
+                        </div>
+                    </div>
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción</label>
-                    <textarea name="descripcion" rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                              placeholder="Breve descripción del contenido de la lección..."></textarea>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nivel *</label>
-                        <select name="nivel" required 
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                            <option value="">Seleccionar nivel</option>
-                            <option value="A1">A1 - Principiante</option>
-                            <option value="A2">A2 - Elemental</option>
-                            <option value="B1">B1 - Intermedio</option>
-                            <option value="B2">B2 - Intermedio Alto</option>
-                            <option value="C1">C1 - Avanzado</option>
-                            <option value="C2">C2 - Maestría</option>
-                        </select>
+
+                <!-- ========== SECCIÓN 2: CLASIFICACIÓN ========== -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <i class="fas fa-tag text-green-500"></i>
+                        Clasificación
+                    </h4>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nivel <span class="text-red-500">*</span>
+                            </label>
+                            <select name="nivel" required 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500">
+                                <option value="">Seleccionar</option>
+                                <option value="A1">A1 - Principiante</option>
+                                <option value="A2">A2 - Elemental</option>
+                                <option value="B1">B1 - Intermedio</option>
+                                <option value="B2">B2 - Intermedio Alto</option>
+                                <option value="C1">C1 - Avanzado</option>
+                                <option value="C2">C2 - Maestría</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Idioma <span class="text-red-500">*</span>
+                            </label>
+                            <select name="idioma" required 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500">
+                                <option value="">Seleccionar</option>
+                                <option value="Inglés">Inglés</option>
+                                <option value="Francés">Francés</option>
+                                <option value="Alemán">Alemán</option>
+                                <option value="Italiano">Italiano</option>
+                                <option value="Portugués">Portugués</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Estado
+                            </label>
+                            <select name="estado" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500">
+                                <option value="activa" selected>Activa</option>
+                                <option value="borrador">Borrador</option>
+                                <option value="inactiva">Inactiva</option>
+                            </select>
+                        </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Idioma *</label>
-                        <select name="idioma" required 
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                            <option value="">Seleccionar idioma</option>
-                            <option value="Inglés">Inglés</option>
-                            <option value="Francés">Francés</option>
-                            <option value="Alemán">Alemán</option>
-                            <option value="Italiano">Italiano</option>
-                            <option value="Portugués">Portugués</option>
-                        </select>
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Duración (minutos)
+                            </label>
+                            <input type="number" name="duracion_minutos" min="5" max="180" value="30"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Orden
+                            </label>
+                            <input type="number" name="orden" min="0" value="0"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500">
+                        </div>
                     </div>
                 </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Duración (minutos)</label>
-                        <input type="number" name="duracion_minutos" min="5" max="180" value="30"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+
+                <!-- ========== SECCIÓN 3: CONTENIDO ESTRUCTURADO ========== -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <i class="fas fa-book text-purple-500"></i>
+                        Contenido de la Lección
+                    </h4>
+                    
+                    <!-- Temas -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Temas (separados por coma)
+                        </label>
+                        <input type="text" name="temas" 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                               placeholder="Ej: saludos formales, despedidas, presentaciones">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Los temas principales que se cubren en esta lección
+                        </p>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Orden</label>
-                        <input type="number" name="orden" min="0" value="0"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <!-- Objetivos -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Objetivos de Aprendizaje (uno por línea)
+                        </label>
+                        <textarea name="objetivos" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Ej:&#10;Saludar formalmente&#10;Presentarse en situaciones sociales&#10;Usar expresiones de cortesía"></textarea>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            ¿Qué aprenderán los estudiantes?
+                        </p>
                     </div>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contenido</label>
-                    <textarea name="contenido" rows="6"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                              placeholder="Contenido educativo detallado de la lección..."></textarea>
+                    
+                    <!-- Vocabulario Clave -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Vocabulario Clave (separado por coma)
+                        </label>
+                        <input type="text" name="vocabulario_clave" 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                               placeholder="Ej: hello, goodbye, nice to meet you, how are you">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Palabras y frases importantes de esta lección
+                        </p>
+                    </div>
+                    
+                    <!-- Gramática (opcional) -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Puntos Gramaticales (separados por coma)
+                        </label>
+                        <input type="text" name="gramatica" 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                               placeholder="Ej: presente simple, pronombres personales">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Estructuras gramaticales cubiertas (opcional)
+                        </p>
+                    </div>
+
+                    <!-- Contenido Principal -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Contenido Principal
+                        </label>
+                        <textarea name="contenido" rows="6"
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Contenido educativo detallado de la lección..."></textarea>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Explicación completa de los conceptos, ejemplos y ejercicios
+                        </p>
+                    </div>
                 </div>
             </form>
             
-            <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+            <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
                 <button type="button" id="btn-cancelar-crear" 
                         class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
                     Cancelar
                 </button>
-                <button type="button" id="btn-guardar-leccion" 
-                        class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
-                    <i class="fas fa-save"></i>
-                    Crear Lección
-                </button>
+                <div class="flex gap-3">
+                    <button type="button" id="btn-guardar-borrador-modal" 
+                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center gap-2">
+                        <i class="fas fa-save"></i>
+                        Guardar Borrador
+                    </button>
+                    <button type="button" id="btn-guardar-leccion" 
+                            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                        <i class="fas fa-check"></i>
+                        Crear y Editar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
