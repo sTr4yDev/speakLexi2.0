@@ -6,6 +6,23 @@ const Estadisticas = require('../models/estadisticasModel');
 const logrosHelper = require('../helpers/logrosHelper');
 const { pool } = require('../config/database');
 
+// Mapeo de tipos de ejercicios entre el editor y el frontend
+const TIPO_EJERCICIO_MAPPING = {
+    'seleccion_multiple': 'multiple_choice',
+    'verdadero_falso': 'true_false', 
+    'completar_espacios': 'fill_blank',
+    'emparejamiento': 'matching',
+    'escritura': 'writing'
+};
+
+// Función para mapear tipos de ejercicios
+const mapearTiposEjercicios = (ejercicios) => {
+    return ejercicios.map(ejercicio => ({
+        ...ejercicio,
+        tipo: TIPO_EJERCICIO_MAPPING[ejercicio.tipo] || ejercicio.tipo
+    }));
+};
+
 // @desc    Obtener catálogo de lecciones SOLO del nivel del usuario
 // @route   GET /api/lecciones/catalogo
 // @access  Private
@@ -383,6 +400,7 @@ exports.crearLeccion = async (req, res) => {
 
         // ✅ NUEVO: Guardar actividades como ejercicios
         if (actividades && Array.isArray(actividades) && actividades.length > 0) {
+            console.log(`📝 Guardando ${actividades.length} actividades como ejercicios para lección ${leccionId}`);
             await Leccion.guardarEjercicios(leccionId, actividades, req.user.id);
         }
 
@@ -462,7 +480,7 @@ exports.listarLecciones = async (req, res) => {
     }
 };
 
-// @desc    Obtener lección por ID
+// @desc    Obtener lección por ID CON EJERCICIOS
 // @route   GET /api/lecciones/:id
 // @access  Private
 exports.obtenerLeccion = async (req, res) => {
@@ -480,15 +498,43 @@ exports.obtenerLeccion = async (req, res) => {
         // Obtener multimedia asociada
         const multimedia = await Multimedia.obtenerPorLeccion(leccionId);
 
-        // ✅ Obtener ejercicios de la lección
-        const ejercicios = await Leccion.obtenerEjerciciosPorLeccion(leccionId);
+        // ✅ Obtener ejercicios de la lección DESDE LA TABLA EJERCICIOS
+        let ejercicios = await Leccion.obtenerEjerciciosPorLeccion(leccionId);
+
+        // 🔥 SOLUCIÓN CRÍTICA: Si no hay ejercicios en la tabla, buscar en el JSON de la lección
+        if (!ejercicios || ejercicios.length === 0) {
+            console.log(`⚠️ No se encontraron ejercicios en tabla para lección ${leccionId}, buscando en JSON...`);
+            
+            // Intentar obtener actividades desde el JSON de la lección
+            if (leccion.actividades && typeof leccion.actividades === 'string') {
+                try {
+                    const actividades = JSON.parse(leccion.actividades);
+                    if (Array.isArray(actividades) && actividades.length > 0) {
+                        ejercicios = actividades;
+                        console.log(`✅ Encontradas ${ejercicios.length} actividades en JSON de lección`);
+                        
+                        // 🔥 GUARDAR LAS ACTIVIDADES EN LA TABLA EJERCICIOS PARA FUTURO
+                        await Leccion.guardarEjercicios(leccionId, actividades, leccion.creado_por);
+                        console.log(`💾 Actividades guardadas en tabla ejercicios para lección ${leccionId}`);
+                    }
+                } catch (parseError) {
+                    console.error('Error parseando actividades JSON:', parseError);
+                }
+            }
+        }
+
+        // 🔥 MAPEAR TIPOS DE EJERCICIOS para compatibilidad con frontend
+        if (ejercicios && ejercicios.length > 0) {
+            ejercicios = mapearTiposEjercicios(ejercicios);
+            console.log(`🎯 Ejercicios mapeados: ${ejercicios.length} ejercicios listos para frontend`);
+        }
 
         res.json({
             success: true,
             data: {
                 ...leccion,
                 multimedia,
-                ejercicios
+                ejercicios: ejercicios || []
             }
         });
 
@@ -501,7 +547,7 @@ exports.obtenerLeccion = async (req, res) => {
     }
 };
 
-// @desc    Actualizar lección
+// @desc    Actualizar lección CON EJERCICIOS
 // @route   PUT /api/lecciones/:id
 // @access  Private (Profesor/Admin)
 exports.actualizarLeccion = async (req, res) => {
@@ -528,10 +574,24 @@ exports.actualizarLeccion = async (req, res) => {
 
         const actualizado = await Leccion.actualizar(leccionId, datosActualizacion);
 
+        // ✅ NUEVO: Actualizar ejercicios si vienen actividades
+        if (actualizado && datosActualizacion.actividades && Array.isArray(datosActualizacion.actividades)) {
+            console.log(`🔄 Actualizando ${datosActualizacion.actividades.length} ejercicios para lección ${leccionId}`);
+            
+            // 🔥 SOLUCIÓN: Eliminar ejercicios existentes y guardar nuevos
+            await pool.execute('DELETE FROM ejercicios WHERE leccion_id = ?', [leccionId]);
+            await Leccion.guardarEjercicios(leccionId, datosActualizacion.actividades, req.user.id);
+            
+            console.log(`✅ ${datosActualizacion.actividades.length} ejercicios actualizados para lección ${leccionId}`);
+        }
+
         if (actualizado) {
             res.json({
                 success: true,
-                mensaje: 'Lección actualizada exitosamente'
+                mensaje: 'Lección actualizada exitosamente',
+                data: {
+                    actividades_actualizadas: datosActualizacion.actividades ? datosActualizacion.actividades.length : 0
+                }
             });
         } else {
             res.status(400).json({
@@ -573,12 +633,16 @@ exports.eliminarLeccion = async (req, res) => {
             });
         }
 
+        // ✅ ELIMINAR EJERCICIOS ASOCIADOS PRIMERO
+        await pool.execute('DELETE FROM ejercicios WHERE leccion_id = ?', [leccionId]);
+        console.log(`🗑️ Ejercicios eliminados para lección ${leccionId}`);
+
         const eliminado = await Leccion.eliminar(leccionId);
 
         if (eliminado) {
             res.json({
                 success: true,
-                mensaje: 'Lección eliminada exitosamente'
+                mensaje: 'Lección y ejercicios asociados eliminados exitosamente'
             });
         } else {
             res.status(400).json({
@@ -661,7 +725,7 @@ exports.registrarProgreso = async (req, res) => {
 
             // Verificar y desbloquear logros
             const logrosNuevos = await logrosHelper.verificarLogros(usuarioId, {
-                porcentaje,
+                porcentaje: progreso,
                 nivel: leccion.nivel,
                 leccion_id: leccionId
             });

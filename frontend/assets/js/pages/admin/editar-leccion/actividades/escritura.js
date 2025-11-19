@@ -1,153 +1,194 @@
 /* ============================================
-   SPEAKLEXI - EDITOR LECCIÓN - ESCRITURA
-   Archivo: assets/js/pages/admin/editor-leccion/actividades/escritura.js
+   SPEAKLEXI - ESCRITURA (FORMATO PYTHON)
+   Compatible con el sistema unificado
    ============================================ */
 
-// Manager específico para actividades de escritura
 window.EscrituraManager = {
     crear() {
         return {
             id: 'actividad_' + Date.now(),
-            tipo: 'escritura',
-            titulo: 'Nueva Actividad Escritura',
-            puntos: 10,
+            tipo: 'writing', // ✅ Formato Python unificado
+            titulo: 'Actividad de Escritura',
+            puntos_maximos: 20,
             orden: 0,
             contenido: {
-                consigna: "",
-                longitud_minima: 50,
-                tiempo_sugerido: 10,
-                criterios: [],
-                ejemplo_respuesta: "",
-                explicacion: "",
-                imagen: null
+                instrucciones: "",
+                palabras_minimas: 50
             },
-            config: {
-                tiempo_limite: null,
-                intentos_permitidos: 1,
-                mostrar_explicacion: true
+            respuesta_correcta: {
+                tipo: "evaluacion_manual",
+                criterios: ["Claridad", "Gramática", "Vocabulario"]
             }
         };
     },
 
     generarCampos(actividad) {
-        const tieneImagen = actividad.contenido.imagen;
-        const criterios = actividad.contenido.criterios || [];
+        const criterios = actividad.respuesta_correcta.criterios || [];
         
         return `
-            <div class="space-y-4">
-                <!-- Imagen de consigna -->
-                <div class="campo-actividad">
-                    <label class="flex items-center justify-between">
-                        <span>Imagen de referencia (Opcional)</span>
-                        ${tieneImagen ? `
-                            <button type="button" onclick="EscrituraManager.eliminarImagen('${actividad.id}')" 
-                                    class="text-red-500 hover:text-red-700 text-sm">
-                                <i class="fas fa-trash mr-1"></i>Eliminar
-                            </button>
-                        ` : ''}
-                    </label>
-                    ${tieneImagen ? `
-                        <div class="preview-imagen">
-                            <img src="${actividad.contenido.imagen.url}" alt="Imagen de consigna" class="max-h-48 mx-auto">
-                            <button type="button" onclick="EscrituraManager.eliminarImagen('${actividad.id}')" 
-                                    class="btn-eliminar-imagen">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    ` : `
-                        <div class="flex gap-2">
-                            <button type="button" onclick="EscrituraManager.agregarImagen('${actividad.id}')"
-                                    class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                <i class="fas fa-image mr-2"></i>Subir Imagen
-                            </button>
-                        </div>
-                    `}
+            <div class="space-y-6">
+                ${this.generarHeaderActividad(actividad)}
+                ${this.generarSeccionInstrucciones(actividad)}
+                ${this.generarSeccionConfiguracion(actividad)}
+                ${this.generarSeccionCriterios(actividad)}
+            </div>
+        `;
+    },
+
+    generarHeaderActividad(actividad) {
+        return `
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center shadow-sm border border-purple-200 dark:border-purple-700">
+                        <i class="fas fa-pen text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Escritura</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Ejercicio de expresión escrita</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-1 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium border border-purple-200 dark:border-purple-700">
+                        ${actividad.puntos_maximos} pts
+                    </span>
+                </div>
+            </div>
+        `;
+    },
+
+    generarSeccionInstrucciones(actividad) {
+        return `
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2 mb-4">
+                    <h4 class="font-semibold text-gray-900 dark:text-white">Instrucciones de Escritura</h4>
                 </div>
 
-                <!-- Consigna -->
-                <div class="campo-actividad">
-                    <label>Consigna de Escritura *</label>
-                    <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4 mb-3">
-                        <p class="text-sm text-indigo-700 dark:text-indigo-300">
-                            ✍️ <strong>Tip:</strong> Escribe una consigna clara que guíe al estudiante.
+                <!-- Instrucciones -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Consigna para el estudiante *
+                    </label>
+                    <textarea 
+                        oninput="EscrituraManager.actualizarInstrucciones('${actividad.id}', this.value)"
+                        placeholder="Ej: Escribe un párrafo describiendo tu rutina diaria. Incluye al menos 50 palabras..."
+                        class="w-full h-32 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                    >${actividad.contenido.instrucciones}</textarea>
+                </div>
+
+                <!-- Ejemplos -->
+                <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-lightbulb text-blue-500 mt-0.5"></i>
+                        <div class="text-sm text-blue-700 dark:text-blue-300">
+                            <strong>Ejemplos de consignas:</strong>
+                            <ul class="mt-1 space-y-1">
+                                <li>• Describe tu ciudad ideal usando al menos 10 adjetivos</li>
+                                <li>• Escribe una carta formal solicitando información</li>
+                                <li>• Narra una experiencia personal importante</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    generarSeccionConfiguracion(actividad) {
+        return `
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2 mb-4">
+                    <h4 class="font-semibold text-gray-900 dark:text-white">Configuración</h4>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Palabras mínimas
+                        </label>
+                        <input type="number" 
+                               value="${actividad.contenido.palabras_minimas || 50}"
+                               oninput="EscrituraManager.actualizarPalabrasMinimas('${actividad.id}', parseInt(this.value))"
+                               min="10" max="1000"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Puntos máximos
+                        </label>
+                        <input type="number" 
+                               value="${actividad.puntos_maximos}"
+                               oninput="EscrituraManager.actualizarPuntos('${actividad.id}', parseInt(this.value))"
+                               min="5" max="100"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    generarSeccionCriterios(actividad) {
+        const criterios = actividad.respuesta_correcta.criterios || [];
+        
+        return `
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Criterios de Evaluación</h4>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full text-sm font-medium">
+                        ${criterios.length} criterios
+                    </span>
+                </div>
+
+                <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-info-circle text-green-500 mt-0.5"></i>
+                        <p class="text-sm text-green-700 dark:text-green-300">
+                            Los criterios ayudan a evaluar la escritura de manera consistente
                         </p>
                     </div>
-                    <textarea oninput="EscrituraManager.actualizarConsigna('${actividad.id}', this.value)"
-                              class="w-full h-32"
-                              placeholder="Ej: Escribe un párrafo de al menos 100 palabras describiendo tu rutina diaria...">${actividad.contenido.consigna}</textarea>
                 </div>
 
-                <!-- Configuración de escritura -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Longitud Mínima (palabras)
-                        </label>
-                        <input type="number" value="${actividad.contenido.longitud_minima}" min="1" max="1000"
-                               oninput="EscrituraManager.actualizarLongitud('${actividad.id}', parseInt(this.value))"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Tiempo Sugerido (minutos)
-                        </label>
-                        <input type="number" value="${actividad.contenido.tiempo_sugerido || 10}" min="1" max="120"
-                               oninput="EscrituraManager.actualizarTiempo('${actividad.id}', parseInt(this.value))"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
-                               placeholder="Tiempo sugerido">
-                    </div>
+                <div class="space-y-3" id="criterios-escritura-${actividad.id}">
+                    ${criterios.length > 0 ? 
+                        criterios.map((criterio, index) => this.generarCriterioHTML(actividad.id, criterio, index)).join('') 
+                    : this.generarPlaceholderCriterios()}
                 </div>
-
-                <!-- Criterios de evaluación -->
-                <div class="campo-actividad">
-                    <label class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Criterios de Evaluación</span>
-                        <button type="button" onclick="EscrituraManager.agregarCriterio('${actividad.id}')" 
-                                class="text-xs text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300">
-                            <i class="fas fa-plus mr-1"></i>Agregar Criterio
-                        </button>
-                    </label>
-                    
-                    <div class="space-y-2" id="criterios-escritura-${actividad.id}">
-                        ${criterios.length > 0 ? 
-                            criterios.map((criterio, index) => this.generarCriterioHTML(actividad.id, criterio, index)).join('') 
-                        : this.generarPlaceholderCriterios()}
-                    </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Los criterios ayudan a los estudiantes a entender cómo serán evaluados
-                    </p>
-                </div>
-
-                <!-- Ejemplo de respuesta -->
-                <div class="campo-actividad">
-                    <label>Ejemplo de Respuesta (Opcional)</label>
-                    <textarea oninput="EscrituraManager.actualizarEjemplo('${actividad.id}', this.value)"
-                              class="w-full h-24"
-                              placeholder="Proporciona un ejemplo de una buena respuesta...">${actividad.contenido.ejemplo_respuesta}</textarea>
-                </div>
-
-                <!-- Retroalimentación -->
-                <div class="campo-actividad">
-                    <label>Retroalimentación General (Opcional)</label>
-                    <textarea oninput="EscrituraManager.actualizarExplicacion('${actividad.id}', this.value)"
-                              class="w-full h-16"
-                              placeholder="Retroalimentación que recibirá el estudiante...">${actividad.contenido.explicacion}</textarea>
-                </div>
+                
+                <button type="button" 
+                        onclick="EscrituraManager.agregarCriterio('${actividad.id}')" 
+                        class="mt-4 w-full py-2 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-600 dark:text-green-400 rounded-lg border border-green-200 dark:border-green-700 transition-colors font-medium">
+                    <i class="fas fa-plus mr-2"></i>
+                    Agregar Criterio
+                </button>
             </div>
         `;
     },
 
     generarCriterioHTML(actividadId, criterio, index) {
         return `
-            <div class="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-700">
-                <input type="text" value="${criterio}" 
-                       oninput="EscrituraManager.actualizarCriterio('${actividadId}', ${index}, this.value)"
-                       class="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
-                       placeholder="Ej: Uso correcto del vocabulario">
-                <button type="button" onclick="EscrituraManager.eliminarCriterio('${actividadId}', ${index})"
-                        class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                    <i class="fas fa-times"></i>
+            <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                <!-- Número -->
+                <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded flex items-center justify-center font-semibold text-green-600 dark:text-green-400 text-sm">
+                    ${index + 1}
+                </div>
+
+                <!-- Campo de criterio -->
+                <div class="flex-1">
+                    <input type="text" 
+                           value="${criterio}"
+                           oninput="EscrituraManager.actualizarCriterio('${actividadId}', ${index}, this.value)"
+                           placeholder="Ej: Claridad, Gramática, Vocabulario..."
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+
+                <!-- Controles -->
+                <button type="button" 
+                        onclick="EscrituraManager.eliminarCriterio('${actividadId}', ${index})"
+                        class="w-8 h-8 flex items-center justify-center text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-400 transition-colors rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                        title="Eliminar criterio">
+                    <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
         `;
@@ -155,129 +196,122 @@ window.EscrituraManager = {
 
     generarPlaceholderCriterios() {
         return `
-            <div class="text-center py-3 text-gray-500 dark:text-gray-400 text-sm">
-                <i class="fas fa-clipboard-list mr-2"></i>
-                No hay criterios definidos
+            <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                <i class="fas fa-clipboard-list text-2xl mb-2 opacity-50"></i>
+                <p class="font-medium">No hay criterios definidos</p>
+                <p class="text-sm">Agrega criterios para evaluar la escritura</p>
             </div>
         `;
     },
 
-    // Funciones de gestión de criterios
+    // ========== FUNCIONES DE GESTIÓN ==========
+
+    actualizarInstrucciones(actividadId, instrucciones) {
+        const actividad = this.getActividad(actividadId);
+        if (actividad) {
+            actividad.contenido.instrucciones = instrucciones;
+        }
+    },
+
+    actualizarPalabrasMinimas(actividadId, palabras) {
+        const actividad = this.getActividad(actividadId);
+        if (actividad) {
+            actividad.contenido.palabras_minimas = palabras;
+        }
+    },
+
+    actualizarPuntos(actividadId, puntos) {
+        const actividad = this.getActividad(actividadId);
+        if (actividad) {
+            actividad.puntos_maximos = puntos;
+        }
+    },
+
+    // ========== GESTIÓN DE CRITERIOS ==========
+
     agregarCriterio(actividadId) {
         const actividad = this.getActividad(actividadId);
         if (actividad) {
-            if (!actividad.contenido.criterios) {
-                actividad.contenido.criterios = [];
+            if (!actividad.respuesta_correcta.criterios) {
+                actividad.respuesta_correcta.criterios = [];
             }
             
-            actividad.contenido.criterios.push("");
+            actividad.respuesta_correcta.criterios.push("Nuevo criterio");
             window.leccionEditor.recargarActividad(actividadId);
         }
     },
 
     eliminarCriterio(actividadId, index) {
         const actividad = this.getActividad(actividadId);
-        if (actividad && actividad.contenido.criterios) {
-            actividad.contenido.criterios.splice(index, 1);
+        if (actividad && actividad.respuesta_correcta.criterios) {
+            actividad.respuesta_correcta.criterios.splice(index, 1);
             window.leccionEditor.recargarActividad(actividadId);
         }
     },
 
     actualizarCriterio(actividadId, index, valor) {
         const actividad = this.getActividad(actividadId);
-        if (actividad && actividad.contenido.criterios) {
-            actividad.contenido.criterios[index] = valor;
+        if (actividad && actividad.respuesta_correcta.criterios) {
+            actividad.respuesta_correcta.criterios[index] = valor;
         }
     },
 
-    // Funciones de gestión de contenido
-    actualizarConsigna(actividadId, consigna) {
-        const actividad = this.getActividad(actividadId);
-        if (actividad) {
-            actividad.contenido.consigna = consigna;
-        }
-    },
+    // ========== FUNCIONES AUXILIARES ==========
 
-    actualizarLongitud(actividadId, longitud) {
-        const actividad = this.getActividad(actividadId);
-        if (actividad) {
-            actividad.contenido.longitud_minima = longitud;
-        }
-    },
-
-    actualizarTiempo(actividadId, tiempo) {
-        const actividad = this.getActividad(actividadId);
-        if (actividad) {
-            actividad.contenido.tiempo_sugerido = tiempo;
-        }
-    },
-
-    actualizarEjemplo(actividadId, ejemplo) {
-        const actividad = this.getActividad(actividadId);
-        if (actividad) {
-            actividad.contenido.ejemplo_respuesta = ejemplo;
-        }
-    },
-
-    actualizarExplicacion(actividadId, explicacion) {
-        const actividad = this.getActividad(actividadId);
-        if (actividad) {
-            actividad.contenido.explicacion = explicacion;
-        }
-    },
-
-    // Funciones de gestión de imágenes
-    agregarImagen(actividadId) {
-        window.currentImageContext = { actividadId, tipoCampo: 'pregunta' };
-        this.abrirSelectorImagen();
-    },
-
-    eliminarImagen(actividadId) {
-        const actividad = this.getActividad(actividadId);
-        if (actividad) {
-            actividad.contenido.imagen = null;
-            window.leccionEditor.recargarActividad(actividadId);
-        }
-    },
-
-    // Helper functions
     getActividad(actividadId) {
         return window.leccionEditor.getActividades().find(a => a.id === actividadId);
     },
 
-    abrirSelectorImagen() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => this.manejarSeleccionImagen(e.target.files[0]);
-        input.click();
-    },
+    // ========== VALIDACIÓN ==========
 
-    async manejarSeleccionImagen(file) {
-        if (!window.currentImageContext || !file) return;
+    validar(actividad) {
+        const errores = [];
 
-        const imagenData = {
-            id: 'temp_' + Date.now(),
-            url: URL.createObjectURL(file),
-            nombre: file.name,
-            tipo: file.type,
-            tamaño: file.size
-        };
+        if (!actividad.contenido.instrucciones || !actividad.contenido.instrucciones.trim()) {
+            errores.push('Las instrucciones de escritura son requeridas');
+        }
 
-        this.asignarImagenSegunContexto(imagenData);
-        window.leccionEditor.mostrarToast('✅ Imagen agregada (modo desarrollo)', 'success');
-    },
+        if (!actividad.contenido.palabras_minimas || actividad.contenido.palabras_minimas < 10) {
+            errores.push('La longitud mínima debe ser de al menos 10 palabras');
+        }
 
-    asignarImagenSegunContexto(imagenData) {
-        const { actividadId, tipoCampo } = window.currentImageContext;
+        if (!actividad.respuesta_correcta.criterios || actividad.respuesta_correcta.criterios.length === 0) {
+            errores.push('Se requieren al menos 1 criterio de evaluación');
+        }
 
-        if (tipoCampo === 'pregunta') {
-            const actividad = this.getActividad(actividadId);
-            if (actividad) {
-                actividad.contenido.imagen = imagenData;
+        if (actividad.respuesta_correcta.criterios) {
+            const criteriosVacios = actividad.respuesta_correcta.criterios.filter(c => !c.trim());
+            if (criteriosVacios.length > 0) {
+                errores.push(`Hay ${criteriosVacios.length} criterios sin completar`);
             }
         }
 
-        window.leccionEditor.recargarActividad(actividadId);
+        if (actividad.puntos_maximos < 5 || actividad.puntos_maximos > 100) {
+            errores.push('Los puntos deben estar entre 5 y 100');
+        }
+
+        return errores;
+    },
+
+    // ========== FORMATO PARA GUARDAR ==========
+    
+    obtenerDatosGuardar(actividad) {
+        // ✅ Estructura compatible con formato Python
+        return {
+            tipo: "writing", // ✅ Formato unificado
+            titulo: actividad.titulo,
+            contenido: {
+                instrucciones: actividad.contenido.instrucciones,
+                palabras_minimas: actividad.contenido.palabras_minimas
+            },
+            respuesta_correcta: {
+                tipo: "evaluacion_manual",
+                criterios: actividad.respuesta_correcta.criterios || []
+            },
+            puntos_maximos: actividad.puntos_maximos,
+            orden: actividad.orden
+        };
     }
 };
+
+console.log('✅ EscrituraManager (Formato Python) cargado');

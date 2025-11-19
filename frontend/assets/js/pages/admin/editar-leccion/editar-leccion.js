@@ -1,5 +1,5 @@
 /* ============================================
-   SPEAKLEXI - EDITOR DE LECCIÓN CORREGIDO
+   SPEAKLEXI - EDITOR DE LECCIÓN CORREGIDO Y COMPATIBLE
    ============================================ */
 (() => {
     'use strict';
@@ -16,6 +16,170 @@
         maxFileSize: 50 * 1024 * 1024,
         allowedFileTypes: ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'audio/mp3', 'application/pdf']
     };
+
+    // 🎯 FORMATO BACKEND - Compatible con Python y leccion-activa.js
+    const TIPO_MAPPING_BACKEND = {
+        'seleccion_multiple': 'multiple_choice',
+        'verdadero_falso': 'true_false',
+        'completar_espacios': 'fill_blank',
+        'emparejamiento': 'matching',
+        'escritura': 'writing'
+    };
+
+    const TIPO_MAPPING_EDITOR = {
+        'multiple_choice': 'seleccion_multiple',
+        'true_false': 'verdadero_falso',
+        'fill_blank': 'completar_espacios',
+        'matching': 'emparejamiento',
+        'writing': 'escritura'
+    };
+
+    // 🎯 FUNCIÓN CRÍTICA: Diagnóstico y corrección de actividades
+    function diagnosticarYCorregirActividades() {
+        console.group('🔍 DIAGNÓSTICO Y CORRECCIÓN DE ACTIVIDADES');
+        
+        let actividadesCorregidas = 0;
+        
+        actividades.forEach((actividad, index) => {
+            console.log(`📋 Actividad ${index} antes de corrección:`, {
+                id: actividad.id,
+                tipo: actividad.tipo,
+                tiene_contenido: !!actividad.contenido,
+                contenido_keys: Object.keys(actividad.contenido || {}),
+                tiene_preguntas: !!actividad.contenido?.preguntas,
+                preguntas_count: actividad.contenido?.preguntas?.length || 0,
+                tiene_opciones: !!actividad.contenido?.preguntas?.[0]?.opciones,
+                opciones_count: actividad.contenido?.preguntas?.[0]?.opciones?.length || 0
+            });
+            
+            // 🎯 CORREGIR ACTIVIDADES DE SELECCIÓN MÚLTIPLE
+            if (actividad.tipo === 'seleccion_multiple') {
+                const necesitaCorreccion = 
+                    !actividad.contenido ||
+                    !actividad.contenido.preguntas ||
+                    !actividad.contenido.preguntas[0] ||
+                    !actividad.contenido.preguntas[0].opciones ||
+                    actividad.contenido.preguntas[0].opciones.length === 0;
+                
+                if (necesitaCorreccion) {
+                    console.warn(`🔄 Corrigiendo actividad ${index} (${actividad.id})`);
+                    
+                    // Inicializar estructura correcta
+                    actividad.contenido = actividad.contenido || {};
+                    actividad.contenido.preguntas = actividad.contenido.preguntas || [{}];
+                    actividad.contenido.preguntas[0] = actividad.contenido.preguntas[0] || {};
+                    actividad.contenido.preguntas[0].pregunta = actividad.contenido.preguntas[0].pregunta || actividad.titulo || "Pregunta de selección múltiple";
+                    actividad.contenido.preguntas[0].opciones = actividad.contenido.preguntas[0].opciones || [
+                        "Opción correcta (edita esto)",
+                        "Opción incorrecta 1",
+                        "Opción incorrecta 2", 
+                        "Opción incorrecta 3"
+                    ];
+                    
+                    // Asegurar respuesta correcta
+                    if (!actividad.respuesta_correcta) {
+                        actividad.respuesta_correcta = {
+                            respuestas: [0],
+                            tipo: "indices"
+                        };
+                    }
+                    
+                    actividadesCorregidas++;
+                }
+            }
+
+            // 🎯 CORREGIR ACTIVIDADES DE VERDADERO/FALSO
+            if (actividad.tipo === 'verdadero_falso') {
+                if (!actividad.contenido || !actividad.contenido.afirmaciones || actividad.contenido.afirmaciones.length === 0) {
+                    console.warn(`🔄 Corrigiendo actividad verdadero/falso ${index} (${actividad.id})`);
+                    
+                    actividad.contenido = actividad.contenido || {};
+                    actividad.contenido.afirmaciones = actividad.contenido.afirmaciones || [{
+                        afirmacion: "Esta es una afirmación de ejemplo",
+                        respuesta: true
+                    }];
+                    
+                    if (!actividad.respuesta_correcta) {
+                        actividad.respuesta_correcta = {
+                            respuestas: [true],
+                            tipo: "booleanos"
+                        };
+                    }
+                    
+                    actividadesCorregidas++;
+                }
+            }
+
+            // 🎯 CORREGIR ACTIVIDADES DE ESCRITURA
+            if (actividad.tipo === 'escritura') {
+                if (!actividad.contenido || !actividad.contenido.consigna) {
+                    console.warn(`🔄 Corrigiendo actividad escritura ${index} (${actividad.id})`);
+                    
+                    actividad.contenido = actividad.contenido || {};
+                    actividad.contenido.consigna = actividad.contenido.consigna || actividad.titulo || "Escribe un texto sobre...";
+                    actividad.contenido.placeholder = actividad.contenido.placeholder || "Escribe tu respuesta aquí...";
+                    actividad.contenido.palabras_minimas = actividad.contenido.palabras_minimas || 50;
+                    
+                    if (!actividad.respuesta_correcta) {
+                        actividad.respuesta_correcta = {
+                            tipo: "evaluacion_manual",
+                            criterios: ["Claridad", "Precisión", "Coherencia"]
+                        };
+                    }
+                    
+                    actividadesCorregidas++;
+                }
+            }
+
+            // 🎯 CORREGIR ACTIVIDADES DE COMPLETAR ESPACIOS
+            if (actividad.tipo === 'completar_espacios') {
+                if (!actividad.contenido || !actividad.contenido.texto) {
+                    console.warn(`🔄 Corrigiendo actividad completar espacios ${index} (${actividad.id})`);
+                    
+                    actividad.contenido = actividad.contenido || {};
+                    actividad.contenido.texto = actividad.contenido.texto || "Este es un texto de ejemplo con ______ espacios.";
+                    actividad.contenido.palabras_faltantes = actividad.contenido.palabras_faltantes || ["palabras"];
+                    
+                    if (!actividad.respuesta_correcta) {
+                        actividad.respuesta_correcta = {
+                            respuestas: actividad.contenido.palabras_faltantes,
+                            tipo: "palabras"
+                        };
+                    }
+                    
+                    actividadesCorregidas++;
+                }
+            }
+
+            // 🎯 CORREGIR ACTIVIDADES DE EMPAREJAMIENTO
+            if (actividad.tipo === 'emparejamiento') {
+                if (!actividad.contenido || !actividad.contenido.pares || actividad.contenido.pares.length === 0) {
+                    console.warn(`🔄 Corrigiendo actividad emparejamiento ${index} (${actividad.id})`);
+                    
+                    actividad.contenido = actividad.contenido || {};
+                    actividad.contenido.pares = actividad.contenido.pares || [
+                        { item: "Elemento A", match: "Corresponde a A" },
+                        { item: "Elemento B", match: "Corresponde a B" }
+                    ];
+                    actividad.contenido.instrucciones = actividad.contenido.instrucciones || "Empareja cada elemento con su correspondiente";
+                    
+                    if (!actividad.respuesta_correcta) {
+                        actividad.respuesta_correcta = {
+                            respuestas: [0, 1],
+                            tipo: "pares_ordenados"
+                        };
+                    }
+                    
+                    actividadesCorregidas++;
+                }
+            }
+        });
+        
+        console.log(`✅ ${actividadesCorregidas} actividades corregidas`);
+        console.groupEnd();
+        
+        return actividadesCorregidas;
+    }
 
     async function init() {
         console.log('🚀 Iniciando Editor de Lección...');
@@ -136,7 +300,6 @@
         document.getElementById('input-archivos')?.addEventListener('change', manejarSubidaArchivos);
         document.getElementById('btn-guardar-borrador')?.addEventListener('click', guardarBorrador);
         
-        // ✅ NUEVO: Botón de vista previa
         document.getElementById('btn-vista-previa')?.addEventListener('click', mostrarVistaPrevia);
         
         const formLeccion = document.getElementById('form-leccion');
@@ -211,14 +374,26 @@
             await new Promise(resolve => setTimeout(resolve, 300));
             cargarDatosEnFormulario(leccionData);
             
+            // 🎯 CORREGIDO: Cargar actividades con formato correcto
             if (leccionData.actividades && Array.isArray(leccionData.actividades)) {
-                actividades = leccionData.actividades;
+                console.log('📦 Actividades cargadas desde servidor:', leccionData.actividades);
+                
+                // Convertir actividades del backend al formato del editor
+                actividades = convertirActividadesDesdeBackend(leccionData.actividades);
+                
+                // 🎯 APLICAR CORRECCIÓN A ACTIVIDADES CARGADAS
+                diagnosticarYCorregirActividades();
+                
                 if (window.ActividadManager) {
                     window.ActividadManager.actividades = actividades;
                     actividades.forEach(act => {
                         window.ActividadManager.mostrarActividad(act);
                     });
+                    console.log('✅ Actividades cargadas en el manager:', actividades.length);
                 }
+            } else {
+                console.warn('⚠️ No se encontraron actividades en la lección');
+                actividades = [];
             }
             
             if (leccionData.multimedia && Array.isArray(leccionData.multimedia)) {
@@ -296,7 +471,190 @@
         actualizarProgreso();
     }
 
-    // ✅ CORREGIDO: Endpoint de subida multimedia
+    // 🎯 NUEVA FUNCIÓN: Convertir actividades del backend al formato del editor
+    function convertirActividadesDesdeBackend(actividadesBackend) {
+        console.log('🔄 Convirtiendo actividades desde backend:', actividadesBackend);
+        
+        if (!actividadesBackend || !Array.isArray(actividadesBackend)) {
+            return [];
+        }
+
+        return actividadesBackend.map((actividad, index) => {
+            const tipoEditor = TIPO_MAPPING_EDITOR[actividad.tipo] || actividad.tipo;
+            
+            // Estructura base para editor
+            const actividadEditor = {
+                id: actividad.id || `act-${Date.now()}-${index}`,
+                tipo: tipoEditor,
+                titulo: actividad.titulo || `Actividad ${index + 1}`,
+                puntos: actividad.puntos_maximos || 10,
+                orden: actividad.orden || index + 1,
+                contenido: {},
+                respuesta_correcta: {}
+            };
+
+            // Convertir contenido según el tipo
+            switch(actividad.tipo) {
+                case 'multiple_choice':
+                    actividadEditor.contenido = {
+                        pregunta: actividad.contenido?.pregunta || actividad.titulo,
+                        opciones: actividad.contenido?.opciones || [],
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    actividadEditor.respuesta_correcta = {
+                        respuestas: actividad.respuesta_correcta?.respuestas || [0]
+                    };
+                    break;
+
+                case 'fill_blank':
+                    actividadEditor.contenido = {
+                        texto: actividad.contenido?.texto || "",
+                        palabras_faltantes: actividad.contenido?.espacios || [],
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    break;
+
+                case 'matching':
+                    actividadEditor.contenido = {
+                        pares: actividad.contenido?.pares || [],
+                        instrucciones: actividad.contenido?.instrucciones || "Empareja cada elemento",
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    break;
+
+                case 'true_false':
+                    actividadEditor.contenido = {
+                        afirmaciones: actividad.contenido?.afirmaciones || [],
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    actividadEditor.respuesta_correcta = {
+                        respuestas: actividad.respuesta_correcta?.respuestas || []
+                    };
+                    break;
+
+                case 'writing':
+                    actividadEditor.contenido = {
+                        consigna: actividad.contenido?.consigna || actividad.titulo,
+                        placeholder: actividad.contenido?.placeholder || "Escribe tu respuesta...",
+                        palabras_minimas: actividad.contenido?.palabras_minimas || 50,
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    actividadEditor.respuesta_correcta = {
+                        tipo: "evaluacion_manual",
+                        criterios: actividad.respuesta_correcta?.criterios || ["Claridad", "Precisión", "Coherencia"]
+                    };
+                    break;
+
+                default:
+                    // Para tipos desconocidos, mantener estructura original
+                    actividadEditor.contenido = actividad.contenido || {};
+                    actividadEditor.respuesta_correcta = actividad.respuesta_correcta || {};
+                    break;
+            }
+
+            console.log(`✅ Actividad ${index} convertida para editor:`, actividadEditor);
+            return actividadEditor;
+        });
+    }
+
+    // 🎯 NUEVA FUNCIÓN: Formatear actividades para el backend
+    function formatearActividadesParaBackend(actividadesEditor) {
+        console.log('🔄 Formateando actividades para backend:', actividadesEditor);
+        
+        if (!actividadesEditor || !Array.isArray(actividadesEditor)) {
+            return [];
+        }
+
+        return actividadesEditor.map((actividad, index) => {
+            const tipoBackend = TIPO_MAPPING_BACKEND[actividad.tipo] || actividad.tipo;
+            
+            // Estructura base para backend
+            const actividadBackend = {
+                id: actividad.id || `act-${Date.now()}-${index}`,
+                titulo: actividad.titulo || `Actividad ${index + 1}`,
+                descripcion: actividad.descripcion || "",
+                tipo: tipoBackend,
+                puntos_maximos: actividad.puntos || actividad.puntos_maximos || 10,
+                orden: actividad.orden || index + 1,
+                estado: actividad.estado || 'activo',
+                contenido: {},
+                respuesta_correcta: {}
+            };
+
+            // Formatear contenido según el tipo
+            switch(actividad.tipo) {
+                case 'seleccion_multiple':
+                    actividadBackend.contenido = {
+                        pregunta: actividad.contenido?.pregunta || actividad.titulo,
+                        opciones: actividad.contenido?.opciones || [],
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    actividadBackend.respuesta_correcta = {
+                        respuestas: actividad.respuesta_correcta?.respuestas || [0],
+                        tipo: "indices"
+                    };
+                    break;
+
+                case 'completar_espacios':
+                    actividadBackend.contenido = {
+                        texto: actividad.contenido?.texto || "",
+                        espacios: actividad.contenido?.palabras_faltantes || [],
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    actividadBackend.respuesta_correcta = {
+                        respuestas: actividad.contenido?.palabras_faltantes || [],
+                        tipo: "palabras"
+                    };
+                    break;
+
+                case 'emparejamiento':
+                    actividadBackend.contenido = {
+                        pares: actividad.contenido?.pares || [],
+                        instrucciones: actividad.contenido?.instrucciones || "Empareja cada elemento",
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    actividadBackend.respuesta_correcta = {
+                        respuestas: actividad.contenido?.pares?.map((_, idx) => idx) || [],
+                        tipo: "pares_ordenados"
+                    };
+                    break;
+
+                case 'verdadero_falso':
+                    actividadBackend.contenido = {
+                        afirmaciones: actividad.contenido?.afirmaciones || [],
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    actividadBackend.respuesta_correcta = {
+                        respuestas: actividad.respuesta_correcta?.respuestas || [],
+                        tipo: "booleanos"
+                    };
+                    break;
+
+                case 'escritura':
+                    actividadBackend.contenido = {
+                        consigna: actividad.contenido?.consigna || actividad.titulo,
+                        placeholder: actividad.contenido?.placeholder || "Escribe tu respuesta...",
+                        palabras_minimas: actividad.contenido?.palabras_minimas || 50,
+                        explicacion: actividad.contenido?.explicacion || ""
+                    };
+                    actividadBackend.respuesta_correcta = {
+                        tipo: "evaluacion_manual",
+                        criterios: actividad.respuesta_correcta?.criterios || ["Claridad", "Precisión", "Coherencia"]
+                    };
+                    break;
+
+                default:
+                    // Para tipos desconocidos, mantener estructura original
+                    actividadBackend.contenido = actividad.contenido || {};
+                    actividadBackend.respuesta_correcta = actividad.respuesta_correcta || {};
+                    break;
+            }
+
+            console.log(`✅ Actividad ${index} formateada para backend:`, actividadBackend);
+            return actividadBackend;
+        });
+    }
+
     async function manejarArchivosSeleccionados(files) {
         if (!leccionId) {
             window.toastManager.warning('Guarda la lección primero antes de subir archivos');
@@ -319,7 +677,6 @@
                 formData.append('archivo', file);
                 formData.append('leccion_id', leccionId);
 
-                // ✅ CORREGIDO: Usar endpoint correcto
                 const response = await window.apiClient.uploadFile('/multimedia/subir', formData);
                 
                 if (response.success) {
@@ -408,11 +765,29 @@
         await guardarLeccion('activa');
     }
 
-    // ✅ CORREGIDO: Flujo de guardado mejorado
+    // ✅ CORREGIDO: Flujo de guardado mejorado con actividades formateadas
     async function guardarLeccion(estado = 'borrador') {
         try {
+            // 🎯 APLICAR CORRECCIÓN ANTES DE GUARDAR
+            diagnosticarYCorregirActividades();
+
             const formData = new FormData(document.getElementById('form-leccion'));
             const contenido = editorQuill ? editorQuill.root.innerHTML : '';
+
+            // 🎯 OBTENER Y FORMATEAR ACTIVIDADES PARA BACKEND
+            let actividadesParaGuardar = [];
+            
+            if (window.ActividadManager && window.ActividadManager.actividades) {
+                console.log('📦 Actividades del manager:', window.ActividadManager.actividades);
+                actividadesParaGuardar = formatearActividadesParaBackend(window.ActividadManager.actividades);
+            } else if (actividades && actividades.length > 0) {
+                console.log('📦 Actividades del array local:', actividades);
+                actividadesParaGuardar = formatearActividadesParaBackend(actividades);
+            } else {
+                console.warn('⚠️ No se encontraron actividades para guardar');
+            }
+
+            console.log('🎯 Actividades formateadas para guardar:', actividadesParaGuardar);
 
             const datosLeccion = {
                 titulo: formData.get('titulo'),
@@ -423,16 +798,15 @@
                 orden: parseInt(formData.get('orden') || 0),
                 contenido: contenido,
                 estado: estado,
-                actividades: actividades,
+                actividades: actividadesParaGuardar, // 🎯 ACTIVIDADES FORMATEADAS
                 multimedia: archivosMultimedia
             };
 
-            console.log('💾 Guardando lección:', datosLeccion);
+            console.log('💾 Guardando lección con actividades:', datosLeccion);
 
             let response;
             
             if (leccionId) {
-                // ✅ CORREGIDO: Usar PUT con endpoint correcto
                 response = await window.apiClient.put(`/lecciones/${leccionId}`, datosLeccion);
             } else {
                 response = await window.apiClient.post('/lecciones', datosLeccion);
@@ -479,7 +853,6 @@
         }, config.autoSaveDelay);
     }
 
-    // ✅ NUEVO: Función de vista previa
     function mostrarVistaPrevia() {
         const titulo = document.querySelector('input[name="titulo"]')?.value || 'Sin título';
         const descripcion = document.querySelector('textarea[name="descripcion"]')?.value || '';
@@ -635,7 +1008,10 @@
                 actualizarGaleriaMultimedia();
                 window.toastManager.success('Archivo eliminado');
             }
-        }
+        },
+
+        // 🎯 EXPONER LA FUNCIÓN DE CORRECCIÓN
+        diagnosticarYCorregirActividades: () => diagnosticarYCorregirActividades()
     };
 
     if (document.readyState === 'loading') {

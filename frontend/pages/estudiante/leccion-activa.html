@@ -33,6 +33,23 @@
                 opacity: 0;
             }
         }
+
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
         
         .animate-slide-in {
             animation: slide-in 0.3s ease-out;
@@ -40,6 +57,10 @@
         
         .animate-fade-out {
             animation: fade-out 0.3s ease-out;
+        }
+
+        .animate-bounce-in {
+            animation: bounce-in 0.6s ease-out;
         }
         
         /* Estilos para ejercicios */
@@ -132,6 +153,58 @@
                 opacity: 0;
             }
         }
+
+        /* Badge para ejercicios completados */
+        .badge-completado {
+            z-index: 10;
+        }
+
+        /* Panel de resultados */
+        .panel-resultados {
+            animation: slide-in 0.5s ease-out;
+        }
+
+        /* Estilos para tipos de ejercicio específicos */
+        .ejercicio-multiple_choice .opcion-correcta {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+
+        .ejercicio-fill_blank .espacio-correcto {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+
+        .ejercicio-matching .par-correcto {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+
+        .ejercicio-true_false .afirmacion-correcta {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+
+        /* Dark mode adjustments */
+        .dark .ejercicio-multiple_choice .opcion-correcta {
+            background-color: #064e3b;
+            border-color: #10b981;
+        }
+
+        .dark .ejercicio-fill_blank .espacio-correcto {
+            background-color: #064e3b;
+            border-color: #10b981;
+        }
+
+        .dark .ejercicio-matching .par-correcto {
+            background-color: #064e3b;
+            border-color: #10b981;
+        }
+
+        .dark .ejercicio-true_false .afirmacion-correcta {
+            background-color: #064e3b;
+            border-color: #10b981;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -146,6 +219,9 @@
         <div id="loading-state" class="flex flex-col items-center justify-center min-h-screen">
             <div class="loader mb-4"></div>
             <p class="text-gray-600 dark:text-gray-300">Cargando lección...</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2" id="loading-details">
+                Preparando ejercicios y contenido
+            </p>
         </div>
         
         <!-- Content Container (se llena dinámicamente) -->
@@ -223,6 +299,9 @@
     <!-- Cargar navbar y footer -->
     <script src="/assets/js/core/navbar-loader.js"></script>
     
+    <!-- 🎯 NUEVO: Adaptador de actividades para compatibilidad con Python -->
+    <script src="/assets/js/utils/actividad-adapter.js"></script>
+    
     <!-- IMPORTANTE: Cargar EjercicioRenderer ANTES de leccion-activa.js -->
     <script src="/assets/components/ejercicioRender.js"></script>
     
@@ -246,6 +325,12 @@
             
             console.log(`📚 Cargando lección ID: ${leccionId}`);
             
+            // Actualizar detalles de carga
+            const loadingDetails = document.getElementById('loading-details');
+            if (loadingDetails) {
+                loadingDetails.textContent = `Cargando lección ${leccionId}...`;
+            }
+            
             // Verificar que las dependencias estén cargadas después de un breve delay
             setTimeout(() => {
                 const dependenciasCargadas = verificarDependencias();
@@ -255,6 +340,14 @@
                 }
                 
                 console.log('✅ Todo listo - leccion-activa.js se inicializará automáticamente');
+                
+                // Mostrar mensaje de compatibilidad si el adaptador está disponible
+                if (window.ActividadAdapter) {
+                    console.log('🎯 ActividadAdapter disponible - Compatibilidad asegurada');
+                    if (loadingDetails) {
+                        loadingDetails.textContent = 'Configurando compatibilidad con actividades...';
+                    }
+                }
             }, 100);
         });
         
@@ -263,7 +356,8 @@
             const dependencias = {
                 'APP_CONFIG': typeof window.APP_CONFIG !== 'undefined',
                 'apiClient': typeof window.apiClient !== 'undefined',
-                'EjercicioRenderer': typeof window.EjercicioRenderer !== 'undefined'
+                'EjercicioRenderer': typeof window.EjercicioRenderer !== 'undefined',
+                'ActividadAdapter': typeof window.ActividadAdapter !== 'undefined' // 🎯 NUEVO: Verificar adaptador
             };
             
             console.log('🔍 Verificando dependencias:', dependencias);
@@ -279,6 +373,13 @@
                     window.apiClient = window.APIClient;
                     dependencias.apiClient = true;
                     faltantes.splice(faltantes.indexOf('apiClient'), 1);
+                }
+                
+                // Si el adaptador no está cargado, mostrar advertencia pero continuar
+                if (faltantes.includes('ActividadAdapter')) {
+                    console.warn('⚠️ ActividadAdapter no cargado - Las actividades de Python podrían no funcionar correctamente');
+                    dependencias.ActividadAdapter = true; // Permitir continuar sin adaptador
+                    faltantes.splice(faltantes.indexOf('ActividadAdapter'), 1);
                 }
                 
                 // Si aún hay dependencias faltantes, mostrar error
@@ -464,9 +565,50 @@
                 apiClient: typeof window.apiClient !== 'undefined',
                 APP_CONFIG: typeof window.APP_CONFIG !== 'undefined',
                 utils: typeof window.utils !== 'undefined',
-                themeManager: typeof window.themeManager !== 'undefined'
+                themeManager: typeof window.themeManager !== 'undefined',
+                actividadAdapter: typeof window.ActividadAdapter !== 'undefined' // 🎯 NUEVO
             });
+
+            // 🎯 NUEVO: Verificar compatibilidad de tipos de actividades
+            if (window.ActividadAdapter) {
+                console.log('🔧 Verificando compatibilidad de tipos de actividades...');
+                const tiposCompatibles = window.ActividadAdapter.verificarEstado();
+                console.log('🎯 Tipos que se adaptarán automáticamente:', tiposCompatibles);
+            }
         }, 1000);
+
+        // 🎯 NUEVO: Función para diagnosticar problemas de compatibilidad
+        function diagnosticarCompatibilidad() {
+            if (!window.ActividadAdapter) {
+                return {
+                    estado: 'advertencia',
+                    mensaje: 'ActividadAdapter no cargado - Las actividades de Python podrían no funcionar'
+                };
+            }
+
+            const tiposProblema = window.ActividadAdapter.verificarEstado();
+            if (tiposProblema.length > 0) {
+                return {
+                    estado: 'compatible',
+                    mensaje: `Sistema listo - ${tiposProblema.length} tipos serán adaptados automáticamente`
+                };
+            } else {
+                return {
+                    estado: 'compatible',
+                    mensaje: 'Sistema listo - Todas las actividades son compatibles'
+                };
+            }
+        }
+
+        // Ejecutar diagnóstico después de la carga
+        setTimeout(() => {
+            const diagnostico = diagnosticarCompatibilidad();
+            console.log(`🔍 Diagnóstico de compatibilidad: ${diagnostico.estado} - ${diagnostico.mensaje}`);
+            
+            if (diagnostico.estado === 'advertencia') {
+                console.warn('⚠️ ' + diagnostico.mensaje);
+            }
+        }, 1500);
     </script>
     
     <!-- Google Analytics (opcional) -->

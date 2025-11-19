@@ -43,6 +43,9 @@ class LeccionActiva {
             await this.cargarLeccion();
             await this.cargarEjercicios();
             
+            // 🎯 NUEVO: Diagnóstico de ejercicios cargados
+            this.diagnosticarEjercicios();
+            
             // Renderizar interfaz
             this.renderizarInterfaz();
             
@@ -62,6 +65,12 @@ class LeccionActiva {
             if (response && response.success) {
                 this.leccionData = response.data;
                 console.log('✅ Lección cargada:', this.leccionData);
+                
+                // 🔥 NUEVO: Si la lección ya incluye ejercicios, usarlos directamente
+                if (this.leccionData.ejercicios && this.leccionData.ejercicios.length > 0) {
+                    console.log('🎯 Ejercicios cargados directamente desde la lección:', this.leccionData.ejercicios.length);
+                    this.ejercicios = this.leccionData.ejercicios;
+                }
             } else {
                 const errorMsg = response ? response.error : 'No response from server';
                 throw new Error(errorMsg || 'Error al cargar lección');
@@ -74,22 +83,55 @@ class LeccionActiva {
 
     async cargarEjercicios() {
         try {
+            // 🔥 SOLUCIÓN MEJORADA: Si ya tenemos ejercicios de la lección, no hacer petición adicional
+            if (this.ejercicios && this.ejercicios.length > 0) {
+                console.log('✅ Ya tenemos ejercicios de la lección, omitiendo carga adicional');
+                return;
+            }
+
+            // 🎯 SOLUCIÓN EXPRÉS: Aplicar adaptador inmediatamente si está disponible
+            if (window.ActividadAdapter) {
+                console.log('⚡ ActividadAdapter disponible - Compatibilidad asegurada');
+                window.ActividadAdapter.verificarEstado();
+            }
+
             // OPCIÓN A: Intentar cargar desde el endpoint de ejercicios
+            console.log('🔍 Intentando cargar ejercicios desde endpoint...');
             const response = await window.apiClient.get(`/ejercicios/leccion/${this.leccionId}`);
             
             console.log('📦 Respuesta completa de ejercicios:', response);
             
             if (response && response.success) {
-                // ✅ CORRECCIÓN: El backend devuelve {success: true, data: [...]}
-                // y api-client lo envuelve en {success: true, data: {success: true, data: [...]}}
-                // Entonces necesitamos acceder a response.data.data
+                // ✅ CORRECCIÓN MEJORADA: Manejar diferentes estructuras de respuesta
+                let ejerciciosData = [];
+                
                 if (response.data && response.data.success) {
-                    this.ejercicios = response.data.data || [];
+                    // Estructura: {success: true, data: {success: true, data: [...]}}
+                    ejerciciosData = response.data.data || [];
+                } else if (response.data && Array.isArray(response.data)) {
+                    // Estructura: {success: true, data: [...]}
+                    ejerciciosData = response.data;
+                } else if (Array.isArray(response.data)) {
+                    // Estructura: {success: true, data: [...]} (directo)
+                    ejerciciosData = response.data;
                 } else {
-                    this.ejercicios = response.data || [];
+                    // Estructura desconocida, usar data directamente
+                    ejerciciosData = response.data || [];
                 }
                 
-                console.log(`✅ ${this.ejercicios.length} ejercicios cargados desde endpoint:`, this.ejercicios);
+                // 🎯 NUEVO: USAR ADAPTADOR PARA COMPATIBILIDAD
+                console.log('🔄 Procesando ejercicios con adaptador...');
+                if (window.ActividadAdapter && window.ActividadAdapter.necesitaAdaptacion(ejerciciosData)) {
+                    console.log('🎯 Adaptando actividades del backend...');
+                    this.ejercicios = window.ActividadAdapter.adaptarTodasActividades(ejerciciosData);
+                } else {
+                    console.log('✅ Los ejercicios ya están en formato correcto');
+                    this.ejercicios = ejerciciosData.map((ej, index) => 
+                        this.convertirActividadAEjercicio(ej, index)
+                    );
+                }
+                
+                console.log(`✅ ${this.ejercicios.length} ejercicios procesados:`, this.ejercicios);
                 
                 if (this.ejercicios.length > 0) {
                     return; // Tenemos ejercicios, salir
@@ -99,9 +141,17 @@ class LeccionActiva {
             // OPCIÓN B: Si no hay ejercicios, usar las actividades de la lección
             if (this.leccionData && this.leccionData.actividades) {
                 console.log('📦 Usando actividades desde la lección como fallback');
-                this.ejercicios = this.leccionData.actividades.map((act, index) => 
-                    this.convertirActividadAEjercicio(act, index)
-                );
+                let actividadesData = this.leccionData.actividades;
+                
+                // 🎯 NUEVO: APLICAR ADAPTADOR TAMBIÉN A ACTIVIDADES
+                if (window.ActividadAdapter && window.ActividadAdapter.necesitaAdaptacion(actividadesData)) {
+                    console.log('🎯 Adaptando actividades de la lección...');
+                    this.ejercicios = window.ActividadAdapter.adaptarTodasActividades(actividadesData);
+                } else {
+                    this.ejercicios = actividadesData.map((act, index) => 
+                        this.convertirActividadAEjercicio(act, index)
+                    );
+                }
                 
                 console.log(`✅ ${this.ejercicios.length} actividades convertidas a ejercicios:`, this.ejercicios);
             } else {
@@ -114,23 +164,160 @@ class LeccionActiva {
             // Si falla todo, intentar usar actividades de la lección como fallback final
             if (this.leccionData && this.leccionData.actividades && this.leccionData.actividades.length > 0) {
                 console.log('🔄 Usando actividades como fallback final');
-                this.ejercicios = this.leccionData.actividades.map((act, index) => 
-                    this.convertirActividadAEjercicio(act, index)
-                );
+                let actividadesData = this.leccionData.actividades;
+                
+                // 🎯 NUEVO: APLICAR ADAPTADOR EN FALLBACK FINAL
+                if (window.ActividadAdapter && window.ActividadAdapter.necesitaAdaptacion(actividadesData)) {
+                    console.log('🎯 Adaptando actividades (fallback final)...');
+                    this.ejercicios = window.ActividadAdapter.adaptarTodasActividades(actividadesData);
+                } else {
+                    this.ejercicios = actividadesData.map((act, index) => 
+                        this.convertirActividadAEjercicio(act, index)
+                    );
+                }
             } else {
                 throw new Error('No se pudieron cargar los ejercicios: ' + error.message);
             }
+        } finally {
+            // 🎯 NUEVO: Diagnóstico de contenido después de cargar
+            this.diagnosticarContenidoEjercicios();
         }
     }
 
-    // 🎯 NUEVA FUNCIÓN: Convertir actividad a ejercicio
+    // 🎯 NUEVO: Método de diagnóstico para opciones vacías
+    diagnosticarContenidoEjercicios() {
+        console.group('🔍 DIAGNÓSTICO DETALLADO DE CONTENIDO');
+        
+        this.ejercicios.forEach((ejercicio, index) => {
+            console.log(`📋 Ejercicio ${index + 1} (${ejercicio.tipo}):`, {
+                id: ejercicio.id,
+                titulo: ejercicio.titulo,
+                contenido_keys: Object.keys(ejercicio.contenido || {}),
+                opciones_count: ejercicio.contenido?.opciones?.length || 0,
+                opciones: ejercicio.contenido?.opciones,
+                tiene_pregunta: !!ejercicio.contenido?.pregunta,
+                pregunta: ejercicio.contenido?.pregunta,
+                contenido_completo: ejercicio.contenido
+            });
+        });
+        
+        console.groupEnd();
+    }
+
+    // 🎯 NUEVO: Método de diagnóstico para debugging (ACTUALIZADO)
+    diagnosticarEjercicios() {
+        console.group('🔍 DIAGNÓSTICO COMPLETO DE EJERCICIOS');
+        console.log('📊 Total ejercicios:', this.ejercicios.length);
+        
+        this.ejercicios.forEach((ej, index) => {
+            const esSeleccionMultiple = ej.tipo === 'multiple_choice' || ej._original?.tipo === 'seleccion_multiple';
+            const opcionesCount = ej.contenido?.opciones?.length || 0;
+            
+            console.log(`📋 Ejercicio ${index + 1}:`, {
+                id: ej.id,
+                tipo_original: ej._original?.tipo || 'N/A',
+                tipo_actual: ej.tipo,
+                es_seleccion_multiple: esSeleccionMultiple,
+                tiene_contenido: !!ej.contenido,
+                tiene_respuesta: !!ej.respuesta_correcta,
+                contenido_keys: Object.keys(ej.contenido || {}),
+                opciones_count: opcionesCount,
+                opciones: esSeleccionMultiple ? (ej.contenido?.opciones || 'NO HAY OPCIONES') : 'N/A',
+                pregunta: ej.contenido?.pregunta || ej.titulo
+            });
+            
+            // 🎯 NUEVO: Advertencia específica para selección múltiple sin opciones
+            if (esSeleccionMultiple && opcionesCount === 0) {
+                console.warn(`⚠️ EJERCICIO ${index + 1} SIN OPCIONES:`, {
+                    id: ej.id,
+                    titulo: ej.titulo,
+                    pregunta: ej.contenido?.pregunta,
+                    contenido: ej.contenido
+                });
+            }
+        });
+        
+        // Verificar tipos problemáticos
+        const tiposProblema = this.ejercicios.filter(ej => 
+            ['seleccion_multiple', 'completar_espacios', 'emparejamiento', 'escritura', 'verdadero_falso']
+            .includes(ej._original?.tipo)
+        );
+        
+        console.log('⚠️ Ejercicios que necesitan adaptación:', tiposProblema.length);
+        
+        // 🎯 NUEVO: Contar ejercicios sin opciones
+        const ejerciciosSinOpciones = this.ejercicios.filter(ej => 
+            (ej.tipo === 'multiple_choice' || ej._original?.tipo === 'seleccion_multiple') && 
+            (!ej.contenido?.opciones || ej.contenido.opciones.length === 0)
+        );
+        
+        console.log('🚨 Ejercicios de selección múltiple SIN OPCIONES:', ejerciciosSinOpciones.length);
+        if (ejerciciosSinOpciones.length > 0) {
+            console.log('📝 IDs de ejercicios problemáticos:', ejerciciosSinOpciones.map(ej => ej.id));
+        }
+        
+        console.groupEnd();
+        
+        return {
+            tiposProblema,
+            ejerciciosSinOpciones
+        };
+    }
+
+    // 🎯 NUEVO: Generar opciones temporales cuando no hay ninguna
+    generarOpcionesTemporales(ejercicio) {
+        console.warn(`🔄 Generando opciones temporales para ejercicio ${ejercicio.id}`);
+        
+        const opcionesTemporales = [
+            "Opción correcta (placeholder)",
+            "Opción incorrecta 1",
+            "Opción incorrecta 2", 
+            "Opción incorrecta 3"
+        ];
+        
+        // Si el ejercicio tiene contenido pero no opciones
+        if (ejercicio.contenido && !ejercicio.contenido.opciones) {
+            ejercicio.contenido.opciones = opcionesTemporales;
+        } else if (!ejercicio.contenido) {
+            ejercicio.contenido = {
+                pregunta: ejercicio.titulo || "Selecciona la opción correcta",
+                opciones: opcionesTemporales
+            };
+        }
+        
+        // Asegurar respuesta correcta temporal
+        if (!ejercicio.respuesta_correcta || !ejercicio.respuesta_correcta.respuestas) {
+            ejercicio.respuesta_correcta = {
+                respuestas: [0], // Primera opción como correcta temporalmente
+                tipo: "indices"
+            };
+        }
+        
+        return ejercicio;
+    }
+
+    // 🎯 NUEVA FUNCIÓN: Convertir actividad a ejercicio (MEJORADA)
     convertirActividadAEjercicio(actividad, index) {
+        console.log(`🔄 Convirtiendo actividad ${index}:`, actividad);
+        
+        // Si el adaptador está disponible y la actividad necesita conversión, usar adaptador
+        if (window.ActividadAdapter && window.ActividadAdapter.necesitaAdaptacion([actividad])) {
+            console.log('🎯 Usando adaptador para actividad individual');
+            return window.ActividadAdapter.adaptarActividad(actividad, index);
+        }
+        
+        // Mapeo de tipos para compatibilidad (fallback si no hay adaptador)
         const tipoMap = {
             'seleccion_multiple': 'multiple_choice',
             'completar_espacios': 'fill_blank',
             'emparejamiento': 'matching',
             'escritura': 'writing',
-            'verdadero_falso': 'true_false'
+            'verdadero_falso': 'true_false',
+            'multiple_choice': 'multiple_choice',
+            'fill_blank': 'fill_blank', 
+            'matching': 'matching',
+            'writing': 'writing',
+            'true_false': 'true_false'
         };
 
         // Parsear contenido si es string
@@ -140,18 +327,18 @@ class LeccionActiva {
                 contenido = JSON.parse(contenido);
             } catch (e) {
                 console.warn('⚠️ Error parseando contenido de actividad:', e);
-                contenido = {};
+                contenido = { pregunta: contenido };
             }
         }
 
-        // Parsear respuesta correcta si es string
+        // Parsear respuesta correcta si es string  
         let respuestaCorrecta = actividad.respuesta_correcta;
         if (typeof respuestaCorrecta === 'string') {
             try {
                 respuestaCorrecta = JSON.parse(respuestaCorrecta);
             } catch (e) {
                 console.warn('⚠️ Error parseando respuesta correcta de actividad:', e);
-                respuestaCorrecta = {};
+                respuestaCorrecta = { respuestas: [respuestaCorrecta] };
             }
         }
 
@@ -159,97 +346,31 @@ class LeccionActiva {
             id: actividad.id || `temp-${index}`,
             titulo: actividad.titulo || `Ejercicio ${index + 1}`,
             descripcion: actividad.descripcion || "Ejercicio de práctica",
-            tipo: tipoMap[actividad.tipo] || actividad.tipo,
-            puntos_maximos: actividad.puntos_maximos || 10,
+            tipo: tipoMap[actividad.tipo] || actividad.tipo || 'multiple_choice',
+            puntos_maximos: actividad.puntos_maximos || actividad.puntos || 10,
             orden: actividad.orden || index + 1,
-            estado: actividad.estado || 'activo'
+            estado: actividad.estado || 'activo',
+            contenido: contenido || {},
+            respuesta_correcta: respuestaCorrecta || {},
+            // 🔥 NUEVO: Preservar datos originales para compatibilidad
+            contenido_original: actividad.contenido,
+            respuesta_correcta_original: actividad.respuesta_correcta
         };
 
-        // Convertir contenido según el tipo
-        switch (actividad.tipo) {
-            case 'seleccion_multiple':
-                ejercicio.contenido = {
-                    pregunta: contenido.pregunta || "Selecciona la opción correcta",
-                    opciones: (contenido.opciones || []).map(o => 
-                        typeof o === 'string' ? o : (o.texto || o)
-                    ),
-                    explicacion: contenido.explicacion
-                };
-                // Manejar respuesta correcta para selección múltiple
-                if (respuestaCorrecta && respuestaCorrecta.respuestas) {
-                    ejercicio.respuesta_correcta = {
-                        respuestas: respuestaCorrecta.respuestas
-                    };
-                }
-                break;
+        // 🎯 NUEVO: Verificar y corregir opciones vacías en selección múltiple
+        if (ejercicio.tipo === 'multiple_choice' || actividad.tipo === 'seleccion_multiple') {
+            const tieneOpciones = ejercicio.contenido?.opciones && ejercicio.contenido.opciones.length > 0;
+            
+            if (!tieneOpciones) {
+                console.warn(`⚠️ Ejercicio ${index} (${ejercicio.id}) es selección múltiple pero no tiene opciones`);
+                console.log('📝 Contenido actual:', ejercicio.contenido);
                 
-            case 'completar_espacios':
-                ejercicio.contenido = {
-                    texto: contenido.texto ? contenido.texto.replace(/\[\[(.*?)\]\]/g, '___') : "Completa los espacios en blanco",
-                    espacios: (contenido.espacios || contenido.palabras_faltantes || []).map(p => ({ 
-                        pista: typeof p === 'string' ? p : (p.pista || p)
-                    })),
-                    explicacion: contenido.explicacion
-                };
-                // Manejar respuesta correcta para completar espacios
-                if (respuestaCorrecta && respuestaCorrecta.respuestas) {
-                    ejercicio.respuesta_correcta = {
-                        respuestas: respuestaCorrecta.respuestas
-                    };
-                }
-                break;
-                
-            case 'emparejamiento':
-                ejercicio.contenido = {
-                    pares: (contenido.pares || []).map(par => ({
-                        left: par.izquierda || par.left,
-                        right: par.derecha || par.right
-                    })),
-                    explicacion: contenido.explicacion
-                };
-                // Manejar respuesta correcta para emparejamiento
-                if (respuestaCorrecta && respuestaCorrecta.respuestas) {
-                    ejercicio.respuesta_correcta = {
-                        respuestas: respuestaCorrecta.respuestas
-                    };
-                }
-                break;
-                
-            case 'escritura':
-                ejercicio.contenido = {
-                    consigna: contenido.consigna || contenido.instrucciones || "Escribe tu respuesta",
-                    placeholder: contenido.placeholder || 'Escribe tu respuesta...',
-                    palabras_minimas: contenido.palabras_minimas || 20,
-                    explicacion: contenido.explicacion
-                };
-                // Manejar respuesta correcta para escritura
-                ejercicio.respuesta_correcta = {
-                    tipo: "evaluacion_manual",
-                    criterios: respuestaCorrecta?.criterios || ["Claridad", "Precisión", "Coherencia"]
-                };
-                break;
-
-            case 'verdadero_falso':
-                ejercicio.contenido = {
-                    afirmaciones: contenido.afirmaciones || ["Afirmación 1", "Afirmación 2", "Afirmación 3"],
-                    explicacion: contenido.explicacion
-                };
-                // Manejar respuesta correcta para verdadero/falso
-                if (respuestaCorrecta && respuestaCorrecta.respuestas) {
-                    ejercicio.respuesta_correcta = {
-                        respuestas: respuestaCorrecta.respuestas
-                    };
-                }
-                break;
-
-            default:
-                // Para tipos desconocidos, usar el contenido original
-                ejercicio.contenido = contenido;
-                ejercicio.respuesta_correcta = respuestaCorrecta;
-                break;
+                // 🎯 CORREGIR: Generar opciones temporales
+                this.generarOpcionesTemporales(ejercicio);
+            }
         }
 
-        console.log(`🔄 Actividad convertida: ${actividad.tipo} → ${ejercicio.tipo}`, ejercicio);
+        console.log(`✅ Actividad convertida: ${actividad.tipo} → ${ejercicio.tipo}`, ejercicio);
         return ejercicio;
     }
 
@@ -260,6 +381,12 @@ class LeccionActiva {
         // Ocultar loading, mostrar contenido
         if (loadingState) loadingState.classList.add('hidden');
         if (contenidoLeccion) contenidoLeccion.classList.remove('hidden');
+        
+        // Verificar que hay ejercicios
+        if (this.ejercicios.length === 0) {
+            this.mostrarError('No se encontraron ejercicios para esta lección.');
+            return;
+        }
         
         // Renderizar header de lección
         contenidoLeccion.innerHTML = this.renderizarHeader();
@@ -334,6 +461,7 @@ class LeccionActiva {
         const ejercicio = this.ejercicios[this.ejercicioActualIndex];
         if (!ejercicio) {
             console.error('❌ No hay ejercicio en el índice:', this.ejercicioActualIndex);
+            this.mostrarError('Error al cargar el ejercicio actual.');
             return;
         }
 
@@ -353,30 +481,48 @@ class LeccionActiva {
                         <i class="fas fa-exclamation-triangle mr-2"></i>
                         Error: EjercicioRenderer no está cargado
                     </p>
+                    <p class="text-sm mt-2">Recarga la página o contacta al administrador.</p>
                 </div>
             `;
             return;
         }
         
-        // Usar EjercicioRenderer para renderizar el ejercicio
-        const renderer = new EjercicioRenderer(ejercicio, ejercicioContainer);
-        ejercicioContainer.innerHTML = renderer.renderizar();
+        try {
+            // Usar EjercicioRenderer para renderizar el ejercicio
+            const renderer = new EjercicioRenderer(ejercicio, ejercicioContainer);
+            ejercicioContainer.innerHTML = renderer.renderizar();
 
-        // 🎯 NUEVO: Si ya está validado, deshabilitar inputs
-        if (this.ejerciciosValidados.has(ejercicio.id)) {
-            this.deshabilitarInputs(ejercicioContainer);
+            // 🎯 NUEVO: Si ya está validado, deshabilitar inputs
+            if (this.ejerciciosValidados.has(ejercicio.id)) {
+                this.deshabilitarInputs(ejercicioContainer);
+            }
+
+            // Agregar controles de navegación
+            ejercicioContainer.innerHTML += this.renderizarControles();
+
+            // 🎯 NUEVO: Si el ejercicio ya fue validado, mostrar resultados guardados
+            if (this.respuestasGuardadas[ejercicio.id]) {
+                this.mostrarResultadosGuardados(ejercicio.id);
+            }
+
+            // Actualizar barra de progreso
+            this.actualizarBarraProgreso();
+            
+        } catch (error) {
+            console.error('❌ Error renderizando ejercicio:', error);
+            ejercicioContainer.innerHTML = `
+                <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+                    <p class="text-yellow-700 dark:text-yellow-300">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Error al renderizar el ejercicio
+                    </p>
+                    <p class="text-sm mt-2">${error.message}</p>
+                    <button onclick="window.location.reload()" class="mt-3 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                        Reintentar
+                    </button>
+                </div>
+            `;
         }
-
-        // Agregar controles de navegación
-        ejercicioContainer.innerHTML += this.renderizarControles();
-
-        // 🎯 NUEVO: Si el ejercicio ya fue validado, mostrar resultados guardados
-        if (this.respuestasGuardadas[ejercicio.id]) {
-            this.mostrarResultadosGuardados(ejercicio.id);
-        }
-
-        // Actualizar barra de progreso
-        this.actualizarBarraProgreso();
     }
 
     renderizarControles() {
@@ -507,12 +653,18 @@ class LeccionActiva {
         const ejercicioContainer = document.getElementById('ejercicio-actual');
         const ejercicio = this.ejercicios.find(e => e.id === ejercicioId);
         
+        if (!ejercicio || !ejercicioContainer) return;
+
         // Recrear renderer y mostrar resultados
-        const renderer = new EjercicioRenderer(ejercicio, ejercicioContainer);
-        renderer.mostrarResultados(datosGuardados.resultado);
-        
-        // Mostrar panel de resultados
-        this.mostrarPanelResultados(datosGuardados.resultado, ejercicio);
+        try {
+            const renderer = new EjercicioRenderer(ejercicio, ejercicioContainer);
+            renderer.mostrarResultados(datosGuardados.resultado);
+            
+            // Mostrar panel de resultados
+            this.mostrarPanelResultados(datosGuardados.resultado, ejercicio);
+        } catch (error) {
+            console.error('Error mostrando resultados guardados:', error);
+        }
     }
 
     async validarEjercicio() {
@@ -1008,7 +1160,19 @@ class LeccionActiva {
         } else {
             // Toast simple de respaldo
             console.log(`📢 ${tipo.toUpperCase()}: ${mensaje}`);
-            alert(mensaje); // Temporal - reemplazar con sistema de toasts
+            // Temporal - mostrar alerta simple
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white ${
+                tipo === 'success' ? 'bg-green-500' :
+                tipo === 'error' ? 'bg-red-500' :
+                tipo === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+            }`;
+            toast.textContent = mensaje;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         }
     }
 

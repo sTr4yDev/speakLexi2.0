@@ -4,6 +4,29 @@ const db = require('../config/database');
 // ✅ IMPORTANTE: Obtener el pool correctamente
 const pool = db.pool || db;
 
+// ✅ FUNCIÓN DE NORMALIZACIÓN DE TIPOS DE EJERCICIOS
+const normalizarTipoEjercicio = (tipo) => {
+    const mapeo = {
+        'seleccion_multiple': 'seleccion_multiple',
+        'seleccionMultiple': 'seleccion_multiple',
+        'multiple_choice': 'seleccion_multiple',
+        'verdadero_falso': 'verdadero_falso',
+        'verdaderoFalso': 'verdadero_falso',
+        'true_false': 'verdadero_falso',
+        'completar_espacios': 'completar_espacios',
+        'completarEspacios': 'completar_espacios',
+        'fill_blank': 'completar_espacios',
+        'emparejamiento': 'emparejamiento',
+        'matching': 'emparejamiento',
+        'escritura': 'escritura',
+        'writing': 'escritura'
+    };
+    
+    const tipoNormalizado = mapeo[tipo] || tipo;
+    console.log(`🔄 Normalizando tipo: "${tipo}" → "${tipoNormalizado}"`);
+    return tipoNormalizado;
+};
+
 /**
  * Crear nueva lección
  */
@@ -24,7 +47,7 @@ exports.crear = async (datosLeccion) => {
             datosLeccion.idioma,
             datosLeccion.duracion_minutos || 30,
             datosLeccion.orden || 0,
-            datosLeccion.estado || 'activa', // ✅ Cambiado de 'borrador' a 'activa'
+            datosLeccion.estado || 'activa',
             datosLeccion.creado_por
         ];
 
@@ -62,11 +85,9 @@ exports.obtenerPorId = async (id) => {
 
 /**
  * Listar TODAS las lecciones (para admin)
- * 🔧 CORREGIDO: Bug MySQL 8.0.22+ - Convertir LIMIT/OFFSET a strings
  */
 exports.listarTodas = async (pagina = 1, limite = 50, filtros = {}) => {
     try {
-        // ✅ Convertir a números enteros primero
         const paginaNum = parseInt(pagina, 10) || 1;
         const limiteNum = parseInt(limite, 10) || 50;
         const offset = (paginaNum - 1) * limiteNum;
@@ -74,7 +95,6 @@ exports.listarTodas = async (pagina = 1, limite = 50, filtros = {}) => {
         let whereConditions = [];
         let params = [];
         
-        // Aplicar filtros opcionales
         if (filtros.nivel) {
             whereConditions.push('l.nivel = ?');
             params.push(filtros.nivel);
@@ -103,18 +123,15 @@ exports.listarTodas = async (pagina = 1, limite = 50, filtros = {}) => {
             LIMIT ? OFFSET ?
         `;
 
-        // 🔥 SOLUCIÓN: Convertir a STRING para evitar bug MySQL 8.0.22+
-        // MySQL espera INT pero mysql2 envía DOUBLE, convertir a string funciona
         params.push(String(limiteNum), String(offset));
         const [lecciones] = await pool.execute(query, params);
 
-        // Obtener total de registros
         const countQuery = `
             SELECT COUNT(*) as total 
             FROM lecciones l 
             ${whereClause}
         `;
-        const countParams = params.slice(0, -2); // Remover LIMIT y OFFSET
+        const countParams = params.slice(0, -2);
         const [totalRows] = await pool.execute(countQuery, countParams);
 
         return {
@@ -137,7 +154,6 @@ exports.listarTodas = async (pagina = 1, limite = 50, filtros = {}) => {
  */
 exports.listarPorNivel = async (nivel, idioma, pagina = 1, limite = 10) => {
     try {
-        // ✅ Convertir a números enteros
         const paginaNum = parseInt(pagina, 10) || 1;
         const limiteNum = parseInt(limite, 10) || 10;
         const offset = (paginaNum - 1) * limiteNum;
@@ -155,7 +171,6 @@ exports.listarPorNivel = async (nivel, idioma, pagina = 1, limite = 10) => {
             LIMIT ? OFFSET ?
         `;
 
-        // 🔥 SOLUCIÓN: Convertir a STRING
         const [lecciones] = await pool.execute(query, [
             nivel, 
             idioma, 
@@ -163,7 +178,6 @@ exports.listarPorNivel = async (nivel, idioma, pagina = 1, limite = 10) => {
             String(offset)
         ]);
 
-        // Obtener total de registros
         const [totalRows] = await pool.execute(
             'SELECT COUNT(*) as total FROM lecciones WHERE nivel = ? AND idioma = ? AND estado = "activa"',
             [nivel, idioma]
@@ -282,7 +296,6 @@ exports.registrarProgreso = async (usuarioId, leccionId, progreso) => {
 
 /**
  * Obtener progreso de un usuario en una lección específica
- * 🔥 NUEVO MÉTODO: Para verificar si ya estaba completada antes
  */
 exports.obtenerProgreso = async (usuarioId, leccionId) => {
     try {
@@ -302,63 +315,80 @@ exports.obtenerProgreso = async (usuarioId, leccionId) => {
 };
 
 // ========================================
-// ✅ NUEVOS MÉTODOS PARA EJERCICIOS/ACTIVIDADES
+// ✅ MÉTODOS CORREGIDOS PARA EJERCICIOS/ACTIVIDADES
 // ========================================
 
 /**
- * Guardar actividades como ejercicios
+ * Guardar actividades como ejercicios - CORREGIDO CON NORMALIZACIÓN
  */
-exports.guardarEjercicios = async (leccionId, actividades, usuarioId) => {
+exports.guardarEjercicios = async (leccionId, actividades, creadoPor) => {
     try {
         console.log(`📝 Guardando ${actividades.length} ejercicios para lección ${leccionId}`);
         
         for (const actividad of actividades) {
-            const {
-                tipo,
-                contenido,
-                opciones,
-                respuesta_correcta,
-                explicacion,
-                orden,
-                puntos,
-                dificultad
-            } = actividad;
-
-            // Validar datos mínimos
-            if (!tipo || !contenido) {
-                console.warn('⚠️ Actividad ignorada por falta de tipo o contenido:', actividad);
-                continue;
+            // ✅ NORMALIZAR TIPO ANTES DE GUARDAR
+            const tipoNormalizado = normalizarTipoEjercicio(actividad.tipo);
+            
+            // ✅ LOG para debug
+            console.log(`📊 Actividad: ${actividad.titulo}`);
+            console.log(`   Tipo original: ${actividad.tipo}`);
+            console.log(`   Tipo normalizado: ${tipoNormalizado}`);
+            
+            const contenido = actividad.contenido || {};
+            
+            let opciones = null;
+            if (tipoNormalizado === 'seleccion_multiple' && contenido.opciones) {
+                opciones = JSON.stringify(contenido.opciones);
+            } else if (tipoNormalizado === 'emparejamiento' && contenido.pares) {
+                opciones = JSON.stringify(contenido.pares);
             }
-
+            
+            let respuestaCorrecta = {};
+            if (actividad.respuesta_correcta) {
+                respuestaCorrecta = actividad.respuesta_correcta;
+            } else if (contenido.respuesta_correcta) {
+                respuestaCorrecta = contenido.respuesta_correcta;
+            }
+            
             const query = `
                 INSERT INTO ejercicios (
-                    leccion_id, tipo, contenido, opciones, 
-                    respuesta_correcta, explicacion, orden, 
-                    puntos, dificultad, estado, creado_por
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'activo', ?)
+                    leccion_id, 
+                    titulo, 
+                    descripcion, 
+                    tipo, 
+                    contenido, 
+                    opciones, 
+                    respuesta_correcta, 
+                    puntos_maximos, 
+                    tiempo_limite_minutos,
+                    orden, 
+                    estado, 
+                    creado_por
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'activo', ?)
             `;
-
-            // Convertir opciones a JSON si es un array/objeto
-            const opcionesJSON = opciones ? JSON.stringify(opciones) : null;
-
-            await pool.execute(query, [
+            
+            const valores = [
                 leccionId,
-                tipo,
-                contenido,
-                opcionesJSON,
-                respuesta_correcta,
-                explicacion || null,
-                orden || 0,
-                puntos || 10,
-                dificultad || 'media',
-                usuarioId
-            ]);
-
-            console.log(`✅ Ejercicio guardado - Tipo: ${tipo}, Orden: ${orden || 0}`);
+                actividad.titulo || 'Ejercicio sin título',
+                actividad.descripcion || '',
+                tipoNormalizado, // ✅ USAR TIPO NORMALIZADO
+                JSON.stringify(contenido),
+                opciones,
+                JSON.stringify(respuestaCorrecta),
+                actividad.puntos || actividad.puntos_maximos || 10,
+                actividad.config?.tiempo_limite || null,
+                actividad.orden || 0,
+                creadoPor
+            ];
+            
+            await pool.execute(query, valores);
+            
+            console.log(`✅ Ejercicio guardado - Tipo: ${tipoNormalizado}, Orden: ${actividad.orden || 0}`);
         }
-
-        console.log(`🎉 ${actividades.length} actividades guardadas como ejercicios para lección ${leccionId}`);
+        
+        console.log(`✅ ${actividades.length} ejercicios guardados exitosamente`);
         return true;
+        
     } catch (error) {
         console.error('❌ Error guardando ejercicios:', error);
         throw error;
@@ -366,34 +396,43 @@ exports.guardarEjercicios = async (leccionId, actividades, usuarioId) => {
 };
 
 /**
- * Obtener ejercicios por lección
+ * Obtener ejercicios por lección - CORREGIDO
  */
 exports.obtenerEjerciciosPorLeccion = async (leccionId) => {
     try {
         const [ejercicios] = await pool.execute(`
             SELECT 
-                id, 
+                id,
                 leccion_id,
-                tipo, 
-                contenido, 
-                opciones, 
-                respuesta_correcta, 
-                explicacion, 
+                titulo,
+                descripcion,
+                tipo,
+                contenido,
+                opciones,
+                respuesta_correcta,
+                puntos_maximos,
+                tiempo_limite_minutos,
                 orden,
-                puntos, 
-                dificultad, 
-                estado,
-                creado_en
-            FROM ejercicios 
+                estado
+            FROM ejercicios
             WHERE leccion_id = ? AND estado = 'activo'
-            ORDER BY orden, creado_en
+            ORDER BY orden ASC
         `, [leccionId]);
-
-        // Parsear opciones JSON si existen
-        const ejerciciosParseados = ejercicios.map(ej => ({
-            ...ej,
-            opciones: ej.opciones ? JSON.parse(ej.opciones) : null
-        }));
+        
+        // ✅ Parsear JSON fields
+        const ejerciciosParseados = ejercicios.map(ej => {
+            try {
+                return {
+                    ...ej,
+                    contenido: typeof ej.contenido === 'string' ? JSON.parse(ej.contenido) : ej.contenido,
+                    opciones: ej.opciones ? (typeof ej.opciones === 'string' ? JSON.parse(ej.opciones) : ej.opciones) : null,
+                    respuesta_correcta: typeof ej.respuesta_correcta === 'string' ? JSON.parse(ej.respuesta_correcta) : ej.respuesta_correcta
+                };
+            } catch (parseError) {
+                console.error('Error parseando ejercicio:', parseError);
+                return ej;
+            }
+        });
 
         console.log(`📖 Obtenidos ${ejerciciosParseados.length} ejercicios para lección ${leccionId}`);
         return ejerciciosParseados;
@@ -408,14 +447,12 @@ exports.obtenerEjerciciosPorLeccion = async (leccionId) => {
  */
 exports.obtenerLeccionCompleta = async (leccionId) => {
     try {
-        // Obtener información básica de la lección
         const leccion = await exports.obtenerPorId(leccionId);
         
         if (!leccion) {
             return null;
         }
 
-        // Obtener ejercicios
         const ejercicios = await exports.obtenerEjerciciosPorLeccion(leccionId);
 
         return {
