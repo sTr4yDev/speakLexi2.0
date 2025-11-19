@@ -74,8 +74,7 @@ class LeccionActiva {
 
     async cargarEjercicios() {
         try {
-            console.log('📝 Cargando ejercicios...');
-            
+            // OPCIÓN A: Intentar cargar desde el endpoint de ejercicios
             const response = await window.apiClient.get(`/ejercicios/leccion/${this.leccionId}`);
             
             console.log('📦 Respuesta completa de ejercicios:', response);
@@ -90,19 +89,168 @@ class LeccionActiva {
                     this.ejercicios = response.data || [];
                 }
                 
-                console.log(`✅ ${this.ejercicios.length} ejercicios cargados:`, this.ejercicios);
+                console.log(`✅ ${this.ejercicios.length} ejercicios cargados desde endpoint:`, this.ejercicios);
                 
-                if (this.ejercicios.length === 0) {
-                    throw new Error('No se encontraron ejercicios para esta lección');
+                if (this.ejercicios.length > 0) {
+                    return; // Tenemos ejercicios, salir
                 }
-            } else {
-                const errorMsg = response ? response.error : 'No response from server';
-                throw new Error(errorMsg || 'Error al cargar ejercicios');
             }
+            
+            // OPCIÓN B: Si no hay ejercicios, usar las actividades de la lección
+            if (this.leccionData && this.leccionData.actividades) {
+                console.log('📦 Usando actividades desde la lección como fallback');
+                this.ejercicios = this.leccionData.actividades.map((act, index) => 
+                    this.convertirActividadAEjercicio(act, index)
+                );
+                
+                console.log(`✅ ${this.ejercicios.length} actividades convertidas a ejercicios:`, this.ejercicios);
+            } else {
+                throw new Error('No se encontraron ejercicios para esta lección');
+            }
+            
         } catch (error) {
             console.error('❌ Error cargando ejercicios:', error);
-            throw new Error('No se pudieron cargar los ejercicios: ' + error.message);
+            
+            // Si falla todo, intentar usar actividades de la lección como fallback final
+            if (this.leccionData && this.leccionData.actividades && this.leccionData.actividades.length > 0) {
+                console.log('🔄 Usando actividades como fallback final');
+                this.ejercicios = this.leccionData.actividades.map((act, index) => 
+                    this.convertirActividadAEjercicio(act, index)
+                );
+            } else {
+                throw new Error('No se pudieron cargar los ejercicios: ' + error.message);
+            }
         }
+    }
+
+    // 🎯 NUEVA FUNCIÓN: Convertir actividad a ejercicio
+    convertirActividadAEjercicio(actividad, index) {
+        const tipoMap = {
+            'seleccion_multiple': 'multiple_choice',
+            'completar_espacios': 'fill_blank',
+            'emparejamiento': 'matching',
+            'escritura': 'writing',
+            'verdadero_falso': 'true_false'
+        };
+
+        // Parsear contenido si es string
+        let contenido = actividad.contenido;
+        if (typeof contenido === 'string') {
+            try {
+                contenido = JSON.parse(contenido);
+            } catch (e) {
+                console.warn('⚠️ Error parseando contenido de actividad:', e);
+                contenido = {};
+            }
+        }
+
+        // Parsear respuesta correcta si es string
+        let respuestaCorrecta = actividad.respuesta_correcta;
+        if (typeof respuestaCorrecta === 'string') {
+            try {
+                respuestaCorrecta = JSON.parse(respuestaCorrecta);
+            } catch (e) {
+                console.warn('⚠️ Error parseando respuesta correcta de actividad:', e);
+                respuestaCorrecta = {};
+            }
+        }
+
+        const ejercicio = {
+            id: actividad.id || `temp-${index}`,
+            titulo: actividad.titulo || `Ejercicio ${index + 1}`,
+            descripcion: actividad.descripcion || "Ejercicio de práctica",
+            tipo: tipoMap[actividad.tipo] || actividad.tipo,
+            puntos_maximos: actividad.puntos_maximos || 10,
+            orden: actividad.orden || index + 1,
+            estado: actividad.estado || 'activo'
+        };
+
+        // Convertir contenido según el tipo
+        switch (actividad.tipo) {
+            case 'seleccion_multiple':
+                ejercicio.contenido = {
+                    pregunta: contenido.pregunta || "Selecciona la opción correcta",
+                    opciones: (contenido.opciones || []).map(o => 
+                        typeof o === 'string' ? o : (o.texto || o)
+                    ),
+                    explicacion: contenido.explicacion
+                };
+                // Manejar respuesta correcta para selección múltiple
+                if (respuestaCorrecta && respuestaCorrecta.respuestas) {
+                    ejercicio.respuesta_correcta = {
+                        respuestas: respuestaCorrecta.respuestas
+                    };
+                }
+                break;
+                
+            case 'completar_espacios':
+                ejercicio.contenido = {
+                    texto: contenido.texto ? contenido.texto.replace(/\[\[(.*?)\]\]/g, '___') : "Completa los espacios en blanco",
+                    espacios: (contenido.espacios || contenido.palabras_faltantes || []).map(p => ({ 
+                        pista: typeof p === 'string' ? p : (p.pista || p)
+                    })),
+                    explicacion: contenido.explicacion
+                };
+                // Manejar respuesta correcta para completar espacios
+                if (respuestaCorrecta && respuestaCorrecta.respuestas) {
+                    ejercicio.respuesta_correcta = {
+                        respuestas: respuestaCorrecta.respuestas
+                    };
+                }
+                break;
+                
+            case 'emparejamiento':
+                ejercicio.contenido = {
+                    pares: (contenido.pares || []).map(par => ({
+                        left: par.izquierda || par.left,
+                        right: par.derecha || par.right
+                    })),
+                    explicacion: contenido.explicacion
+                };
+                // Manejar respuesta correcta para emparejamiento
+                if (respuestaCorrecta && respuestaCorrecta.respuestas) {
+                    ejercicio.respuesta_correcta = {
+                        respuestas: respuestaCorrecta.respuestas
+                    };
+                }
+                break;
+                
+            case 'escritura':
+                ejercicio.contenido = {
+                    consigna: contenido.consigna || contenido.instrucciones || "Escribe tu respuesta",
+                    placeholder: contenido.placeholder || 'Escribe tu respuesta...',
+                    palabras_minimas: contenido.palabras_minimas || 20,
+                    explicacion: contenido.explicacion
+                };
+                // Manejar respuesta correcta para escritura
+                ejercicio.respuesta_correcta = {
+                    tipo: "evaluacion_manual",
+                    criterios: respuestaCorrecta?.criterios || ["Claridad", "Precisión", "Coherencia"]
+                };
+                break;
+
+            case 'verdadero_falso':
+                ejercicio.contenido = {
+                    afirmaciones: contenido.afirmaciones || ["Afirmación 1", "Afirmación 2", "Afirmación 3"],
+                    explicacion: contenido.explicacion
+                };
+                // Manejar respuesta correcta para verdadero/falso
+                if (respuestaCorrecta && respuestaCorrecta.respuestas) {
+                    ejercicio.respuesta_correcta = {
+                        respuestas: respuestaCorrecta.respuestas
+                    };
+                }
+                break;
+
+            default:
+                // Para tipos desconocidos, usar el contenido original
+                ejercicio.contenido = contenido;
+                ejercicio.respuesta_correcta = respuestaCorrecta;
+                break;
+        }
+
+        console.log(`🔄 Actividad convertida: ${actividad.tipo} → ${ejercicio.tipo}`, ejercicio);
+        return ejercicio;
     }
 
     renderizarInterfaz() {

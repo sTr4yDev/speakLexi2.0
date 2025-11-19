@@ -1,4 +1,3 @@
-// backend/routes/multimediaRoutes.js   
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -57,21 +56,21 @@ router.get('/leccion/:leccionId',
 
 // Rutas de profesor/admin
 router.post('/subir',
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),  // ✅ CORREGIDO
     upload.single('archivo'),
     validarSubidaMultimedia,
     multimediaController.subirMultimedia
 );
 
 router.put('/:id/orden',
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),  // ✅ CORREGIDO
     param('id').isInt({ min: 1 }),
     body('orden').isInt({ min: 0 }),
     multimediaController.actualizarOrden
 );
 
 router.delete('/:id',
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),  // ✅ CORREGIDO
     param('id').isInt({ min: 1 }),
     multimediaController.eliminarMultimedia
 );

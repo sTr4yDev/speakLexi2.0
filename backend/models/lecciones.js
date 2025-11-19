@@ -24,7 +24,7 @@ exports.crear = async (datosLeccion) => {
             datosLeccion.idioma,
             datosLeccion.duracion_minutos || 30,
             datosLeccion.orden || 0,
-            datosLeccion.estado || 'borrador',
+            datosLeccion.estado || 'activa', // ✅ Cambiado de 'borrador' a 'activa'
             datosLeccion.creado_por
         ];
 
@@ -297,6 +297,133 @@ exports.obtenerProgreso = async (usuarioId, leccionId) => {
         return filas.length > 0 ? filas[0] : null;
     } catch (error) {
         console.error('Error en Leccion.obtenerProgreso:', error);
+        throw error;
+    }
+};
+
+// ========================================
+// ✅ NUEVOS MÉTODOS PARA EJERCICIOS/ACTIVIDADES
+// ========================================
+
+/**
+ * Guardar actividades como ejercicios
+ */
+exports.guardarEjercicios = async (leccionId, actividades, usuarioId) => {
+    try {
+        console.log(`📝 Guardando ${actividades.length} ejercicios para lección ${leccionId}`);
+        
+        for (const actividad of actividades) {
+            const {
+                tipo,
+                contenido,
+                opciones,
+                respuesta_correcta,
+                explicacion,
+                orden,
+                puntos,
+                dificultad
+            } = actividad;
+
+            // Validar datos mínimos
+            if (!tipo || !contenido) {
+                console.warn('⚠️ Actividad ignorada por falta de tipo o contenido:', actividad);
+                continue;
+            }
+
+            const query = `
+                INSERT INTO ejercicios (
+                    leccion_id, tipo, contenido, opciones, 
+                    respuesta_correcta, explicacion, orden, 
+                    puntos, dificultad, estado, creado_por
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'activo', ?)
+            `;
+
+            // Convertir opciones a JSON si es un array/objeto
+            const opcionesJSON = opciones ? JSON.stringify(opciones) : null;
+
+            await pool.execute(query, [
+                leccionId,
+                tipo,
+                contenido,
+                opcionesJSON,
+                respuesta_correcta,
+                explicacion || null,
+                orden || 0,
+                puntos || 10,
+                dificultad || 'media',
+                usuarioId
+            ]);
+
+            console.log(`✅ Ejercicio guardado - Tipo: ${tipo}, Orden: ${orden || 0}`);
+        }
+
+        console.log(`🎉 ${actividades.length} actividades guardadas como ejercicios para lección ${leccionId}`);
+        return true;
+    } catch (error) {
+        console.error('❌ Error guardando ejercicios:', error);
+        throw error;
+    }
+};
+
+/**
+ * Obtener ejercicios por lección
+ */
+exports.obtenerEjerciciosPorLeccion = async (leccionId) => {
+    try {
+        const [ejercicios] = await pool.execute(`
+            SELECT 
+                id, 
+                leccion_id,
+                tipo, 
+                contenido, 
+                opciones, 
+                respuesta_correcta, 
+                explicacion, 
+                orden,
+                puntos, 
+                dificultad, 
+                estado,
+                creado_en
+            FROM ejercicios 
+            WHERE leccion_id = ? AND estado = 'activo'
+            ORDER BY orden, creado_en
+        `, [leccionId]);
+
+        // Parsear opciones JSON si existen
+        const ejerciciosParseados = ejercicios.map(ej => ({
+            ...ej,
+            opciones: ej.opciones ? JSON.parse(ej.opciones) : null
+        }));
+
+        console.log(`📖 Obtenidos ${ejerciciosParseados.length} ejercicios para lección ${leccionId}`);
+        return ejerciciosParseados;
+    } catch (error) {
+        console.error('❌ Error obteniendo ejercicios:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtener lección completa con ejercicios y multimedia
+ */
+exports.obtenerLeccionCompleta = async (leccionId) => {
+    try {
+        // Obtener información básica de la lección
+        const leccion = await exports.obtenerPorId(leccionId);
+        
+        if (!leccion) {
+            return null;
+        }
+
+        // Obtener ejercicios
+        const ejercicios = await exports.obtenerEjerciciosPorLeccion(leccionId);
+
+        return {
+            ...leccion,
+            ejercicios
+        };
+    } catch (error) {
+        console.error('Error obteniendo lección completa:', error);
         throw error;
     }
 };

@@ -1,3 +1,4 @@
+//frontend/assets/js/pages/admin/editar-leccion/actividades/completar-espacios.js
 /* ============================================
    SPEAKLEXI - EDITOR LECCIÓN - COMPLETAR ESPACIOS MEJORADO
    Diseño moderno tipo Duolingo con mejor UX/UI

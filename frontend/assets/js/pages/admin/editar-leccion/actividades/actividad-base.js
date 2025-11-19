@@ -1,3 +1,4 @@
+// frontend/assets/js/pages/admin/editar-leccion/actividades/actividad-base.js
 // Clase base para todas las actividades
 class ActividadBase {
     constructor(tipo, config) {

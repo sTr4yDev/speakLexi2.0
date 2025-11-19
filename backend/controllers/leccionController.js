@@ -341,7 +341,7 @@ exports.obtenerLeccionesRecientes = async (req, res) => {
 // FUNCIONES ORIGINALES DEL CONTROLADOR
 // ========================================
 
-// @desc    Crear nueva lección
+// @desc    Crear nueva lección CON ACTIVIDADES
 // @route   POST /api/lecciones
 // @access  Private (Profesor/Admin)
 exports.crearLeccion = async (req, res) => {
@@ -354,7 +354,8 @@ exports.crearLeccion = async (req, res) => {
             idioma,
             duracion_minutos,
             orden,
-            estado  // 🎯 AGREGAR este parámetro
+            estado,
+            actividades  // ✅ AGREGAR este parámetro para las actividades
         } = req.body;
 
         // Validar datos requeridos
@@ -373,19 +374,26 @@ exports.crearLeccion = async (req, res) => {
             idioma,
             duracion_minutos: duracion_minutos || 30,
             orden: orden || 0,
-            estado: estado || 'activa',  // 🎯 CAMBIAR de 'borrador' a 'activa' por defecto
+            estado: estado || 'activa',
             creado_por: req.user.id
         };
 
+        // Guardar lección
         const leccionId = await Leccion.crear(leccionData);
+
+        // ✅ NUEVO: Guardar actividades como ejercicios
+        if (actividades && Array.isArray(actividades) && actividades.length > 0) {
+            await Leccion.guardarEjercicios(leccionId, actividades, req.user.id);
+        }
 
         res.status(201).json({
             success: true,
             mensaje: 'Lección creada exitosamente',
-            data: {
-                id: leccionId,
-                leccion_id: leccionId,
-                ...leccionData
+            data: { 
+                id: leccionId, 
+                leccion_id: leccionId, 
+                ...leccionData,
+                actividades_guardadas: actividades ? actividades.length : 0
             }
         });
 
@@ -472,11 +480,15 @@ exports.obtenerLeccion = async (req, res) => {
         // Obtener multimedia asociada
         const multimedia = await Multimedia.obtenerPorLeccion(leccionId);
 
+        // ✅ Obtener ejercicios de la lección
+        const ejercicios = await Leccion.obtenerEjerciciosPorLeccion(leccionId);
+
         res.json({
             success: true,
             data: {
                 ...leccion,
-                multimedia
+                multimedia,
+                ejercicios
             }
         });
 
@@ -653,9 +665,6 @@ exports.registrarProgreso = async (req, res) => {
                 nivel: leccion.nivel,
                 leccion_id: leccionId
             });
-
-            // Actualizar racha si aplica
-            //await Gamificacion.actualizarRacha(usuarioId);
 
             return res.json({
                 success: true,

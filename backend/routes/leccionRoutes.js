@@ -1,4 +1,3 @@
-// backend/routes/leccionRoutes.js
 const express = require('express');
 const router = express.Router();
 const leccionController = require('../controllers/leccionController');
@@ -89,7 +88,7 @@ router.get('/nivel/:nivel',
 
 // 2. Crear lección (REST estándar: POST /)
 router.post('/',
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),  // ✅ CORREGIDO
     validarCrearLeccion,
     leccionController.crearLeccion
 );
@@ -106,14 +105,14 @@ router.get('/:id',
 
 // ✅ Actualizar lección
 router.put('/:id',
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),  // ✅ CORREGIDO
     param('id').isInt({ min: 1 }),
     leccionController.actualizarLeccion
 );
 
 // ✅ Eliminar lección
 router.delete('/:id',
-    authMiddleware.verificarRol('profesor', 'admin'),
+    authMiddleware.verificarRol(['profesor', 'admin']),  // ✅ CORREGIDO
     param('id').isInt({ min: 1 }),
     leccionController.eliminarLeccion
 );
@@ -133,12 +132,5 @@ router.post('/:id/completar',
     body('xp_acumulado').optional().isInt({ min: 0 }),
     leccionController.completarLeccion
 );
-
-// ========================================
-// RUTAS DE COMPATIBILIDAD (OPCIONAL)
-// ========================================
-
-// Si necesitas mantener compatibilidad con rutas anteriores
-// router.get('/:id/obtener', leccionController.obtenerLeccion); // Alternativa
 
 module.exports = router;
