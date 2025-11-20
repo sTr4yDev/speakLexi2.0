@@ -4,278 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar Contraseña - SpeakLexi</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <!-- Config Tailwind -->
+    <script src="/assets/js/core/tailwind-config.js"></script>
 </head>
-<body class="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors duration-300">
-    <!-- Toggle de Modo Oscuro -->
-    <div class="fixed top-4 right-4 z-40">
-        <button id="theme-toggle" class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300">
-            <i class="fas fa-moon text-gray-700 dark:text-yellow-400 text-lg" id="theme-icon"></i>
-        </button>
-    </div>
-
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="max-w-md w-full">
-            <!-- Logo -->
+<body class="bg-gradient-to-br from-primary-600 via-secondary-600 to-primary-700 min-h-screen flex items-center justify-center p-4">
+    
+    <!-- Contenedor principal -->
+    <div class="w-full max-w-md">
+        <!-- Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 animate-fade-in">
+            
+            <!-- Header -->
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                    SpeakLexi
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4">
+                    <i class="fas fa-key text-3xl text-primary-600 dark:text-primary-400"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    Recuperar Contraseña
                 </h1>
-                <p class="text-gray-600 dark:text-gray-300">Recupera tu contraseña</p>
-            </div>
-
-            <!-- Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-all duration-300 hover:shadow-2xl">
-                <!-- Vista: Formulario -->
-                <div id="form-view">
-                    <div class="text-center mb-6">
-                        <div class="w-16 h-16 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-key text-transparent bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-2xl"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold mb-2 dark:text-white">¿Olvidaste tu contraseña?</h2>
-                        <p class="text-gray-600 dark:text-gray-300 text-sm">
-                            Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
-                        </p>
-                    </div>
-
-                    <!-- Alerta de error -->
-                    <div id="error-alert" class="hidden mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg transition-all duration-300">
-                        <div class="flex items-start gap-3">
-                            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mt-0.5"></i>
-                            <p id="error-message" class="text-sm text-red-800 dark:text-red-300"></p>
-                        </div>
-                    </div>
-
-                    <form id="recovery-form" class="space-y-4">
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Correo Electrónico
-                            </label>
-                            <div class="relative">
-                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    required
-                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-300"
-                                    placeholder="tu@email.com"
-                                />
-                            </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Te enviaremos un enlace para restablecer tu contraseña
-                            </p>
-                        </div>
-
-                        <button
-                            type="submit"
-                            id="submit-btn"
-                            class="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                        >
-                            Enviar Enlace de Recuperación
-                        </button>
-
-                        <button
-                            type="button"
-                            id="back-btn"
-                            class="w-full px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium transition-colors duration-300"
-                        >
-                            Volver al inicio de sesión
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Vista: Correo Enviado -->
-                <div id="success-view" class="hidden">
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-check-circle text-transparent bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-4xl"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold mb-2 dark:text-white">¡Correo enviado!</h2>
-                        <p class="text-gray-600 dark:text-gray-300 mb-1">
-                            Revisa tu bandeja de entrada en
-                        </p>
-                        <p class="font-semibold text-gray-900 dark:text-white mb-4" id="sent-email"></p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">
-                            Haz clic en el enlace del correo para restablecer tu contraseña
-                        </p>
-
-                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6 transition-colors duration-300">
-                            <div class="flex items-start gap-2">
-                                <i class="fas fa-info-circle text-yellow-600 dark:text-yellow-400 mt-0.5"></i>
-                                <p class="text-sm text-yellow-800 dark:text-yellow-300">
-                                    Si no recibes el correo en unos minutos, revisa tu carpeta de spam
-                                </p>
-                            </div>
-                        </div>
-
-                        <button
-                            onclick="window.location.href='login.html'"
-                            class="w-full px-4 py-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors duration-300"
-                        >
-                            Volver al inicio de sesión
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Información adicional -->
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    ¿Necesitas ayuda? <a href="#" class="text-purple-600 dark:text-purple-400 hover:underline font-medium">Contáctanos</a>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Ingresa tu email para recibir instrucciones
                 </p>
             </div>
+
+            <!-- Formulario -->
+            <form id="recuperar-form" class="space-y-6">
+                
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-envelope mr-2"></i>Correo Electrónico
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                        placeholder="tu@email.com"
+                    />
+                    <p id="email-error" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+
+                <!-- Botón enviar -->
+                <button
+                    type="submit"
+                    id="submit-btn"
+                    class="w-full py-3 px-4 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-xl font-semibold hover:from-secondary-700 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                    <i class="fas fa-paper-plane mr-2"></i>Enviar Instrucciones
+                </button>
+            </form>
+
+            <!-- Links -->
+            <div class="mt-6 text-center space-y-2">
+                <a href="/pages/auth/login.html" class="block text-primary-600 dark:text-primary-400 hover:underline text-sm">
+                    <i class="fas fa-arrow-left mr-2"></i>Volver al Login
+                </a>
+                <div class="text-gray-600 dark:text-gray-400 text-sm">
+                    ¿No tienes cuenta? 
+                    <a href="/pages/auth/registro.html" class="text-primary-600 dark:text-primary-400 hover:underline font-medium">
+                        Regístrate aquí
+                    </a>
+                </div>
+            </div>
         </div>
+
+        <!-- Footer -->
+        <p class="text-center text-white/80 text-sm mt-6">
+            © 2024 SpeakLexi. Todos los derechos reservados.
+        </p>
     </div>
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full"></div>
 
-    <script type="module">
-        // Verificar tema guardado o preferencia del sistema
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.getElementById('theme-icon').className = 'fas fa-sun text-yellow-400 text-lg';
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.getElementById('theme-icon').className = 'fas fa-moon text-gray-700 text-lg';
-        }
-
-        // Toggle de tema
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            if (document.documentElement.classList.contains('dark')) {
-                localStorage.theme = 'dark';
-                document.getElementById('theme-icon').className = 'fas fa-sun text-yellow-400 text-lg';
-            } else {
-                localStorage.theme = 'light';
-                document.getElementById('theme-icon').className = 'fas fa-moon text-gray-700 text-lg';
-            }
-        });
-
-        const recoveryForm = document.getElementById('recovery-form');
-        const emailInput = document.getElementById('email');
-        const submitBtn = document.getElementById('submit-btn');
-        const backBtn = document.getElementById('back-btn');
-        const errorAlert = document.getElementById('error-alert');
-        const errorMessage = document.getElementById('error-message');
-        const formView = document.getElementById('form-view');
-        const successView = document.getElementById('success-view');
-        const sentEmail = document.getElementById('sent-email');
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            const bgColor = type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500';
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in dark:bg-opacity-90`;
-            toast.innerHTML = `
-                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function showError(msg) {
-            errorMessage.textContent = msg;
-            errorAlert.classList.remove('hidden');
-            // Agregar animación de sacudida
-            errorAlert.classList.add('animate-shake');
-            setTimeout(() => {
-                errorAlert.classList.remove('animate-shake');
-            }, 500);
-        }
-
-        function hideError() {
-            errorAlert.classList.add('hidden');
-        }
-
-        backBtn.addEventListener('click', () => {
-            window.location.href = 'login.html';
-        });
-
-        recoveryForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideError();
-
-            // Validación básica del email
-            const email = emailInput.value;
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            if (!emailRegex.test(email)) {
-                showError('Por favor, introduce una dirección de correo electrónico válida');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
-
-            try {
-                const res = await fetch('http://localhost:5000/api/auth/recuperar-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ correo: emailInput.value })
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(data.error || 'Error al enviar correo');
-                }
-
-                // Mostrar vista de éxito
-                sentEmail.textContent = emailInput.value;
-                formView.classList.add('hidden');
-                successView.classList.remove('hidden');
-
-                showToast('✅ Correo enviado correctamente', 'success');
-
-            } catch (error) {
-                showError(error.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Enviar Enlace de Recuperación';
-            }
-        });
-
-        // Efecto de enfoque en los campos de entrada
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('ring-2', 'ring-purple-500', 'ring-opacity-50', 'rounded-lg');
-            });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.classList.remove('ring-2', 'ring-purple-500', 'ring-opacity-50', 'rounded-lg');
-            });
-        });
-    </script>
-
-    <style>
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        
-        .animate-fade-in {
-            animation: fade-in 0.3s ease-out;
-        }
-        
-        .animate-shake {
-            animation: shake 0.5s ease-in-out;
-        }
-    </style>
+    <!-- Scripts -->
+    <script src="/config/app-config.js"></script>
+    <script src="/assets/js/core/api-client.js"></script>
+    <script src="/assets/js/core/form-validator.js"></script>
+    <script src="/assets/js/core/toast-manager.js"></script>
+    <script src="/assets/js/core/module-loader.js"></script>
+    <script src="/assets/js/core/utils.js"></script>
+    <script src="/assets/js/pages/auth/recuperar-contrasena.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 // backend/middleware/auth.js
-// ✅ VERSIÓN CORREGIDA - Noviembre 2024
+// ✅ VERSIÓN CORREGIDA - Noviembre 2025
 
 const jwt = require('jsonwebtoken');
 const database = require('../config/database');

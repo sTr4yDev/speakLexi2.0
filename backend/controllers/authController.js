@@ -791,3 +791,201 @@ exports.cerrarSesion = async (req, res) => {
         });
     }
 };
+
+// @desc    Desactivar cuenta temporalmente (30 días)
+// @route   POST /api/auth/desactivar-cuenta
+// @access  Private
+exports.desactivarCuenta = async (req, res) => {
+    let connection;
+    try {
+        const usuario_id = req.user.id; // Del middleware auth
+
+        connection = await database.getConnection();
+        await connection.beginTransaction();
+
+        // Verificar que el usuario existe y está activo
+        const [usuarios] = await connection.query(
+            'SELECT id, correo, nombre, estado_cuenta FROM usuarios WHERE id = ?',
+            [usuario_id]
+        );
+
+        if (!usuarios.length) {
+            await connection.rollback();
+            return res.status(404).json({ 
+                error: 'Usuario no encontrado' 
+            });
+        }
+
+        const usuario = usuarios[0];
+
+        if (usuario.estado_cuenta === 'desactivado') {
+            await connection.rollback();
+            return res.status(400).json({ 
+                error: 'La cuenta ya está desactivada' 
+            });
+        }
+
+        // Calcular fecha de eliminación (30 días)
+        const fechaEliminacion = new Date();
+        fechaEliminacion.setDate(fechaEliminacion.getDate() + 30);
+
+        // Desactivar cuenta
+        await connection.query(
+            `UPDATE usuarios 
+             SET estado_cuenta = 'desactivado',
+                 fecha_desactivacion = NOW(),
+                 fecha_eliminacion_programada = ?
+             WHERE id = ?`,
+            [fechaEliminacion, usuario_id]
+        );
+
+        // Registrar en log (opcional)
+        await connection.query(
+            `INSERT INTO logs_actividad (usuario_id, accion, detalles, fecha) 
+             VALUES (?, 'desactivar_cuenta', 'Cuenta desactivada temporalmente', NOW())`,
+            [usuario_id]
+        );
+
+        await connection.commit();
+
+        // Enviar email de confirmación (opcional)
+        try {
+            await emailService.enviarConfirmacionDesactivacion(
+                usuario.correo,
+                usuario.nombre,
+                fechaEliminacion
+            );
+        } catch (emailError) {
+            console.error('Error enviando email:', emailError);
+        }
+
+        res.json({
+            mensaje: 'Cuenta desactivada. Tienes 30 días para reactivarla.',
+            fecha_eliminacion: fechaEliminacion,
+            success: true
+        });
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+        }
+        console.error('Error desactivando cuenta:', error);
+        res.status(500).json({ 
+            error: 'Error al desactivar la cuenta' 
+        });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+};
+
+// @desc    Eliminar cuenta permanentemente
+// @route   DELETE /api/auth/eliminar-cuenta
+// @access  Private
+exports.eliminarCuenta = async (req, res) => {
+    let connection;
+    try {
+        const usuario_id = req.user.id; // Del middleware auth
+
+        connection = await database.getConnection();
+        await connection.beginTransaction();
+
+        // Verificar que el usuario existe
+        const [usuarios] = await connection.query(
+            'SELECT id, correo, nombre, rol FROM usuarios WHERE id = ?',
+            [usuario_id]
+        );
+
+        if (!usuarios.length) {
+            await connection.rollback();
+            return res.status(404).json({ 
+                error: 'Usuario no encontrado' 
+            });
+        }
+
+        const usuario = usuarios[0];
+
+        // ============================================
+        // ELIMINAR DATOS RELACIONADOS (CASCADE)
+        // ============================================
+
+        // 1. Eliminar progreso y gamificación
+        await connection.query(
+            'DELETE FROM progreso_lecciones WHERE usuario_id = ?',
+            [usuario_id]
+        );
+        await connection.query(
+            'DELETE FROM logros_usuarios WHERE usuario_id = ?',
+            [usuario_id]
+        );
+
+        // 2. Eliminar perfil específico según rol
+        switch(usuario.rol) {
+            case 'alumno':
+            case 'estudiante':
+                await connection.query(
+                    'DELETE FROM perfil_estudiantes WHERE usuario_id = ?',
+                    [usuario_id]
+                );
+                break;
+            case 'profesor':
+                await connection.query(
+                    'DELETE FROM perfil_profesores WHERE usuario_id = ?',
+                    [usuario_id]
+                );
+                break;
+            case 'admin':
+                // Los admins no se pueden auto-eliminar por seguridad
+                await connection.rollback();
+                return res.status(403).json({ 
+                    error: 'Los administradores no pueden eliminar sus propias cuentas' 
+                });
+        }
+
+        // 3. Eliminar perfil general
+        await connection.query(
+            'DELETE FROM perfil_usuarios WHERE usuario_id = ?',
+            [usuario_id]
+        );
+
+        // 4. FINALMENTE eliminar usuario principal
+        await connection.query(
+            'DELETE FROM usuarios WHERE id = ?',
+            [usuario_id]
+        );
+
+        await connection.commit();
+
+        // Enviar email de confirmación (opcional)
+        try {
+            await emailService.enviarConfirmacionEliminacion(
+                usuario.correo,
+                usuario.nombre
+            );
+        } catch (emailError) {
+            console.error('Error enviando email:', emailError);
+        }
+
+        console.log(`✅ Usuario ${usuario_id} eliminado permanentemente`);
+
+        res.json({
+            mensaje: 'Cuenta eliminada permanentemente',
+            success: true
+        });
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+        }
+        console.error('Error eliminando cuenta:', error);
+        res.status(500).json({ 
+            error: 'Error al eliminar la cuenta',
+            detalles: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+};

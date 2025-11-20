@@ -91,11 +91,11 @@
                     </button>
                     <!-- Dropdown de perfil -->
                     <div id="dropdown-perfil" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
-                        <a href="/perfil" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors">
+                        <a href="/pages/estudiante/perfil.html" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors">
                             <i class="fas fa-user mr-2"></i>Mi Perfil
                         </a>
-                        <a href="/configuracion" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <i class="fas fa-cog mr-2"></i>Configuración
+                        <a href="/pages/estudiante/cambiar-curso.html" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-exchange-alt mr-2"></i>Cambiar Curso
                         </a>
                         <a href="/pages/mensajes.html" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             <i class="fas fa-envelope mr-2"></i>Mensajes
@@ -113,10 +113,10 @@
                     <a href="/index.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
                         Inicio
                     </a>
-                    <a href="login.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
+                    <a href="/pages/auth/login.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
                         Iniciar Sesión
                     </a>
-                    <a href="registro.html" class="px-4 py-2 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-lg font-medium hover:from-secondary-700 hover:to-primary-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-lg">
+                    <a href="/pages/auth/registro.html" class="px-4 py-2 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-lg font-medium hover:from-secondary-700 hover:to-primary-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-lg">
                         Registrarse
                     </a>
                 </div>
@@ -136,13 +136,13 @@
     <!-- Menú móvil -->
     <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div class="px-4 py-4 space-y-2">
-            <a href="index.html" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+            <a href="/index.html" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
                 Inicio
             </a>
-            <a href="login.html" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+            <a href="/pages/auth/login.html" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
                 Iniciar Sesión
             </a>
-            <a href="registro.html" class="block px-4 py-2 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-lg font-medium text-center">
+            <a href="/pages/auth/registro.html" class="block px-4 py-2 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-lg font-medium text-center">
                 Registrarse
             </a>
         </div>
@@ -169,15 +169,39 @@
         });
     }
 
-    // Cerrar paneles al hacer clic fuera (SE EJECUTA DESPUÉS DE QUE notificaciones-manager.js CARGUE)
-    document.addEventListener('click', () => {
+    // Toggle dropdown de perfil
+    const btnPerfil = document.getElementById('btn-perfil');
+    const dropdownPerfil = document.getElementById('dropdown-perfil');
+    
+    if (btnPerfil && dropdownPerfil) {
+        btnPerfil.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownPerfil.classList.toggle('hidden');
+            
+            // Cerrar otros paneles
+            const panelNotif = document.getElementById('panel-notificaciones');
+            const panelMsg = document.getElementById('panel-mensajes');
+            if (panelNotif) panelNotif.classList.add('hidden');
+            if (panelMsg) panelMsg.classList.add('hidden');
+        });
+    }
+
+    // Cerrar paneles al hacer clic fuera
+    document.addEventListener('click', (e) => {
         const panelNotif = document.getElementById('panel-notificaciones');
         const panelMsg = document.getElementById('panel-mensajes');
         const dropPerfil = document.getElementById('dropdown-perfil');
         
-        if (panelNotif) panelNotif.classList.add('hidden');
-        if (panelMsg) panelMsg.classList.add('hidden');
-        if (dropPerfil) dropPerfil.classList.add('hidden');
+        // Solo cerrar si el click no fue en los botones
+        if (!e.target.closest('#btn-notificaciones') && panelNotif) {
+            panelNotif.classList.add('hidden');
+        }
+        if (!e.target.closest('#btn-mensajes') && panelMsg) {
+            panelMsg.classList.add('hidden');
+        }
+        if (!e.target.closest('#btn-perfil') && dropPerfil) {
+            dropPerfil.classList.add('hidden');
+        }
     });
 
     // Evitar que los paneles se cierren al hacer clic dentro

@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-18 21:50:49
+# RAW LINKS — Actualizado 2025-11-19 16:55:25
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: 0af364e81a0fb2443c0ce5102468132f95993a67
+# Commit: 225a1ef82345ee59e1018111cf52decd9bf294a2
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -127,6 +127,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/profesor/retroalimentacion-profesor.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/testing/generador-datos.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/testing/generar-estudiantes-asignados.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/utils/actividad-adapter.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/diag.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/index.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/admin-dashboard.html

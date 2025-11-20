@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña - SpeakLexi</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    <script src="/assets/js/core/tailwind-config.js"></script>
+</head>
+<body class="bg-gradient-to-br from-primary-600 via-secondary-600 to-primary-700 min-h-screen flex items-center justify-center p-4">
+    
+    <div class="w-full max-w-md">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 animate-fade-in">
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4">
+                    <i class="fas fa-lock text-3xl text-primary-600 dark:text-primary-400"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    Nueva Contraseña
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Ingresa tu nueva contraseña segura
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <form id="restablecer-form" class="space-y-6">
+                
+                <!-- Nueva Contraseña -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-key mr-2"></i>Nueva Contraseña
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="password"
+                            id="password"
+                            required
+                            class="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                            placeholder="••••••••"
+                        />
+                        <button 
+                            type="button" 
+                            id="toggle-password"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        >
+                            <i class="fas fa-eye" id="eye-icon"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Requisitos de contraseña -->
+                    <div class="mt-2 space-y-1">
+                        <p class="text-xs text-gray-600 dark:text-gray-400">La contraseña debe contener:</p>
+                        <div class="flex flex-col space-y-1 text-xs">
+                            <span id="req-length" class="text-red-500">
+                                <i class="fas fa-times mr-1"></i>Mínimo 8 caracteres
+                            </span>
+                            <span id="req-uppercase" class="text-red-500">
+                                <i class="fas fa-times mr-1"></i>Una letra mayúscula
+                            </span>
+                            <span id="req-lowercase" class="text-red-500">
+                                <i class="fas fa-times mr-1"></i>Una letra minúscula
+                            </span>
+                            <span id="req-number" class="text-red-500">
+                                <i class="fas fa-times mr-1"></i>Un número
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Indicador de fortaleza -->
+                    <div class="mt-3">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div id="strength-bar" class="h-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <span id="strength-text" class="text-xs font-medium text-gray-600 dark:text-gray-400"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirmar Contraseña -->
+                <div>
+                    <label for="confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-check-double mr-2"></i>Confirmar Contraseña
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="password"
+                            id="confirm-password"
+                            required
+                            class="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                            placeholder="••••••••"
+                        />
+                        <button 
+                            type="button" 
+                            id="toggle-confirm"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        >
+                            <i class="fas fa-eye" id="eye-icon-confirm"></i>
+                        </button>
+                    </div>
+                    <p id="match-error" class="text-red-500 text-sm mt-1 hidden">
+                        <i class="fas fa-exclamation-circle mr-1"></i>Las contraseñas no coinciden
+                    </p>
+                </div>
+
+                <!-- Botón -->
+                <button
+                    type="submit"
+                    id="submit-btn"
+                    class="w-full py-3 px-4 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-xl font-semibold hover:from-secondary-700 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled
+                >
+                    <i class="fas fa-save mr-2"></i>Restablecer Contraseña
+                </button>
+            </form>
+
+            <!-- Link -->
+            <div class="mt-6 text-center">
+                <a href="/pages/auth/login.html" class="text-primary-600 dark:text-primary-400 hover:underline text-sm">
+                    <i class="fas fa-arrow-left mr-2"></i>Volver al Login
+                </a>
+            </div>
+        </div>
+
+        <p class="text-center text-white/80 text-sm mt-6">
+            © 2024 SpeakLexi. Todos los derechos reservados.
+        </p>
+    </div>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full"></div>
+
+    <script src="/config/app-config.js"></script>
+    <script src="/assets/js/core/api-client.js"></script>
+    <script src="/assets/js/core/form-validator.js"></script>
+    <script src="/assets/js/core/toast-manager.js"></script>
+    <script src="/assets/js/core/module-loader.js"></script>
+    <script src="/assets/js/core/utils.js"></script>
+    <script src="/assets/js/pages/auth/restablecer-contrasena.js"></script>
+</body>
+</html>

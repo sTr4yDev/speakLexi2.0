@@ -26,6 +26,11 @@ const cursosRoutes = require('./routes/cursosRoutes');
 const ejercicioRoutes = require('./routes/ejercicioRoutes');
 
 // ==========================================================
+// ✅ IMPORTAR RUTAS DE USUARIO (NUEVO)
+// ==========================================================
+const userRoutes = require('./routes/user-routes');
+
+// ==========================================================
 // IMPORTAR RUTAS DE MÓDULO 3: GESTIÓN DE APRENDIZAJE
 // ==========================================================
 const progresoRoutes = require('./routes/progresoRoutes');
@@ -127,6 +132,9 @@ app.use('/api/multimedia', multimediaRoutes);
 app.use('/api/cursos', cursosRoutes);
 app.use('/api/ejercicios', ejercicioRoutes);
 
+// ✅ AGREGAR RUTAS DE USUARIO (LÍNEA CRÍTICA)
+app.use('/api/usuario', userRoutes);
+
 // ==========================================================
 // RUTAS DE MÓDULO 3: GESTIÓN DE APRENDIZAJE
 // ==========================================================
@@ -178,6 +186,8 @@ app.get('/api/health', async (req, res) => {
       courses: 'available',
       exercises: 'available',
       email: 'available',
+      // ✅ AGREGAR SERVICIO DE USUARIO
+      user_management: 'available',
       // AGREGAR SERVICIOS DEL MÓDULO 3
       progress: 'available',
       gamification: 'available',
@@ -210,7 +220,7 @@ app.get('/api/health', async (req, res) => {
 app.get('/api/config', (req, res) => {
   const features = {
       auth: true,
-      users: false,
+      users: true, // ✅ ACTIVAR GESTIÓN DE USUARIOS
       lessons: true,
       multimedia: true,
       courses: true,
@@ -231,6 +241,8 @@ app.get('/api/config', (req, res) => {
 
   const endpoints = {
       auth: '/api/auth',
+      // ✅ AGREGAR ENDPOINT DE USUARIO
+      usuario: '/api/usuario',
       lecciones: '/api/lecciones',
       multimedia: '/api/multimedia',
       cursos: '/api/cursos',
@@ -276,6 +288,18 @@ app.get('/', (req, res) => {
     'POST /api/auth/registro - Registro de usuario',
     'POST /api/auth/login - Inicio de sesión',
     'POST /api/auth/verificar - Verificación de email',
+    
+    '--- GESTIÓN DE USUARIO ---', // ✅ NUEVA SECCIÓN
+    'GET  /api/usuario/perfil - Obtener perfil del usuario',
+    'PUT  /api/usuario/perfil - Actualizar perfil',
+    'PUT  /api/usuario/cambiar-contrasena - Cambiar contraseña',
+    'PATCH /api/usuario/cambiar-idioma - Cambiar idioma de aprendizaje',
+    'PATCH /api/usuario/cambiar-curso - Cambiar curso actual',
+    'PATCH /api/usuario/cambiar-nivel - Cambiar nivel',
+    'GET  /api/usuario/estadisticas - Estadísticas del usuario',
+    'GET  /api/usuario/progreso - Progreso del usuario',
+    'GET  /api/usuario/logros - Logros del usuario',
+    'GET  /api/usuario/historial - Historial de actividad',
     
     '--- CURSOS ---',
     'GET  /api/cursos - Listar todos los cursos',
@@ -356,6 +380,8 @@ app.use('*', (req, res) => {
     '/api/health', 
     '/api/config', 
     '/api/auth/*',
+    // ✅ AGREGAR ENDPOINT DE USUARIO
+    '/api/usuario/*',
     '/api/cursos/*',
     '/api/lecciones/*',
     '/api/multimedia/*',
@@ -438,6 +464,7 @@ initializeApp().then(() => {
     console.log(`📍 URL: http://${HOST}:${PORT}`);
     console.log(`📊 Entorno: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔐 Autenticación: http://${HOST}:${PORT}/api/auth`);
+    console.log(`👤 Usuario: http://${HOST}:${PORT}/api/usuario`); // ✅ NUEVO
     console.log(`📚 Cursos: http://${HOST}:${PORT}/api/cursos`);
     console.log(`📖 Lecciones: http://${HOST}:${PORT}/api/lecciones`);
     console.log(`🎯 Ejercicios: http://${HOST}:${PORT}/api/ejercicios`);

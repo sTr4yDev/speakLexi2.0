@@ -63,7 +63,6 @@
             nombreInput: document.getElementById('nombre'),
             apellidosInput: document.getElementById('apellidos'),
             emailInput: document.getElementById('email'),
-            telefonoInput: document.getElementById('telefono'),
             
             // Campos de contraseña
             currentPasswordInput: document.getElementById('current-password'),
@@ -170,7 +169,7 @@
         }
 
         /**
-         * Carga los datos del usuario
+         * Carga los datos del usuario - VERSIÓN MEJORADA
          */
         async function cargarDatosUsuario() {
             if (estado.isLoading) return;
@@ -178,27 +177,31 @@
             mostrarCargando(true);
 
             try {
-                // ✅ USAR apiClient PARA CARGAR DATOS DEL PERFIL
-                const response = await window.apiClient.get(config.ENDPOINTS.USUARIOS.PERFIL);
+                // 1. PRIMERO intentar cargar del backend
+                console.log('🔄 Intentando cargar datos del backend...');
+                const response = await window.apiClient.get(config.ENDPOINTS.USUARIO.PERFIL);
 
                 if (response.success) {
                     estado.datosPerfil = response.data;
+                    console.log('✅ Datos del backend cargados:', estado.datosPerfil);
                     actualizarUI();
                 } else {
-                    throw new Error(response.error || 'Error al cargar datos del perfil');
+                    throw new Error(response.error || 'Error del servidor');
                 }
 
             } catch (error) {
-                console.error('💥 Error al cargar datos:', error);
+                console.error('💥 Error al cargar datos del backend:', error);
                 
-                // Usar datos del localStorage como fallback
-                estado.datosPerfil = obtenerDatosFallback();
-                actualizarUI();
+                // 2. SI FALLA, usar datos del localStorage
+                console.log('🔄 Usando datos del localStorage como respaldo...');
+                estado.datosPerfil = obtenerDatosDesdeLocalStorage();
                 
-                if (error.message.includes('Failed to fetch')) {
-                    window.toastManager.warning('Usando datos locales. El servidor no está disponible.');
+                if (estado.datosPerfil.usuario) {
+                    actualizarUI();
+                    window.toastManager.warning('Datos cargados desde caché. El servidor tiene problemas temporales.');
+                    console.log('✅ Datos del localStorage cargados:', estado.datosPerfil);
                 } else {
-                    window.toastManager.error('Error al cargar datos del perfil');
+                    window.toastManager.error('No se pudieron cargar los datos del perfil');
                 }
             } finally {
                 mostrarCargando(false);
@@ -206,14 +209,33 @@
         }
 
         /**
-         * Obtiene datos de fallback desde localStorage
+         * Obtiene datos REALES desde localStorage
          */
-        function obtenerDatosFallback() {
+        function obtenerDatosDesdeLocalStorage() {
+            const usuarioStorage = window.Utils.getFromStorage(config.STORAGE.USUARIO);
+            
+            if (!usuarioStorage) {
+                return null;
+            }
+
             return {
-                usuario: estado.usuario,
+                usuario: {
+                    id: usuarioStorage.id,
+                    nombre: usuarioStorage.nombre,
+                    primer_apellido: usuarioStorage.primer_apellido,
+                    segundo_apellido: usuarioStorage.segundo_apellido,
+                    correo: usuarioStorage.correo,
+                    rol: usuarioStorage.rol,
+                    estado_cuenta: usuarioStorage.estado_cuenta,
+                    fecha_registro: usuarioStorage.fecha_registro,
+                    foto_perfil: usuarioStorage.foto_perfil,
+                    correo_verificado: usuarioStorage.correo_verificado
+                },
                 datos_estudiante: {
-                    idioma_aprendizaje: estado.usuario?.idioma || 'Inglés',
-                    nivel_actual: estado.usuario?.nivel_actual || 'A1'
+                    idioma_aprendizaje: usuarioStorage.idioma_aprendizaje || 'Inglés',
+                    nivel_actual: usuarioStorage.nivel_actual || 'A1',
+                    puntos_experiencia: usuarioStorage.puntos_experiencia || 0,
+                    racha_actual: usuarioStorage.racha_actual || 0
                 }
             };
         }
@@ -222,22 +244,46 @@
          * Actualiza la interfaz con los datos del usuario
          */
         function actualizarUI() {
-            if (!estado.datosPerfil) return;
+            if (!estado.datosPerfil) {
+                console.log('⚠️ No hay datos para mostrar');
+                return;
+            }
 
             const { usuario, datos_estudiante } = estado.datosPerfil;
 
+            console.log('🔄 Actualizando UI con datos:', { usuario, datos_estudiante });
+
             // Información personal
-            if (elementos.nombreInput) elementos.nombreInput.value = usuario?.nombre || '';
-            if (elementos.apellidosInput) elementos.apellidosInput.value = `${usuario?.primer_apellido || ''} ${usuario?.segundo_apellido || ''}`.trim();
-            if (elementos.emailInput) elementos.emailInput.value = usuario?.correo || '';
-            if (elementos.telefonoInput) elementos.telefonoInput.value = usuario?.telefono || '';
+            if (elementos.nombreInput) {
+                elementos.nombreInput.value = usuario?.nombre || '';
+                console.log('📝 Nombre:', usuario?.nombre);
+            }
+            
+            if (elementos.apellidosInput) {
+                elementos.apellidosInput.value = `${usuario?.primer_apellido || ''} ${usuario?.segundo_apellido || ''}`.trim();
+                console.log('📝 Apellidos:', elementos.apellidosInput.value);
+            }
+            
+            if (elementos.emailInput) {
+                elementos.emailInput.value = usuario?.correo || '';
+                console.log('📝 Email:', usuario?.correo);
+            }
 
             // Información académica
-            if (elementos.idiomaDisplay) elementos.idiomaDisplay.textContent = datos_estudiante?.idioma_aprendizaje || '-';
-            if (elementos.nivelDisplay) elementos.nivelDisplay.textContent = datos_estudiante?.nivel_actual || '-';
+            if (elementos.idiomaDisplay) {
+                elementos.idiomaDisplay.textContent = datos_estudiante?.idioma_aprendizaje || 'Inglés';
+                console.log('🌎 Idioma:', datos_estudiante?.idioma_aprendizaje);
+            }
+            
+            if (elementos.nivelDisplay) {
+                elementos.nivelDisplay.textContent = datos_estudiante?.nivel_actual || 'A1';
+                console.log('📊 Nivel:', datos_estudiante?.nivel_actual);
+            }
 
             // Foto de perfil
             actualizarFotoPerfil(usuario);
+            
+            console.log('✅ UI actualizada correctamente');
         }
 
         /**
@@ -248,9 +294,11 @@
 
             if (usuario?.foto_perfil && usuario.foto_perfil !== 'default-avatar.png') {
                 elementos.profilePhoto.src = usuario.foto_perfil;
+                console.log('🖼️ Foto de perfil cargada:', usuario.foto_perfil);
             } else {
                 const nombreCompleto = `${usuario?.nombre || 'Usuario'} ${usuario?.primer_apellido || ''}`;
                 elementos.profilePhoto.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&background=9333ea&color=fff&size=128`;
+                console.log('🖼️ Foto por defecto generada');
             }
         }
 
@@ -273,12 +321,13 @@
                 const datosActualizados = {
                     nombre: elementos.nombreInput?.value.trim() || '',
                     primer_apellido: elementos.apellidosInput?.value.split(' ')[0] || '',
-                    segundo_apellido: elementos.apellidosInput?.value.split(' ').slice(1).join(' ') || null,
-                    telefono: elementos.telefonoInput?.value.trim() || null
+                    segundo_apellido: elementos.apellidosInput?.value.split(' ').slice(1).join(' ') || null
                 };
 
-                // ✅ USAR apiClient PARA ACTUALIZAR PERFIL
-                const response = await window.apiClient.put(config.ENDPOINTS.USUARIOS.ACTUALIZAR_PERFIL, datosActualizados);
+                console.log('📤 Enviando datos actualizados:', datosActualizados);
+
+                // Intentar guardar en el backend
+                const response = await window.apiClient.put(config.ENDPOINTS.USUARIO.ACTUALIZAR_PERFIL, datosActualizados);
 
                 if (response.success) {
                     window.toastManager.success('Información actualizada correctamente');
@@ -287,6 +336,7 @@
                     if (response.data.usuario) {
                         estado.datosPerfil.usuario = { ...estado.datosPerfil.usuario, ...response.data.usuario };
                         window.Utils.saveToStorage(config.STORAGE.USUARIO, estado.datosPerfil.usuario);
+                        console.log('💾 Datos guardados en localStorage');
                     }
                 } else {
                     throw new Error(response.error || 'Error al actualizar la información');
@@ -294,7 +344,7 @@
 
             } catch (error) {
                 console.error('💥 Error al guardar información:', error);
-                window.toastManager.error(error.message);
+                window.toastManager.error('No se pudo guardar. El servidor no está disponible.');
             } finally {
                 mostrarCargando(false);
                 deshabilitarFormularios(false);
@@ -338,8 +388,7 @@
                     newPassword: elementos.newPasswordInput?.value || ''
                 };
 
-                // ✅ USAR apiClient PARA CAMBIAR CONTRASEÑA
-                const response = await window.apiClient.put(config.ENDPOINTS.USUARIOS.CAMBIAR_CONTRASEÑA, datosContraseña);
+                const response = await window.apiClient.put(config.ENDPOINTS.USUARIO.CAMBIAR_PASSWORD, datosContraseña);
 
                 if (response.success) {
                     window.toastManager.success('Contraseña actualizada correctamente');
@@ -355,7 +404,7 @@
 
             } catch (error) {
                 console.error('💥 Error al cambiar contraseña:', error);
-                window.toastManager.error(error.message);
+                window.toastManager.error('No se pudo cambiar la contraseña. El servidor no está disponible.');
             } finally {
                 mostrarCargando(false);
                 deshabilitarFormularios(false);
@@ -391,19 +440,18 @@
                 const formData = new FormData();
                 formData.append('foto_perfil', archivo);
 
-                // ✅ USAR apiClient PARA SUBIR FOTO
-                const response = await window.apiClient.uploadFile(config.ENDPOINTS.USUARIOS.SUBIR_FOTO, formData);
+                const response = await window.apiClient.uploadFile(config.ENDPOINTS.MULTIMEDIA.SUBIR, formData);
 
                 if (response.success) {
                     window.toastManager.success('Foto de perfil actualizada correctamente');
                     
                     // Actualizar imagen en tiempo real
-                    if (response.data.foto_perfil && elementos.profilePhoto) {
-                        elementos.profilePhoto.src = response.data.foto_perfil;
+                    if (response.data.url && elementos.profilePhoto) {
+                        elementos.profilePhoto.src = response.data.url;
                         
                         // Actualizar datos locales
                         if (estado.datosPerfil.usuario) {
-                            estado.datosPerfil.usuario.foto_perfil = response.data.foto_perfil;
+                            estado.datosPerfil.usuario.foto_perfil = response.data.url;
                             window.Utils.saveToStorage(config.STORAGE.USUARIO, estado.datosPerfil.usuario);
                         }
                     }
@@ -413,7 +461,7 @@
 
             } catch (error) {
                 console.error('💥 Error al cambiar foto:', error);
-                window.toastManager.error(error.message);
+                window.toastManager.error('No se pudo cambiar la foto. El servidor no está disponible.');
             }
         }
 
@@ -465,8 +513,7 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Desactivando...';
 
             try {
-                // ✅ USAR apiClient PARA DESACTIVAR CUENTA
-                const response = await window.apiClient.post(config.ENDPOINTS.USUARIOS.DESACTIVAR_CUENTA);
+                const response = await window.apiClient.post(config.ENDPOINTS.USUARIO.DESACTIVAR);
 
                 if (response.success) {
                     window.toastManager.success('Cuenta desactivada. Tienes 30 días para reactivarla.');
@@ -481,7 +528,7 @@
 
             } catch (error) {
                 console.error('💥 Error al desactivar cuenta:', error);
-                window.toastManager.error(error.message);
+                window.toastManager.error('No se pudo desactivar la cuenta. El servidor no está disponible.');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-pause mr-2"></i>Sí, Desactivar Mi Cuenta';
             }
@@ -495,8 +542,7 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Eliminando...';
 
             try {
-                // ✅ USAR apiClient PARA ELIMINAR CUENTA
-                const response = await window.apiClient.delete(config.ENDPOINTS.USUARIOS.ELIMINAR_CUENTA);
+                const response = await window.apiClient.delete(config.ENDPOINTS.USUARIO.ELIMINAR);
 
                 if (response.success) {
                     window.toastManager.success('Cuenta eliminada permanentemente');
@@ -511,7 +557,7 @@
 
             } catch (error) {
                 console.error('💥 Error al eliminar cuenta:', error);
-                window.toastManager.error(error.message);
+                window.toastManager.error('No se pudo eliminar la cuenta. El servidor no está disponible.');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-trash mr-2"></i>Sí, Eliminar Permanentemente';
             }
@@ -544,7 +590,10 @@
             cargarDatosUsuario();
 
             if (window.APP_CONFIG.ENV.DEBUG) {
-                console.log('🔧 Perfil configurado:', { config, estado, elementos });
+                console.log('🔧 Perfil configurado:', { 
+                    usuario: estado.usuario,
+                    elementos: Object.keys(elementos).filter(key => elementos[key] !== null)
+                });
             }
         }
 

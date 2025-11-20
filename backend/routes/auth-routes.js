@@ -1,5 +1,5 @@
 // ==========================================================
-// backend/routes/auth-routes.js - VERSIÓN CORREGIDA ONBOARDING
+// backend/routes/auth-routes.js - VERSIÓN COMPLETA CON ELIMINAR CUENTA
 // ==========================================================
 
 const express = require('express');
@@ -318,6 +318,25 @@ const validacionesActualizarNivel = [
 ];
 
 // ==========================================================
+// VALIDACIONES PARA ELIMINAR/DESACTIVAR CUENTA
+// ==========================================================
+const validacionesEliminarCuenta = [
+  body('confirmacion')
+    .optional()
+    .isString()
+    .withMessage('La confirmación debe ser un texto')
+    .custom((value, { req }) => {
+      // Validar que el usuario escribió "ELIMINAR" para confirmar
+      if (value && value.toUpperCase() !== 'ELIMINAR') {
+        throw new Error('Debes escribir "ELIMINAR" en mayúsculas para confirmar la eliminación');
+      }
+      return true;
+    }),
+
+  handleValidationErrors
+];
+
+// ==========================================================
 // MIDDLEWARE DE LOGGING
 // ==========================================================
 router.use((req, res, next) => {
@@ -370,6 +389,19 @@ router.get('/verificar-token', authMiddleware.verificarToken, authController.ver
 router.get('/perfil', authMiddleware.verificarToken, authController.obtenerPerfil);
 router.post('/logout', authMiddleware.verificarToken, authController.cerrarSesion);
 
+// ✅✅✅ NUEVAS RUTAS PARA ELIMINAR CUENTA (UC-07)
+router.delete('/eliminar-cuenta', 
+  authMiddleware.verificarToken, 
+  validacionesEliminarCuenta, 
+  authController.eliminarCuenta
+);
+
+router.post('/desactivar-cuenta', 
+  authMiddleware.verificarToken, 
+  validacionesEliminarCuenta, 
+  authController.desactivarCuenta
+);
+
 // ==========================================================
 // RUTAS DE UTILIDAD Y DIAGNÓSTICO
 // ==========================================================
@@ -420,7 +452,10 @@ router.get('/config', (req, res) => {
       multi_language_support: true,
       level_assessment: true,
       profile_management: true,
-      refresh_tokens: false
+      refresh_tokens: false,
+      // ✅ NUEVAS FUNCIONALIDADES
+      account_deletion: true,
+      account_deactivation: true
     },
     security: {
       max_login_attempts: 5,
@@ -440,7 +475,10 @@ router.get('/config', (req, res) => {
       private: [
         'GET /api/auth/verificar-token',
         'GET /api/auth/perfil',
-        'POST /api/auth/logout'
+        'POST /api/auth/logout',
+        // ✅ NUEVOS ENDPOINTS
+        'DELETE /api/auth/eliminar-cuenta',
+        'POST /api/auth/desactivar-cuenta'
       ],
       utility: [
         'GET /api/auth/health',
@@ -527,6 +565,40 @@ router.get('/docs', (req, res) => {
           200: 'Datos del perfil',
           401: 'No autenticado'
         }
+      },
+      // ✅ NUEVOS ENDPOINTS DOCUMENTADOS
+      'DELETE /eliminar-cuenta': {
+        description: 'Eliminar cuenta permanentemente (acción irreversible)',
+        authentication: true,
+        headers: {
+          Authorization: 'Bearer {token}'
+        },
+        body: {
+          confirmacion: 'string (opcional, debe ser "ELIMINAR" para confirmar)'
+        },
+        response: {
+          200: 'Cuenta eliminada permanentemente',
+          401: 'No autenticado',
+          403: 'Los administradores no pueden auto-eliminarse',
+          404: 'Usuario no encontrado'
+        },
+        warning: 'ACCIÓN IRREVERSIBLE - Todos los datos serán eliminados permanentemente'
+      },
+      'POST /desactivar-cuenta': {
+        description: 'Desactivar cuenta temporalmente (30 días para reactivar)',
+        authentication: true,
+        headers: {
+          Authorization: 'Bearer {token}'
+        },
+        body: {
+          confirmacion: 'string (opcional, debe ser "ELIMINAR" para confirmar)'
+        },
+        response: {
+          200: 'Cuenta desactivada temporalmente',
+          401: 'No autenticado',
+          404: 'Usuario no encontrado'
+        },
+        note: 'La cuenta se eliminará permanentemente después de 30 días si no se reactiva'
       }
     }
   });
@@ -549,6 +621,10 @@ router.use((req, res) => {
       'POST /api/auth/recuperar-contrasena',
       'PATCH /api/auth/actualizar-nivel',
       'GET /api/auth/verificar-token',
+      'GET /api/auth/perfil',
+      // ✅ NUEVOS ENDPOINTS LISTADOS
+      'DELETE /api/auth/eliminar-cuenta',
+      'POST /api/auth/desactivar-cuenta',
       'GET /api/auth/health',
       'GET /api/auth/config',
       'GET /api/auth/docs'
